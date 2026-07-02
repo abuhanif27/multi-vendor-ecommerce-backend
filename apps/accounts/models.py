@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from apps.common.models import TimeStampedModel, UUIDModel
 from apps.accounts.choices import UserRole
+from apps.accounts.managers import UserManager
 
 
 class User(UUIDModel, TimeStampedModel, AbstractUser):
@@ -13,3 +14,5 @@ class User(UUIDModel, TimeStampedModel, AbstractUser):
         choices=UserRole.choices,
         default=UserRole.CUSTOMER,
     )
+
+    objects = UserManager()
