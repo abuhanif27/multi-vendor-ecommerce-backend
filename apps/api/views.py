@@ -1,16 +1,17 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.api.serializers import HealthCheckSerializer
+
 
 class HealthCheckAPIView(APIView):
-    """
-    Simple API to verify the backend is running.
-    """
 
     def get(self, request):
-        return Response(
-            {
-                "status": "ok",
-                "message": "Multi-Vendor E-commerce Backend is running.",
-            }
-        )
+        data = {
+            "status": "ok",
+            "message": "Multi-Vendor E-commerce Backend is running.",
+        }
+
+        serializer = HealthCheckSerializer(instance=data)
+
+        return Response(serializer.data)
