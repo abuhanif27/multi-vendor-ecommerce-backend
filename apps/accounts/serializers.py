@@ -31,3 +31,8 @@ class RegisterSerializer(serializers.Serializer):
             )
 
         return attrs
+
+    def create(self, validated_data):
+        validated_data.pop("confirm_password")
+
+        return User.objects.create_user(**validated_data)
