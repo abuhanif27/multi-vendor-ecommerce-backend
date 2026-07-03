@@ -24,6 +24,11 @@ class User(UUIDModel, TimeStampedModel, AbstractUser):
         default=UserRole.CUSTOMER,
     )
 
+    is_verified = models.BooleanField(
+        default=False,
+        help_text="Designates whether the user's email has been verified.",
+    )
+
     USERNAME_FIELD = "email"
 
     REQUIRED_FIELDS = []
