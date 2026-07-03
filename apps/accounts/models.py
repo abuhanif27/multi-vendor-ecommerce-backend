@@ -64,6 +64,7 @@ class EmailVerificationToken(UUIDModel, TimeStampedModel):
 
         super().save(*args, **kwargs)
 
+    @property
     def is_expired(self):
         return timezone.now() >= self.expires_at
 
