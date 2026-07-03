@@ -1,5 +1,8 @@
 from rest_framework import generics
 from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
 from apps.accounts.serializers import RegisterSerializer
 from apps.accounts.models import EmailVerificationToken
 
@@ -24,5 +27,36 @@ class RegisterAPIView(generics.CreateAPIView):
             {
 
                 "message": "User Registration Successful. Please verify your email.",
+            }
+        )
+
+
+class VerifyEmailAPIView(APIView):
+
+    def get(self, request):
+        token = request.query_params.get("token")
+
+        verification = get_object_or_404(
+            EmailVerificationToken,
+            token=token,
+        )
+
+        if verification.is_expired:
+            return Response(
+                {
+                    "message": "Verification link has expired."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        user = verification.user
+        user.is_verified = True
+        user.save(update_fields=["is_verified"])
+
+        verification.delete()
+
+        return Response(
+            {
+                "message": "Email verified successfully."
             }
         )
