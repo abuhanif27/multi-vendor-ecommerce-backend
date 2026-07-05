@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from apps.accounts.serializers import RegisterSerializer
 from apps.accounts.models import EmailVerificationToken
+from apps.accounts.services import create_verification_token, build_email_verification_link
 
 
 class RegisterAPIView(generics.CreateAPIView):
@@ -15,19 +16,15 @@ class RegisterAPIView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
 
-        token = EmailVerificationToken.objects.create(user=user)
-
-        print("=" * 80)
-        print("EMAIL VERIFICATION LINK")
-        print(
-            f"http://127.0.0.1:8000/api/v1/auth/verify-email/?token={token.token}")
-        print("=" * 80)
+        token = create_verification_token(user)
+        link = build_email_verification_link(token)
+        print(link)
 
         return Response(
             {
 
                 "message": "User Registration Successful. Please verify your email.",
-            }
+            }, status=status.HTTP_201_CREATED
         )
 
 
@@ -58,5 +55,5 @@ class VerifyEmailAPIView(APIView):
         return Response(
             {
                 "message": "Email verified successfully."
-            }
+            }, status=status.HTTP_200_OK
         )
