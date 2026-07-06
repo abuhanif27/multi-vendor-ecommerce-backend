@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from apps.accounts.serializers import RegisterSerializer
 from apps.accounts.models import EmailVerificationToken
-from apps.accounts.services import create_verification_token, build_email_verification_link
+from apps.accounts.services import send_verification_email
 
 
 class RegisterAPIView(generics.CreateAPIView):
@@ -16,9 +16,7 @@ class RegisterAPIView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
 
-        token = create_verification_token(user)
-        link = build_email_verification_link(token)
-        print(link)
+        send_verification_email(user)
 
         return Response(
             {
