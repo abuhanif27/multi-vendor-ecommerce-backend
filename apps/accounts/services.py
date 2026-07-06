@@ -1,4 +1,6 @@
 from apps.accounts.models import EmailVerificationToken
+from rest_framework.response import Response
+from rest_framework import status
 
 
 def create_verification_token(user):
@@ -11,6 +13,13 @@ def build_email_verification_link(token):
 
 def send_verification_email(user):
     token = create_verification_token(user)
+
+    if not token:
+        return Response(
+            {"message": "Verification token is required."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
     link = build_email_verification_link(token)
 
     print("=" * 80)
