@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
+from django.db import transaction
 from apps.accounts.serializers import RegisterSerializer
 from apps.accounts.models import EmailVerificationToken
 from apps.accounts.services import send_verification_email
@@ -14,9 +15,10 @@ class RegisterAPIView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
 
-        send_verification_email(user)
+        with transaction.atomic():
+            user = serializer.save()
+            send_verification_email(user)
 
         return Response(
             {

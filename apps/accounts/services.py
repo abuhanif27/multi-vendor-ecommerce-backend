@@ -12,4 +12,8 @@ def build_email_verification_link(token):
 def send_verification_email(user):
     token = create_verification_token(user)
     link = build_email_verification_link(token)
+
+    print("=" * 80)
+    print("EMAIL VERIFICATION LINK")
     print(link)
+    print("=" * 80)
