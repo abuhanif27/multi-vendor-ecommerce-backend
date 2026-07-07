@@ -45,3 +45,9 @@ class Shop(UUIDModel, TimeStampedModel):
         self.slug = slug
 
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ["-created_at"]
