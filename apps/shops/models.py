@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.utils.text import slugify
 from django.conf import settings
 from apps.common.models import UUIDModel, TimeStampedModel
 
@@ -31,3 +31,8 @@ class Shop(UUIDModel, TimeStampedModel):
         choices=ShopStatus.choices,
         default=ShopStatus.PENDING,
     )
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
