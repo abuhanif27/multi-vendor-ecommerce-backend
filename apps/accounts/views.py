@@ -2,6 +2,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 from apps.accounts.serializers import RegisterSerializer, LoginSerializer
@@ -67,9 +68,11 @@ class LoginAPIView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
 
+        refresh = RefreshToken.for_user(user)
         return Response(
             {
-                "message": "Login successful.",
+                "refresh": str(refresh),
+                "access": str(refresh.access_token),
             },
             status=status.HTTP_200_OK,
         )
