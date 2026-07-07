@@ -33,6 +33,10 @@ class User(UUIDModel, TimeStampedModel, AbstractUser):
         help_text="Designates whether the user's email has been verified.",
     )
 
+    @property
+    def is_vendor(self):
+        return self.role == UserRole.VENDOR
+
     USERNAME_FIELD = "email"
 
     REQUIRED_FIELDS = []
