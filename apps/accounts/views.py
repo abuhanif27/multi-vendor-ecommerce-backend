@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from django.db import transaction
-from apps.accounts.serializers import RegisterSerializer
+from apps.accounts.serializers import RegisterSerializer, LoginSerializer
 from apps.accounts.models import EmailVerificationToken
 from apps.accounts.services import send_verification_email
 
@@ -56,4 +56,20 @@ class VerifyEmailAPIView(APIView):
             {
                 "message": "Email verified successfully."
             }, status=status.HTTP_200_OK
+        )
+
+
+class LoginAPIView(generics.GenericAPIView):
+    serializer_class = LoginSerializer
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data["user"]
+
+        return Response(
+            {
+                "message": "Login successful.",
+            },
+            status=status.HTTP_200_OK,
         )
