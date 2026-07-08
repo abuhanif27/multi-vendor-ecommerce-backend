@@ -43,11 +43,11 @@ class Shop(UUIDModel, TimeStampedModel):
         if not self.slug:
             base_slug = slugify(self.name)
             slug = base_slug
-            counter = 2
+            suffix = 2
 
             while Shop.objects.filter(slug=slug).exists():
-                slug = f"{base_slug}-{counter}"
-                counter += 1
+                slug = f"{base_slug}-{suffix}"
+                suffix += 1
 
             self.slug = slug
 
@@ -100,12 +100,15 @@ class Product(UUIDModel, TimeStampedModel):
         if not self.slug:
             base_slug = slugify(self.name)
             slug = base_slug
-            counter = 2
+            suffix = 2
 
             while Product.objects.filter(slug=slug).exists():
-                slug = f"{base_slug}-{counter}"
-                counter += 1
+                slug = f"{base_slug}-{suffix}"
+                suffix += 1
 
             self.slug = slug
 
         super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ["-created_at"]
