@@ -1,6 +1,6 @@
 from rest_framework.permissions import BasePermission
 
-from apps.accounts.models import UserRole
+from apps.accounts.choices import UserRole
 
 
 class IsVendor(BasePermission):
