@@ -30,6 +30,7 @@ class Shop(UUIDModel, TimeStampedModel):
 
     slug = models.SlugField(
         unique=True,
+        max_length=255,
     )
 
     status = models.CharField(
@@ -72,6 +73,7 @@ class Product(UUIDModel, TimeStampedModel):
 
     slug = models.SlugField(
         unique=True,
+        max_length=255,
     )
 
     description = models.TextField(blank=True)
