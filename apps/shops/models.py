@@ -3,6 +3,7 @@ from django.utils.text import slugify
 from django.conf import settings
 from django.core.validators import MinValueValidator
 from apps.common.models import UUIDModel, TimeStampedModel
+from apps.catalog.models import Category
 
 
 class Shop(UUIDModel, TimeStampedModel):
@@ -65,7 +66,13 @@ class Product(UUIDModel, TimeStampedModel):
         on_delete=models.CASCADE,
         related_name="products",
     )
-
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.PROTECT,
+        related_name='products',
+        null=True,
+        blank=True,
+    )
     name = models.CharField(
         max_length=255,
     )
