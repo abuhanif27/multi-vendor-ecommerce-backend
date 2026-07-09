@@ -29,15 +29,7 @@ class Category(UUIDModel, TimeStampedModel):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            base_slug = slugify(self.name)
-            slug = base_slug
-            counter = 2
-
-            while Category.objects.filter(slug=slug).exists():
-                slug = f"{base_slug}-{counter}"
-                counter += 1
-
-            self.slug = slug
+            self.slug = slugify(self.name)
 
         super().save(*args, **kwargs)
 

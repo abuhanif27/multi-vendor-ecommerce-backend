@@ -5,4 +5,4 @@ from apps.catalog.models import Category
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    readonly_fields = ('slug',)
+    prepopulated_fields = {"slug": ("name",)}
