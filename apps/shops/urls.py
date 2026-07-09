@@ -1,6 +1,10 @@
 from django.urls import path
 
-from apps.shops.views import ProductListCreateApiView, ProductDetailAPIView
+from apps.shops.views import (
+    ProductListCreateApiView,
+    ProductDetailAPIView,
+    MyProductListAPIView,
+)
 
 urlpatterns = [
     path(
@@ -12,5 +16,10 @@ urlpatterns = [
         "products/<slug:slug>/",
         ProductDetailAPIView.as_view(),
         name="product-detail",
+    ),
+    path(
+        "my/products/",
+        MyProductListAPIView.as_view(),
+        name="my-product-list",
     ),
 ]
