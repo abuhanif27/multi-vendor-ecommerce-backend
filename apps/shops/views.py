@@ -1,8 +1,8 @@
-from rest_framework import generics
-
-from apps.shops.models import Shop, Product
+from apps.shops.permissions import IsProductOwner, IsVendor
 from apps.shops.serializers import ShopSerializer, ProductSerializer
-from apps.shops.permissions import IsVendor
+from apps.shops.models import Shop, Product
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 
 class CreateShopAPIView(generics.CreateAPIView):
@@ -56,3 +56,14 @@ class MyProductListAPIView(generics.ListAPIView):
                 shop__owner=self.request.user,
             )
         )
+
+
+class ProductDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Product.objects.select_related("shop")
+    serializer_class = ProductSerializer
+    lookup_field = "slug"
+
+    def get_permissions(self):
+        if self.request.method in ["PUT", "PATCH", "DELETE"]:
+            return [IsVendor(), IsProductOwner()]
+        return [IsAuthenticatedOrReadOnly()]
