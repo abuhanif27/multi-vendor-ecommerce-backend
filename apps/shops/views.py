@@ -27,3 +27,18 @@ class ProductListCreateApiView(generics.ListCreateAPIView):
                 .select_related('shop')
                 .filter(status=Product.ProductStatus.ACTIVE, shop__status=Shop.ShopStatus.APPROVED)
                 )
+
+
+class ProductDetailAPIView(generics.RetrieveAPIView):
+    serializer_class = ProductSerializer
+    lookup_field = "slug"
+
+    def get_queryset(self):
+        return (
+            Product.objects
+            .select_related("shop")
+            .filter(
+                status=Product.ProductStatus.ACTIVE,
+                shop__status=Shop.ShopStatus.APPROVED,
+            )
+        )
