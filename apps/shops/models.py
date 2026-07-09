@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 from django.conf import settings
+from django.core.validators import MinValueValidator
 from apps.common.models import UUIDModel, TimeStampedModel
 
 
@@ -81,6 +82,7 @@ class Product(UUIDModel, TimeStampedModel):
     price = models.DecimalField(
         max_digits=10,
         decimal_places=2,
+        validators=[MinValueValidator(0.01)],
     )
 
     stock = models.PositiveIntegerField(
