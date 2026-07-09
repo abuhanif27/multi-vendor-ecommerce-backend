@@ -25,6 +25,7 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "shop",
+            "category",
             "name",
             "slug",
             "description",
@@ -46,3 +47,10 @@ class ProductSerializer(serializers.ModelSerializer):
                 "You do not have permission to add a product to this shop."
             )
         return shop
+
+    def validate_category(self, category):
+        if not category.is_active:
+            raise serializers.ValidationError(
+                "You cannot add a product to an inactive category."
+            )
+        return category
