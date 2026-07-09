@@ -5,20 +5,13 @@ from django.core.validators import MinValueValidator
 from apps.common.models import UUIDModel, TimeStampedModel
 
 
-class ProductStatus(models.TextChoices):
-    DRAFT = "draft", "Draft"
-    ACTIVE = "active", "Active"
-    ARCHIVED = "archived", "Archived"
-
-
-class ShopStatus(models.TextChoices):
-    PENDING = "pending", "Pending"
-    APPROVED = "approved", "Approved"
-    SUSPENDED = "suspended", "Suspended"
-    REJECTED = "rejected", "Rejected"
-
-
 class Shop(UUIDModel, TimeStampedModel):
+    class ShopStatus(models.TextChoices):
+        PENDING = "pending", "Pending"
+        APPROVED = "approved", "Approved"
+        SUSPENDED = "suspended", "Suspended"
+        REJECTED = "rejected", "Rejected"
+
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -62,6 +55,11 @@ class Shop(UUIDModel, TimeStampedModel):
 
 
 class Product(UUIDModel, TimeStampedModel):
+    class ProductStatus(models.TextChoices):
+        DRAFT = "draft", "Draft"
+        ACTIVE = "active", "Active"
+        ARCHIVED = "archived", "Archived"
+
     shop = models.ForeignKey(
         Shop,
         on_delete=models.CASCADE,
