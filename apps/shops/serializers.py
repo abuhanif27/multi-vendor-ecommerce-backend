@@ -38,3 +38,11 @@ class ProductSerializer(serializers.ModelSerializer):
             "slug",
             "status",
         )
+
+    def validate_shop(self, shop):
+        request = self.context.get("request")
+        if request.user != shop.owner:
+            raise serializers.ValidationError(
+                "You do not have permission to add a product to this shop."
+            )
+        return shop
