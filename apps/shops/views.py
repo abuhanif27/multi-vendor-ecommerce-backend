@@ -5,10 +5,22 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 
-class CreateShopAPIView(generics.CreateAPIView):
-    queryset = Shop.objects.all()
+class ShopListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = ShopSerializer
-    permission_classes = [IsVendor]
+
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [IsVendor()]
+
+        return []
+
+    def get_queryset(self):
+        return (
+            Shop.objects
+            .filter(
+                status=Shop.ShopStatus.APPROVED,
+            )
+        )
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)

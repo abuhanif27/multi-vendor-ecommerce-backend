@@ -4,9 +4,11 @@ from apps.shops.views import (
     ProductListCreateApiView,
     ProductDetailAPIView,
     MyProductListAPIView,
+    ShopListCreateAPIView,
 )
 
 urlpatterns = [
+    path('shops/', ShopListCreateAPIView.as_view(), name='shop-list'),
     path(
         "products/",
         ProductListCreateApiView.as_view(),
