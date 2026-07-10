@@ -163,6 +163,62 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
                 )
 
 
+@extend_schema_view(
+    get=extend_schema(
+        tags=["Products"],
+        summary="Retrieve product",
+        description="""
+Retrieve a single active product by its slug.
+
+This endpoint is public.
+""",
+        responses={
+            200: ProductSerializer,
+            404: None,
+        },
+    ),
+    patch=extend_schema(
+        tags=["Products"],
+        summary="Update product",
+        description="""
+Partially update a product.
+
+Requirements:
+- Authenticated user
+- Vendor role
+- Product owner
+""",
+        request=ProductSerializer,
+        responses={
+            200: ProductSerializer,
+            400: None,
+            401: None,
+            403: None,
+            404: None,
+        },
+    ),
+    put=extend_schema(
+        exclude=True,
+    ),
+    delete=extend_schema(
+        tags=["Products"],
+        summary="Delete product",
+        description="""
+Delete a product.
+
+Requirements:
+- Authenticated user
+- Vendor role
+- Product owner
+""",
+        responses={
+            204: None,
+            401: None,
+            403: None,
+            404: None,
+        },
+    ),
+)
 class ProductDetailAPIView(generics.RetrieveAPIView):
     serializer_class = ProductSerializer
     lookup_field = "slug"
