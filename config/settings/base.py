@@ -42,6 +42,7 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     'rest_framework',
     'django_filters',
+    'drf_spectacular',
 ]
 
 LOCAL_APPS = [
@@ -60,6 +61,14 @@ INSTALLED_APPS = (
     + THIRD_PARTY_APPS
     + LOCAL_APPS
 )
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Multi Vendor Marketplace API",
+    "DESCRIPTION": "Production-ready REST API for a multi-vendor e-commerce platform.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -153,4 +162,5 @@ REST_FRAMEWORK = {
         "django_filters.rest_framework.DjangoFilterBackend",
     ],
     'COERCE_DECIMAL_TO_STRING': False,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
