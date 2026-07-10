@@ -1,5 +1,8 @@
 from apps.shops.permissions import IsProductOwner, IsVendor, IsShopOwner
 from apps.shops.serializers import ShopSerializer, ProductSerializer
+from django_filters.rest_framework import DjangoFilterBackend
+
+from apps.shops.filters import ProductFilter
 from apps.shops.models import Shop, Product
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -28,6 +31,8 @@ class ShopListCreateAPIView(generics.ListCreateAPIView):
 
 class ProductListCreateApiView(generics.ListCreateAPIView):
     serializer_class = ProductSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ProductFilter
 
     def get_permissions(self):
         if self.request.method == "POST":
