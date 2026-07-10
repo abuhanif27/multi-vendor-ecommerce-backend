@@ -2,11 +2,12 @@ from django.db import models
 from django.utils.text import slugify
 from django.conf import settings
 from django.core.validators import MinValueValidator
-from apps.common.models import UUIDModel, TimeStampedModel, SlugModel
+from apps.common.models import UUIDModel, TimeStampedModel
+from apps.common.mixins import SlugMixin
 from apps.catalog.models import Category
 
 
-class Shop(UUIDModel, TimeStampedModel, SlugModel):
+class Shop(UUIDModel, TimeStampedModel, SlugMixin):
     class ShopStatus(models.TextChoices):
         PENDING = "pending", "Pending"
         APPROVED = "approved", "Approved"
@@ -46,7 +47,7 @@ class Shop(UUIDModel, TimeStampedModel, SlugModel):
         ordering = ["-created_at"]
 
 
-class Product(UUIDModel, TimeStampedModel, SlugModel):
+class Product(UUIDModel, TimeStampedModel, SlugMixin):
     class ProductStatus(models.TextChoices):
         DRAFT = "draft", "Draft"
         ACTIVE = "active", "Active"
