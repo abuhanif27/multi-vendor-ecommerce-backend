@@ -1,7 +1,7 @@
 from django.urls import path
 
 from apps.shops.views import (
-    ProductListCreateApiView,
+    ProductListCreateAPIView,
     ProductDetailAPIView,
     MyProductListAPIView,
     ShopDetailAPIView,
@@ -23,7 +23,7 @@ urlpatterns = [
     ),
     path(
         "products/",
-        ProductListCreateApiView.as_view(),
+        ProductListCreateAPIView.as_view(),
         name="product-list",
     ),
     path(

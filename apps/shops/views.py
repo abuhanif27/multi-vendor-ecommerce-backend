@@ -7,8 +7,43 @@ from apps.shops.models import Shop, Product
 from rest_framework import generics
 from rest_framework import filters
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from drf_spectacular.utils import extend_schema, OpenApiParameter, extend_schema_view
 
 
+@extend_schema_view(
+    get=extend_schema(
+        tags=["Shops"],
+        summary="List shops",
+        description="""
+Returns all approved shops.
+
+This endpoint is public.
+
+Supports:
+- Pagination
+""",
+        responses={
+            200: ShopSerializer,
+        },
+    ),
+    post=extend_schema(
+        tags=["Shops"],
+        summary="Create shop",
+        description="""
+Creates a new shop for the authenticated vendor.
+
+Authentication:
+- Vendor only
+""",
+        request=ShopSerializer,
+        responses={
+            201: ShopSerializer,
+            400: None,
+            401: None,
+            403: None,
+        },
+    ),
+)
 class ShopListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = ShopSerializer
 
@@ -30,7 +65,81 @@ class ShopListCreateAPIView(generics.ListCreateAPIView):
         serializer.save(owner=self.request.user)
 
 
-class ProductListCreateApiView(generics.ListCreateAPIView):
+@extend_schema_view(
+    get=extend_schema(
+        tags=["Products"],
+        summary="List products",
+        description="""
+Returns active products from approved shops.
+
+Features:
+
+- Pagination
+- Category filtering
+- Shop filtering
+- Price filtering
+- Search
+- Ordering
+
+Public endpoint.
+""",
+        parameters=[
+            OpenApiParameter(
+                name="category",
+                type=str,
+                description="Category slug.",
+            ),
+            OpenApiParameter(
+                name="shop",
+                type=str,
+                description="Shop slug.",
+            ),
+            OpenApiParameter(
+                name="min_price",
+                type=float,
+                description="Minimum product price.",
+            ),
+            OpenApiParameter(
+                name="max_price",
+                type=float,
+                description="Maximum product price.",
+            ),
+            OpenApiParameter(
+                name="search",
+                type=str,
+                description="Search by product name, description, shop name or category name.",
+            ),
+            OpenApiParameter(
+                name="ordering",
+                type=str,
+                description="Available values: price, -price, name, created_at, -created_at.",
+            ),
+        ],
+        responses={
+            200: ProductSerializer,
+        },
+    ),
+    post=extend_schema(
+        tags=["Products"],
+        summary="Create product",
+        description="""
+Creates a new product for the authenticated vendor.
+
+Requirements:
+
+- Authenticated user
+- Vendor role
+""",
+        request=ProductSerializer,
+        responses={
+            201: ProductSerializer,
+            400: None,
+            401: None,
+            403: None,
+        },
+    ),
+)
+class ProductListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = ProductSerializer
     filter_backends = [
         DjangoFilterBackend,

@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
@@ -60,6 +61,7 @@ class VerifyEmailAPIView(APIView):
         )
 
 
+@extend_schema(tags=["Authentication"],)
 class LoginAPIView(generics.GenericAPIView):
     serializer_class = LoginSerializer
 

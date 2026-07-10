@@ -62,10 +62,38 @@ INSTALLED_APPS = (
     + LOCAL_APPS
 )
 
+
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Multi Vendor Marketplace API",
-    "DESCRIPTION": "Production-ready REST API for a multi-vendor e-commerce platform.",
+    "TITLE": "Multi-Vendor Marketplace API",
+    "DESCRIPTION": """
+A production-ready REST API for a multi-vendor e-commerce platform.
+
+## Features
+
+- JWT Authentication
+- Vendor & Customer Roles
+- Shop Management
+- Product Catalog
+- Category Management
+- Product Filtering
+- Product Search
+- Product Ordering
+- Pagination
+
+Built with:
+
+- Django
+- Django REST Framework
+- PostgreSQL
+""",
     "VERSION": "1.0.0",
+    "CONTACT": {
+        "name": "Abu Hanif",
+        "email": "ahanif2500@gmail.com",
+    },
+    "LICENSE": {
+        "name": "MIT",
+    },
     "SERVE_INCLUDE_SCHEMA": False,
 }
 
