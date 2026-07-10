@@ -2,11 +2,11 @@ from django.db import models
 from django.utils.text import slugify
 from django.conf import settings
 from django.core.validators import MinValueValidator
-from apps.common.models import UUIDModel, TimeStampedModel
+from apps.common.models import UUIDModel, TimeStampedModel, SlugModel
 from apps.catalog.models import Category
 
 
-class Shop(UUIDModel, TimeStampedModel):
+class Shop(UUIDModel, TimeStampedModel, SlugModel):
     class ShopStatus(models.TextChoices):
         PENDING = "pending", "Pending"
         APPROVED = "approved", "Approved"
@@ -36,16 +36,7 @@ class Shop(UUIDModel, TimeStampedModel):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            base_slug = slugify(self.name)
-            slug = base_slug
-            suffix = 2
-
-            while Shop.objects.filter(slug=slug).exists():
-                slug = f"{base_slug}-{suffix}"
-                suffix += 1
-
-            self.slug = slug
-
+            self.slug = self.generate_unique_slug(self.name)
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -55,7 +46,7 @@ class Shop(UUIDModel, TimeStampedModel):
         ordering = ["-created_at"]
 
 
-class Product(UUIDModel, TimeStampedModel):
+class Product(UUIDModel, TimeStampedModel, SlugModel):
     class ProductStatus(models.TextChoices):
         DRAFT = "draft", "Draft"
         ACTIVE = "active", "Active"
@@ -103,16 +94,7 @@ class Product(UUIDModel, TimeStampedModel):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            base_slug = slugify(self.name)
-            slug = base_slug
-            suffix = 2
-
-            while Product.objects.filter(slug=slug).exists():
-                slug = f"{base_slug}-{suffix}"
-                suffix += 1
-
-            self.slug = slug
-
+            self.slug = self.generate_unique_slug(self.name)
         super().save(*args, **kwargs)
 
     class Meta:
