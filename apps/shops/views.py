@@ -5,6 +5,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from apps.shops.filters import ProductFilter
 from apps.shops.models import Shop, Product
 from rest_framework import generics
+from rest_framework import filters
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 
@@ -31,8 +32,15 @@ class ShopListCreateAPIView(generics.ListCreateAPIView):
 
 class ProductListCreateApiView(generics.ListCreateAPIView):
     serializer_class = ProductSerializer
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter
+    ]
     filterset_class = ProductFilter
+
+    search_fields = ['name', 'description', 'shop__name', 'category__name']
+    ordering_fields = ['price', 'created_at', 'name']
 
     def get_permissions(self):
         if self.request.method == "POST":
@@ -41,7 +49,7 @@ class ProductListCreateApiView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         return (Product.objects
-                .select_related('shop')
+                .select_related('shop', 'category')
                 .filter(status=Product.ProductStatus.ACTIVE, shop__status=Shop.ShopStatus.APPROVED)
                 )
 
