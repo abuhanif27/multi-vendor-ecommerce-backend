@@ -79,3 +79,16 @@ class ProductDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
         if self.request.method in ["PUT", "PATCH", "DELETE"]:
             return [IsVendor(), IsProductOwner()]
         return [IsAuthenticatedOrReadOnly()]
+
+
+class MyShopListAPIView(generics.ListAPIView):
+    serializer_class = ShopSerializer
+    permission_classes = [IsVendor]
+
+    def get_queryset(self):
+        return (
+            Shop.objects
+            .filter(
+                owner=self.request.user,
+            )
+        )
