@@ -1,8 +1,6 @@
 from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator
-from django_filters.rest_framework import DjangoFilterBackend
-from apps.shops.filters import ProductFilter
 from apps.common.models import UUIDModel, TimeStampedModel
 from apps.common.mixins import SlugMixin
 from apps.catalog.models import Category
@@ -38,7 +36,7 @@ class Shop(UUIDModel, TimeStampedModel, SlugMixin):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = self.generate_unique_slug(self.name)
+            self.slug = self._create_unique_slug(self.name)
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -96,7 +94,7 @@ class Product(UUIDModel, TimeStampedModel, SlugMixin):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = self.generate_unique_slug(self.name)
+            self.slug = self._create_unique_slug(self.name)
         super().save(*args, **kwargs)
 
     class Meta:
