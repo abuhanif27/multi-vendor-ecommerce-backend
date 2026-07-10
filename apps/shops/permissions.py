@@ -18,3 +18,10 @@ class IsProductOwner(BasePermission):
 
     def has_object_permission(self, request, view, obj):
         return obj.shop.owner == request.user
+
+
+class IsShopOwner(BasePermission):
+    message = "You do not have permission to perform this action on this shop."
+
+    def has_object_permission(self, request, view, obj):
+        return obj.owner == request.user
