@@ -81,11 +81,6 @@ class MyShopListAPIView(generics.ListAPIView):
 @PRODUCT_LIST_SCHEMA
 class ProductListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = ProductSerializer
-    filter_backends = [
-        DjangoFilterBackend,
-        filters.SearchFilter,
-        filters.OrderingFilter
-    ]
     filterset_class = ProductFilter
 
     search_fields = ['name', 'description', 'shop__name', 'category__name']
