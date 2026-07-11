@@ -99,3 +99,33 @@ class Product(UUIDModel, TimeStampedModel, SlugMixin):
 
     class Meta:
         ordering = ["-created_at"]
+
+
+class ProductImage(UUIDModel, TimeStampedModel):
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name="images",
+    )
+
+    image = models.ImageField(
+        upload_to="products/",
+    )
+
+    sort_order = models.PositiveSmallIntegerField(
+        default=1,
+        help_text=(
+            "Display order of the image. "
+            "The image with the lowest sort_order is treated as the primary image."
+        ),
+    )
+
+    @property
+    def is_primary(self):
+        return self.sort_order == 1
+
+    class Meta:
+        ordering = ["sort_order", "created_at"]
+
+    def __str__(self):
+        return f"{self.product.name} - Image {self.sort_order}"
