@@ -7,7 +7,7 @@ from apps.shops.models import Shop, Product
 from rest_framework import generics
 from rest_framework import filters
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from drf_spectacular.utils import extend_schema, OpenApiParameter, extend_schema_view
+from drf_spectacular.utils import OpenApiExample, extend_schema, OpenApiParameter, extend_schema_view
 
 
 @extend_schema_view(
@@ -42,6 +42,16 @@ Authentication:
             401: None,
             403: None,
         },
+        examples=[
+            OpenApiExample(
+                "Create Shop",
+                summary="Example shop creation",
+                request_only=True,
+                value={
+                    "name": "Apple Store",
+                },
+            ),
+        ]
     ),
 )
 class ShopListCreateAPIView(generics.ListCreateAPIView):
@@ -137,6 +147,22 @@ Requirements:
             401: None,
             403: None,
         },
+        examples=[
+            OpenApiExample(
+                "Create Product",
+                summary="Example request",
+                request_only=True,
+                value={
+                    "shop": "apple-store",
+                    "category": "phones",
+                    "name": "iPhone 16 Pro",
+                    "description": "Latest Apple flagship smartphone.",
+                    "price": "1499.00",
+                    "stock": 25,
+                    "status": "active",
+                },
+            ),
+        ]
     ),
 )
 class ProductListCreateAPIView(generics.ListCreateAPIView):
@@ -196,6 +222,17 @@ Requirements:
             403: None,
             404: None,
         },
+        examples=[
+            OpenApiExample(
+                "Update Product",
+                summary="Partial update",
+                request_only=True,
+                value={
+                    "price": "1399.00",
+                    "stock": 40,
+                },
+            ),
+        ]
     ),
     put=extend_schema(
         exclude=True,
@@ -219,7 +256,7 @@ Requirements:
         },
     ),
 )
-class ProductDetailAPIView(generics.RetrieveAPIView):
+class ProductDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ProductSerializer
     lookup_field = "slug"
 
@@ -327,6 +364,16 @@ Requirements:
             403: None,
             404: None,
         },
+        examples=[
+            OpenApiExample(
+                "Update Shop",
+                summary="Rename shop",
+                request_only=True,
+                value={
+                    "name": "Apple Official Store",
+                },
+            ),
+        ]
     ),
     put=extend_schema(
         exclude=True,
@@ -355,7 +402,7 @@ class ShopDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = "slug"
 
     def get_permissions(self):
-        if self.request.method in ["PUT", "PATCH", "DELETE"]:
+        if self.request.method in ["PATCH", "DELETE"]:
             return [
                 IsVendor(),
                 IsShopOwner(),
