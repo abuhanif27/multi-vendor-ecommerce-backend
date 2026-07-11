@@ -1,11 +1,14 @@
-from drf_spectacular.utils import extend_schema
 from rest_framework import generics
 
 from apps.catalog.models import Category
 from apps.catalog.serializers import CategorySerializer
+from apps.catalog.schema.categories import (
+    CATEGORY_LIST_SCHEMA,
+    CATEGORY_DETAIL_SCHEMA,
+)
 
 
-@extend_schema(tags=["Categories"],)
+@CATEGORY_LIST_SCHEMA
 class CategoryListAPIView(generics.ListAPIView):
     serializer_class = CategorySerializer
 
@@ -17,6 +20,7 @@ class CategoryListAPIView(generics.ListAPIView):
         )
 
 
+@CATEGORY_DETAIL_SCHEMA
 class CategoryDetailAPIView(generics.RetrieveAPIView):
     serializer_class = CategorySerializer
     lookup_field = "slug"
