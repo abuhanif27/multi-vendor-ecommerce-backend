@@ -226,12 +226,21 @@ class ProductDetailAPIView(generics.RetrieveAPIView):
     def get_queryset(self):
         return (
             Product.objects
-            .select_related("shop")
+            .select_related("shop", "category")
             .filter(
                 status=Product.ProductStatus.ACTIVE,
                 shop__status=Shop.ShopStatus.APPROVED,
             )
         )
+
+    def get_permissions(self):
+        if self.request.method in ["PATCH", "DELETE"]:
+            return [
+                IsVendor(),
+                IsProductOwner(),
+            ]
+
+        return [IsAuthenticatedOrReadOnly()]
 
 
 class MyProductListAPIView(generics.ListAPIView):
@@ -248,17 +257,6 @@ class MyProductListAPIView(generics.ListAPIView):
         )
 
 
-class ProductDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Product.objects.select_related("shop")
-    serializer_class = ProductSerializer
-    lookup_field = "slug"
-
-    def get_permissions(self):
-        if self.request.method in ["PUT", "PATCH", "DELETE"]:
-            return [IsVendor(), IsProductOwner()]
-        return [IsAuthenticatedOrReadOnly()]
-
-
 class MyShopListAPIView(generics.ListAPIView):
     serializer_class = ShopSerializer
     permission_classes = [IsVendor]
@@ -272,6 +270,62 @@ class MyShopListAPIView(generics.ListAPIView):
         )
 
 
+@extend_schema_view(
+    get=extend_schema(
+        tags=["Shops"],
+        summary="Retrieve Shop",
+        description="""
+Retrieve a single active Shop by its slug.
+
+This endpoint is public.
+""",
+        responses={
+            200: ShopSerializer,
+            404: None,
+        },
+    ),
+    patch=extend_schema(
+        tags=["Shops"],
+        summary="Update Shop",
+        description="""
+Partially update a Shop.
+
+Requirements:
+- Authenticated user
+- Vendor role
+- Shop owner
+""",
+        request=ShopSerializer,
+        responses={
+            200: ShopSerializer,
+            400: None,
+            401: None,
+            403: None,
+            404: None,
+        },
+    ),
+    put=extend_schema(
+        exclude=True,
+    ),
+    delete=extend_schema(
+        tags=["Shops"],
+        summary="Delete Shop",
+        description="""
+Delete a Shop.
+
+Requirements:
+- Authenticated user
+- Vendor role
+- Shop owner
+""",
+        responses={
+            204: None,
+            401: None,
+            403: None,
+            404: None,
+        },
+    ),
+)
 class ShopDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ShopSerializer
     lookup_field = "slug"
