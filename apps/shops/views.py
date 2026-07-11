@@ -243,6 +243,18 @@ class ProductDetailAPIView(generics.RetrieveAPIView):
         return [IsAuthenticatedOrReadOnly()]
 
 
+@extend_schema_view(
+    get=extend_schema(
+        tags=["Vendor"],
+        summary="My products",
+        description="Returns all products owned by the authenticated vendor.",
+        responses={
+            200: ProductSerializer,
+            401: None,
+            403: None,
+        },
+    ),
+)
 class MyProductListAPIView(generics.ListAPIView):
     serializer_class = ProductSerializer
     permission_classes = [IsVendor]
@@ -257,6 +269,18 @@ class MyProductListAPIView(generics.ListAPIView):
         )
 
 
+@extend_schema_view(
+    get=extend_schema(
+        tags=["Vendor"],
+        summary="My shops",
+        description="Returns all shops owned by the authenticated vendor.",
+        responses={
+            200: ShopSerializer,
+            401: None,
+            403: None,
+        },
+    ),
+)
 class MyShopListAPIView(generics.ListAPIView):
     serializer_class = ShopSerializer
     permission_classes = [IsVendor]
