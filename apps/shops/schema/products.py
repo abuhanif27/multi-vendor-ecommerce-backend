@@ -5,7 +5,7 @@ from drf_spectacular.utils import (
 )
 
 from apps.shops.serializers import ProductSerializer
-from apps.shops.docs.product_examples import (
+from apps.shops.schema.product_examples import (
     CREATE_PRODUCT_EXAMPLE,
     UPDATE_PRODUCT_EXAMPLE,
 )

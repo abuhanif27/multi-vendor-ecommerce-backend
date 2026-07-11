@@ -7,12 +7,12 @@ from apps.shops.serializers import ShopSerializer, ProductSerializer
 from apps.shops.permissions import IsProductOwner, IsVendor, IsShopOwner
 from apps.shops.filters import ProductFilter
 
-from apps.shops.docs.shops import (
+from apps.shops.schema.shops import (
     SHOP_LIST_SCHEMA,
     SHOP_DETAIL_SCHEMA,
     MY_SHOPS_SCHEMA,
 )
-from apps.shops.docs.products import (
+from apps.shops.schema.products import (
     PRODUCT_LIST_SCHEMA,
     PRODUCT_DETAIL_SCHEMA,
     MY_PRODUCTS_SCHEMA,

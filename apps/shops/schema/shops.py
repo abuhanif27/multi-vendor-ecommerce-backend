@@ -3,7 +3,7 @@ from drf_spectacular.utils import (
     extend_schema,
     extend_schema_view,
 )
-from apps.shops.docs.shop_examples import (
+from apps.shops.schema.shop_examples import (
     CREATE_SHOP_EXAMPLE,
     UPDATE_SHOP_EXAMPLE,
 )
