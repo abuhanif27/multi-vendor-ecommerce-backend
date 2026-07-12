@@ -36,4 +36,9 @@ urlpatterns = [
         MyProductListAPIView.as_view(),
         name="my-product-list",
     ),
+    path(
+        "products/<slug:product_slug>/images/",
+        ProductImageCreateAPIView.as_view(),
+        name="product-image-create",
+    )
 ]

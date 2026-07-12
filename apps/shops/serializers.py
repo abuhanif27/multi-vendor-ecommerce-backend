@@ -74,3 +74,18 @@ class ProductImageSerializer(serializers.ModelSerializer):
         read_only_fields = (
             "id",
         )
+
+    def validate(self, attrs):
+        product = self.context["product"]
+
+        if product.images.count() >= 5:
+            raise serializers.ValidationError(
+                {
+                    "image": (
+                        "A product can have a maximum "
+                        "of 5 images."
+                    )
+                }
+            )
+
+        return attrs
