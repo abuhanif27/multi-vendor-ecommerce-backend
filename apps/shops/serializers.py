@@ -94,7 +94,15 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         product = self.context["product"]
-        sort_order = validated_data["sort_order"]
+
+        image_count = product.images.count()
+
+        sort_order = min(
+            validated_data["sort_order"],
+            image_count + 1,
+        )
+
+        validated_data["sort_order"] = sort_order
 
         with transaction.atomic():
             # Increment sort_order of existing images if necessary
