@@ -8,3 +8,5 @@ from apps.shops.views.products import (
     ProductDetailAPIView,
     MyProductListAPIView,
 )
+
+from apps.shops.views.product_images import ProductImageCreateAPIView
