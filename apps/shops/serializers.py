@@ -1,6 +1,10 @@
 from rest_framework import serializers
 
-from apps.shops.models import Shop, Product
+from apps.shops.models import (
+    Shop,
+    Product,
+    ProductImage
+)
 
 
 class ShopSerializer(serializers.ModelSerializer):
@@ -54,3 +58,19 @@ class ProductSerializer(serializers.ModelSerializer):
                 "You cannot add a product to an inactive category."
             )
         return category
+
+
+class ProductImageSerializer(serializers.ModelSerializer):
+    is_primary = serializers.ReadOnlyField()
+
+    class Meta:
+        model = ProductImage
+        fields = (
+            "id",
+            "image",
+            "sort_order",
+            "is_primary",
+        )
+        read_only_fields = (
+            "id",
+        )
