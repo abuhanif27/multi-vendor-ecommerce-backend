@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from django.db import transaction
+from django.db.models import F
 from apps.shops.models import (
     Shop,
     Product,
@@ -89,3 +91,21 @@ class ProductImageSerializer(serializers.ModelSerializer):
             )
 
         return attrs
+
+    def create(self, validated_data):
+        product = self.context["product"]
+        sort_order = validated_data["sort_order"]
+
+        with transaction.atomic():
+            # Increment sort_order of existing images if necessary
+            ProductImage.objects.filter(
+                product=product,
+                sort_order__gte=sort_order
+            ).update(sort_order=F("sort_order") + 1)
+
+            # Create the new image
+            image = ProductImage.objects.create(
+                product=product,
+                **validated_data
+            )
+        return image
