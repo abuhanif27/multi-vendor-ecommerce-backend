@@ -1,12 +1,12 @@
 from django.urls import path
 
 from apps.shops.views import (
+    ShopListCreateAPIView,
+    ShopDetailAPIView,
+    MyShopListAPIView,
     ProductListCreateAPIView,
     ProductDetailAPIView,
     MyProductListAPIView,
-    ShopDetailAPIView,
-    ShopListCreateAPIView,
-    MyShopListAPIView,
 )
 
 urlpatterns = [
