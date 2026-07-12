@@ -23,7 +23,3 @@ class ProductImageCreateAPIView(generics.CreateAPIView):
         context = super().get_serializer_context()
         context["product"] = self.get_product()
         return context
-
-    def perform_create(self, serializer):
-        product = self.get_product()
-        serializer.save(product=product)
