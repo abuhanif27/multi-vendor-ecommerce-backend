@@ -1,3 +1,5 @@
+from apps.shops.services import ProductImageService
+from apps.shops.models import ProductImage
 from rest_framework import serializers
 
 from django.db import transaction
@@ -63,6 +65,11 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
+    sort_order = serializers.IntegerField(
+        required=False,
+        min_value=1,
+    )
+
     is_primary = serializers.ReadOnlyField()
 
     class Meta:
@@ -73,12 +80,19 @@ class ProductImageSerializer(serializers.ModelSerializer):
             "sort_order",
             "is_primary",
         )
+
         read_only_fields = (
             "id",
         )
 
     def validate(self, attrs):
-        product = self.context["product"]
+        product = self.context.get("product")
+
+        if product is None:
+            raise AssertionError(
+                "ProductImageSerializer requires "
+                "'product' in serializer context."
+            )
 
         if product.images.count() >= 5:
             raise serializers.ValidationError(
@@ -93,27 +107,8 @@ class ProductImageSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        product = self.context["product"]
-
-        image_count = product.images.count()
-
-        sort_order = min(
-            validated_data["sort_order"],
-            image_count + 1,
+        return ProductImageService.insert(
+            product=self.context["product"],
+            image=validated_data["image"],
+            sort_order=validated_data.get("sort_order"),
         )
-
-        validated_data["sort_order"] = sort_order
-
-        with transaction.atomic():
-            # Increment sort_order of existing images if necessary
-            ProductImage.objects.filter(
-                product=product,
-                sort_order__gte=sort_order
-            ).update(sort_order=F("sort_order") + 1)
-
-            # Create the new image
-            image = ProductImage.objects.create(
-                product=product,
-                **validated_data
-            )
-        return image
