@@ -57,7 +57,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
         )
 
 
-class ProductImageMoveSerializer(
+class ProductImageUpdateSerializer(
     serializers.Serializer,
 ):
     sort_order = serializers.IntegerField(
@@ -78,6 +78,6 @@ class ProductImageMoveSerializer(
 
     def create(self, validated_data):
         raise AssertionError(
-            "ProductImageMoveSerializer "
+            "ProductImageUpdateSerializer "
             "does not support create()."
         )

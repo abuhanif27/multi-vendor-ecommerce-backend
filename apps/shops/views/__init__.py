@@ -1,12 +1,3 @@
-from apps.shops.views.shops import (
-    ShopListCreateAPIView,
-    ShopDetailAPIView,
-    MyShopListAPIView,
-)
-from apps.shops.views.products import (
-    ProductListCreateAPIView,
-    ProductDetailAPIView,
-    MyProductListAPIView,
-)
-
-from apps.shops.views.product_images import ProductImageCreateAPIView
+from .shops import *
+from .products import *
+from .product_images import *

@@ -7,7 +7,8 @@ from apps.shops.views import (
     ProductListCreateAPIView,
     ProductDetailAPIView,
     MyProductListAPIView,
-    ProductImageCreateAPIView
+    ProductImageCreateAPIView,
+    ProductImageDetailAPIView,
 )
 
 urlpatterns = [
@@ -41,6 +42,11 @@ urlpatterns = [
         "products/<slug:product_slug>/images/",
         ProductImageCreateAPIView.as_view(),
         name="product-image-create",
+    ),
+    path(
+        "products/<slug:product_slug>/images/<int:pk>/",
+        ProductImageDetailAPIView.as_view(),
+        name="product-image-detail",
     ),
 
 ]
