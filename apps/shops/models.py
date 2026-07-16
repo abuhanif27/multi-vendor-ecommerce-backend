@@ -3,7 +3,7 @@ from django.conf import settings
 from django.core.validators import MinValueValidator
 from apps.common.models import UUIDModel, TimeStampedModel
 from apps.common.mixins import SlugMixin
-from apps.catalog.models import Category
+from apps.catalog.models import Category, CategoryAttributeValue
 
 
 class Shop(UUIDModel, TimeStampedModel, SlugMixin):
@@ -72,13 +72,13 @@ class Product(UUIDModel, TimeStampedModel, SlugMixin):
     )
 
     description = models.TextField(blank=True)
-
+    # TODO: Remove after ProductVariant migration.
     price = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         validators=[MinValueValidator(0.01)],
     )
-
+    # TODO: Remove after ProductVariant migration.
     stock = models.PositiveIntegerField(
         default=0,
     )
@@ -160,7 +160,56 @@ class ProductVariant(UUIDModel, TimeStampedModel):
         )
 
     def __str__(self):
-        return self.sku
+        return f"{self.product.name} ({self.sku})"
+
+
+class VariantAttributeValue(UUIDModel, TimeStampedModel):
+    """
+    Stores the selected value of an attribute for a product variant.
+
+    Example:
+
+        Variant:
+            MAC-16-512-SLV
+
+        Selections:
+            RAM -> 16 GB
+            Storage -> 512 GB
+            Color -> Silver
+    """
+
+    variant = models.ForeignKey(
+        ProductVariant,
+        on_delete=models.CASCADE,
+        related_name="attribute_values",
+    )
+
+    category_attribute_value = models.ForeignKey(
+        CategoryAttributeValue,
+        on_delete=models.PROTECT,
+        related_name="variant_values",
+    )
+
+    class Meta:
+        ordering = (
+            "created_at",
+        )
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=(
+                    "variant",
+                    "category_attribute_value",
+                ),
+                name="unique_value_per_variant",
+            ),
+        ]
+
+    def __str__(self):
+        return (
+            f"{self.variant.sku} → "
+            f"{self.category_attribute_value}"
+        )
 
 
 class ProductImage(UUIDModel, TimeStampedModel):
