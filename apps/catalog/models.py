@@ -9,7 +9,10 @@ class Category(UUIDModel, TimeStampedModel):
         max_length=255,
         unique=True,
     )
+    description = models.TextField(
+        blank=True,
 
+    )
     slug = models.SlugField(
         max_length=255,
         unique=True,
