@@ -129,3 +129,53 @@ class CategoryAttribute(UUIDModel, TimeStampedModel):
 
     def __str__(self):
         return f"{self.category} → {self.name}"
+
+
+class CategoryAttributeValue(UUIDModel, TimeStampedModel):
+    """
+    Represents an allowed value for a category attribute.
+
+    Examples:
+
+    Laptop
+        RAM
+            8 GB
+            16 GB
+
+    Phone
+        Color
+            Black
+            White
+    """
+    category_attribute = models.ForeignKey(
+        CategoryAttribute,
+        on_delete=models.CASCADE,
+        related_name="values",
+    )
+
+    value = models.CharField(
+        max_length=100,
+    )
+
+    sort_order = models.PositiveSmallIntegerField(
+        default=1,
+    )
+
+    is_active = models.BooleanField(
+        default=True,
+    )
+
+    class Meta:
+        ordering = (
+            "sort_order",
+            "created_at",
+        )
+        constraints = [
+            models.UniqueConstraint(
+                fields=("category_attribute", "value"),
+                name="unique_value_per_attribute",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.category_attribute} → {self.value}"

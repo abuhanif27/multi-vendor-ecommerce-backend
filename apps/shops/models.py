@@ -101,6 +101,68 @@ class Product(UUIDModel, TimeStampedModel, SlugMixin):
         ordering = ["-created_at"]
 
 
+class ProductVariant(UUIDModel, TimeStampedModel):
+    """
+    Represents a purchasable variant of a product.
+
+    Examples:
+
+        MacBook Pro
+            - 16GB / 512GB / Silver
+            - 32GB / 1TB / Space Black
+
+        Nike Air Max
+            - Black / Size 41
+            - White / Size 42
+    """
+
+    class VariantStatus(models.TextChoices):
+        ACTIVE = "active", "Active"
+        INACTIVE = "inactive", "Inactive"
+
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name="variants",
+    )
+
+    sku = models.CharField(
+        max_length=100,
+        unique=True,
+    )
+
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        validators=[
+            MinValueValidator(0.01),
+        ],
+    )
+
+    stock = models.PositiveIntegerField(
+        default=0,
+    )
+
+    barcode = models.CharField(
+        max_length=100,
+        blank=True,
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=VariantStatus.choices,
+        default=VariantStatus.ACTIVE,
+    )
+
+    class Meta:
+        ordering = (
+            "-created_at",
+        )
+
+    def __str__(self):
+        return self.sku
+
+
 class ProductImage(UUIDModel, TimeStampedModel):
     product = models.ForeignKey(
         Product,
