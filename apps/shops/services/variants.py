@@ -190,6 +190,10 @@ class VariantService:
         selected_values: list[CategoryAttributeValue],
         exclude_variant: ProductVariant | None = None,
     ) -> None:
+        """
+        Run all business validations before creating
+        or updating a product variant.
+        """
         cls._validate_category(
             product=product,
             selected_values=selected_values,
@@ -219,7 +223,7 @@ class VariantService:
         price: Decimal,
         stock: int,
         barcode: str = "",
-        status,
+        status: ProductVariant.Status,
         selected_values: list[CategoryAttributeValue],
     ) -> ProductVariant:
         """
@@ -242,13 +246,13 @@ class VariantService:
             )
 
             VariantAttributeValue.objects.bulk_create(
-                [
+                (
                     VariantAttributeValue(
                         variant=variant,
                         category_attribute_value=value,
                     )
                     for value in selected_values
-                ]
+                )
             )
 
             return variant
@@ -262,7 +266,7 @@ class VariantService:
         price: Decimal,
         stock: int,
         barcode: str = "",
-        status,
+        status: ProductVariant.Status,
         selected_values: list[CategoryAttributeValue],
     ) -> ProductVariant:
         """
@@ -295,13 +299,13 @@ class VariantService:
             variant.attribute_values.all().delete()
 
             VariantAttributeValue.objects.bulk_create(
-                [
+                (
                     VariantAttributeValue(
                         variant=variant,
                         category_attribute_value=value,
                     )
                     for value in selected_values
-                ]
+                )
             )
 
             return variant
