@@ -306,4 +306,7 @@ class VariantService:
         *,
         variant: ProductVariant,
     ) -> None:
-        raise NotImplementedError
+        """
+        Delete a product variant.
+        """
+        variant.delete()
