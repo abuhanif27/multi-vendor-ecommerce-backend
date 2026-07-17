@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import transaction
-
+from decimal import Decimal
 from apps.catalog.models import (
     CategoryAttributeValue,
 )
@@ -183,34 +183,51 @@ class VariantService:
                 )
 
     @classmethod
+    def _run_validations(
+        cls,
+        *,
+        product: Product,
+        selected_values: list[CategoryAttributeValue],
+        exclude_variant: ProductVariant | None = None,
+    ) -> None:
+        cls._validate_category(
+            product=product,
+            selected_values=selected_values,
+        )
+
+        cls._validate_unique_attributes(
+            selected_values=selected_values,
+        )
+
+        cls._validate_required_attributes(
+            product=product,
+            selected_values=selected_values,
+        )
+
+        cls._validate_duplicate_variant(
+            product=product,
+            selected_values=selected_values,
+            exclude_variant=exclude_variant,
+        )
+
+    @classmethod
     def create(
         cls,
         *,
         product: Product,
         sku: str,
-        price,
+        price: Decimal,
         stock: int,
         barcode: str = "",
         status,
         selected_values: list[CategoryAttributeValue],
     ) -> ProductVariant:
+        """
+        Create a product variant and its attribute values.
+        """
         with transaction.atomic():
 
-            cls._validate_category(
-                product=product,
-                selected_values=selected_values,
-            )
-
-            cls._validate_unique_attributes(
-                selected_values=selected_values,
-            )
-
-            cls._validate_required_attributes(
-                product=product,
-                selected_values=selected_values,
-            )
-
-            cls._validate_duplicate_variant(
+            cls._run_validations(
                 product=product,
                 selected_values=selected_values,
             )
@@ -242,29 +259,18 @@ class VariantService:
         *,
         variant: ProductVariant,
         sku: str,
-        price,
+        price: Decimal,
         stock: int,
         barcode: str = "",
         status,
         selected_values: list[CategoryAttributeValue],
     ) -> ProductVariant:
+        """
+        Update a product variant and replace its attribute values.
+        """
         with transaction.atomic():
 
-            cls._validate_category(
-                product=variant.product,
-                selected_values=selected_values,
-            )
-
-            cls._validate_unique_attributes(
-                selected_values=selected_values,
-            )
-
-            cls._validate_required_attributes(
-                product=variant.product,
-                selected_values=selected_values,
-            )
-
-            cls._validate_duplicate_variant(
+            cls._run_validations(
                 product=variant.product,
                 selected_values=selected_values,
                 exclude_variant=variant,
@@ -307,6 +313,7 @@ class VariantService:
         variant: ProductVariant,
     ) -> None:
         """
-        Delete a product variant.
+        Delete a product variant and its related
+        attribute values via cascade deletion.
         """
         variant.delete()
