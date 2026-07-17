@@ -143,6 +143,7 @@ class VariantService:
         cls,
         product: Product,
         selected_values: list[CategoryAttributeValue],
+        exclude_variant: ProductVariant | None = None,
     ) -> None:
         """
         Ensure the product does not already contain
@@ -161,6 +162,9 @@ class VariantService:
                 "attribute_values__category_attribute_value",
             )
         )
+
+        if exclude_variant is not None:
+            variants = variants.exclude(pk=exclude_variant.pk)
 
         for variant in variants:
             existing_value_ids = {
@@ -244,7 +248,57 @@ class VariantService:
         status,
         selected_values: list[CategoryAttributeValue],
     ) -> ProductVariant:
-        raise NotImplementedError
+        with transaction.atomic():
+
+            cls._validate_category(
+                product=variant.product,
+                selected_values=selected_values,
+            )
+
+            cls._validate_unique_attributes(
+                selected_values=selected_values,
+            )
+
+            cls._validate_required_attributes(
+                product=variant.product,
+                selected_values=selected_values,
+            )
+
+            cls._validate_duplicate_variant(
+                product=variant.product,
+                selected_values=selected_values,
+                exclude_variant=variant,
+            )
+
+            variant.sku = sku
+            variant.price = price
+            variant.stock = stock
+            variant.barcode = barcode
+            variant.status = status
+
+            variant.save(
+                update_fields=[
+                    "sku",
+                    "price",
+                    "stock",
+                    "barcode",
+                    "status",
+                ]
+            )
+
+            variant.attribute_values.all().delete()
+
+            VariantAttributeValue.objects.bulk_create(
+                [
+                    VariantAttributeValue(
+                        variant=variant,
+                        category_attribute_value=value,
+                    )
+                    for value in selected_values
+                ]
+            )
+
+            return variant
 
     @classmethod
     def delete(
