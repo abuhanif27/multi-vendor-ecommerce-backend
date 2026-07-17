@@ -177,3 +177,79 @@ class VariantService:
                         )
                     }
                 )
+
+    @classmethod
+    def create(
+        cls,
+        *,
+        product: Product,
+        sku: str,
+        price,
+        stock: int,
+        barcode: str = "",
+        status,
+        selected_values: list[CategoryAttributeValue],
+    ) -> ProductVariant:
+        with transaction.atomic():
+
+            cls._validate_category(
+                product=product,
+                selected_values=selected_values,
+            )
+
+            cls._validate_unique_attributes(
+                selected_values=selected_values,
+            )
+
+            cls._validate_required_attributes(
+                product=product,
+                selected_values=selected_values,
+            )
+
+            cls._validate_duplicate_variant(
+                product=product,
+                selected_values=selected_values,
+            )
+
+            variant = ProductVariant.objects.create(
+                product=product,
+                sku=sku,
+                price=price,
+                stock=stock,
+                barcode=barcode,
+                status=status,
+            )
+
+            VariantAttributeValue.objects.bulk_create(
+                [
+                    VariantAttributeValue(
+                        variant=variant,
+                        category_attribute_value=value,
+                    )
+                    for value in selected_values
+                ]
+            )
+
+            return variant
+
+    @classmethod
+    def update(
+        cls,
+        *,
+        variant: ProductVariant,
+        sku: str,
+        price,
+        stock: int,
+        barcode: str = "",
+        status,
+        selected_values: list[CategoryAttributeValue],
+    ) -> ProductVariant:
+        raise NotImplementedError
+
+    @classmethod
+    def delete(
+        cls,
+        *,
+        variant: ProductVariant,
+    ) -> None:
+        raise NotImplementedError
