@@ -4,24 +4,87 @@ from apps.accounts.choices import UserRole
 
 
 class IsVendor(BasePermission):
+    """
+    Allows access only to authenticated vendors.
+    """
+
     message = "Only vendors can perform this action."
 
-    def has_permission(self, request, view):
+    def has_permission(
+        self,
+        request,
+        view,
+    ):
         return (
             request.user.is_authenticated
             and request.user.role == UserRole.VENDOR
         )
 
 
-class IsProductOwner(BasePermission):
-    message = "You do not have permission to perform this action on this product."
+class IsShopOwner(BasePermission):
+    """
+    Allows access only to the owner of a shop.
 
-    def has_object_permission(self, request, view, obj):
+    Expected object:
+        Shop
+    """
+
+    message = (
+        "You do not have permission to perform "
+        "this action on this shop."
+    )
+
+    def has_object_permission(
+        self,
+        request,
+        view,
+        obj,
+    ):
+        return obj.owner == request.user
+
+
+class IsProductOwner(BasePermission):
+    """
+    Allows access only to the owner of a product.
+
+    Expected object:
+        Product
+    """
+
+    message = (
+        "You do not have permission to perform "
+        "this action on this product."
+    )
+
+    def has_object_permission(
+        self,
+        request,
+        view,
+        obj,
+    ):
         return obj.shop.owner == request.user
 
 
-class IsShopOwner(BasePermission):
-    message = "You do not have permission to perform this action on this shop."
+class IsVariantOwner(BasePermission):
+    """
+    Allows access only to the owner of a product variant.
 
-    def has_object_permission(self, request, view, obj):
-        return obj.owner == request.user
+    Expected object:
+        ProductVariant
+    """
+
+    message = (
+        "You do not have permission to perform "
+        "this action on this variant."
+    )
+
+    def has_object_permission(
+        self,
+        request,
+        view,
+        obj,
+    ):
+        return (
+            obj.product.shop.owner
+            == request.user
+        )
