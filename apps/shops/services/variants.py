@@ -223,7 +223,7 @@ class VariantService:
         price: Decimal,
         stock: int,
         barcode: str = "",
-        status: ProductVariant.Status,
+        status: ProductVariant.VariantStatus,
         selected_values: list[CategoryAttributeValue],
     ) -> ProductVariant:
         """
@@ -266,7 +266,7 @@ class VariantService:
         price: Decimal,
         stock: int,
         barcode: str = "",
-        status: ProductVariant.Status,
+        status: ProductVariant.VariantStatus,
         selected_values: list[CategoryAttributeValue],
     ) -> ProductVariant:
         """
