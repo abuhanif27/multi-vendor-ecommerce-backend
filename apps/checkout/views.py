@@ -31,7 +31,7 @@ class CheckoutAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         
         try:
-            dto = CheckoutService.process_checkout(
+            order = CheckoutService.process_checkout(
                 user=request.user,
                 shipping_address=serializer.validated_data["shipping_address"],
                 billing_address=serializer.validated_data.get("billing_address")
@@ -39,9 +39,8 @@ class CheckoutAPIView(APIView):
         except DjangoValidationError as e:
             raise ValidationError({"detail": e.messages})
             
-        # Return success with DTO placeholder (in a real scenario, returning Order ID)
         return Response({
             "detail": "Checkout processed successfully.",
-            "cart_id": dto["cart_id"],
-            "grand_total": dto["financials"]["grand_total"],
+            "order_id": str(order.id),
+            "grand_total": order.grand_total,
         }, status=status.HTTP_200_OK)

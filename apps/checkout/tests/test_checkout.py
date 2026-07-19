@@ -111,8 +111,15 @@ class CheckoutAPITestCase(APITestCase):
         
         # Check that cart is now CHECKED_OUT
         from apps.cart.models import Cart
-        cart = Cart.objects.get(id=response.data["cart_id"])
-        self.assertEqual(cart.status, Cart.CartStatus.CHECKED_OUT)
+        cart = Cart.objects.get(user=self.user, status=Cart.CartStatus.CHECKED_OUT)
+        self.assertIsNotNone(cart)
+        
+        # Check that order was created
+        from apps.orders.models import Order
+        order = Order.objects.get(id=response.data["order_id"])
+        self.assertEqual(order.status, Order.OrderStatus.PENDING)
+        self.assertEqual(order.vendor_orders.count(), 1)
+        self.assertEqual(order.vendor_orders.first().items.count(), 1)
         
         # Check that inventory was reserved
         self.inventory.refresh_from_db()

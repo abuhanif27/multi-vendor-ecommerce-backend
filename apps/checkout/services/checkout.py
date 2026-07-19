@@ -4,6 +4,7 @@ from django.db import transaction
 from apps.cart.services.cart import CartService
 from apps.inventory.services.inventory import InventoryService
 from apps.cart.models import Cart
+from apps.orders.services.order import OrderService
 
 class CheckoutService:
     @staticmethod
@@ -138,6 +139,6 @@ class CheckoutService:
             "vendor_orders": vendor_orders
         }
         
-        # Future: return OrderService.create_order(dto)
-        # For now, return the DTO or a mock success response
-        return dto
+        # 5. Delegate to OrderService to create the persistent order
+        order = OrderService.create_order_from_dto(dto)
+        return order
