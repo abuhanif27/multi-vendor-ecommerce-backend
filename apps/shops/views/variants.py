@@ -1,6 +1,10 @@
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
+from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticated,
+)
 
 from apps.shops.models import (
     Product,
@@ -14,6 +18,7 @@ from apps.shops.serializers import (
 from apps.common.mixins import (
     ReadResponseMixin,
 )
+from apps.shops.permissions import IsVariantOwner
 
 
 class ProductLookupMixin:
@@ -90,10 +95,26 @@ class VariantQuerysetMixin:
         )
 
 
+class VariantPermissionMixin:
+    """
+    Configure permissions for variant APIs.
+    """
+
+    def get_permissions(self):
+        if self.request.method in ("GET", "HEAD", "OPTIONS"):
+            return [AllowAny()]
+
+        return [
+            IsAuthenticated(),
+            IsVariantOwner(),
+        ]
+
+
 class ProductVariantListCreateAPIView(
     ProductLookupMixin,
     VariantSerializerMixin,
     VariantQuerysetMixin,
+    VariantPermissionMixin,
     ReadResponseMixin,
     generics.ListCreateAPIView,
 ):
@@ -107,6 +128,7 @@ class ProductVariantDetailAPIView(
     ProductLookupMixin,
     VariantSerializerMixin,
     VariantQuerysetMixin,
+    VariantPermissionMixin,
     ReadResponseMixin,
     generics.RetrieveUpdateDestroyAPIView,
 ):
