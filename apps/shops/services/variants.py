@@ -7,6 +7,9 @@ from apps.catalog.models import (
 from apps.catalog.services import (
     CategoryService,
 )
+from apps.inventory.services import (
+    InventoryService,
+)
 
 from apps.shops.models import (
     Product,
@@ -221,7 +224,6 @@ class VariantService:
         product: Product,
         sku: str,
         price: Decimal,
-        stock: int,
         barcode: str = "",
         status: ProductVariant.VariantStatus,
         selected_values: list[CategoryAttributeValue],
@@ -240,7 +242,6 @@ class VariantService:
                 product=product,
                 sku=sku,
                 price=price,
-                stock=stock,
                 barcode=barcode,
                 status=status,
             )
@@ -255,6 +256,8 @@ class VariantService:
                 )
             )
 
+            InventoryService.create_inventory(variant)
+
             return variant
 
     @classmethod
@@ -264,7 +267,6 @@ class VariantService:
         variant: ProductVariant,
         sku: str,
         price: Decimal,
-        stock: int,
         barcode: str = "",
         status: ProductVariant.VariantStatus,
         selected_values: list[CategoryAttributeValue],
@@ -282,7 +284,6 @@ class VariantService:
 
             variant.sku = sku
             variant.price = price
-            variant.stock = stock
             variant.barcode = barcode
             variant.status = status
 
@@ -290,7 +291,6 @@ class VariantService:
                 update_fields=[
                     "sku",
                     "price",
-                    "stock",
                     "barcode",
                     "status",
                 ]

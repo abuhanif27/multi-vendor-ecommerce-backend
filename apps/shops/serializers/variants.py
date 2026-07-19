@@ -60,6 +60,13 @@ class VariantReadSerializer(
         
         return []
 
+    available_stock = serializers.SerializerMethodField()
+
+    def get_available_stock(self, obj):
+        if hasattr(obj, 'inventory'):
+            return obj.inventory.quantity_on_hand - obj.inventory.quantity_reserved
+        return 0
+
     class Meta:
         model = ProductVariant
 
@@ -67,7 +74,7 @@ class VariantReadSerializer(
             "id",
             "sku",
             "price",
-            "stock",
+            "available_stock",
             "barcode",
             "status",
             "attributes",
@@ -93,7 +100,6 @@ class VariantWriteSerializer(
         fields = (
             "sku",
             "price",
-            "stock",
             "barcode",
             "status",
             "selected_values",

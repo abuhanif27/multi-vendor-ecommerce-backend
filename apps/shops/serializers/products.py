@@ -16,8 +16,6 @@ class ProductSerializer(serializers.ModelSerializer):
             "name",
             "slug",
             "description",
-            "price",
-            "stock",
             "status",
             "images",
         )

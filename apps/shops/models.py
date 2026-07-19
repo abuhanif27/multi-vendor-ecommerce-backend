@@ -72,16 +72,6 @@ class Product(UUIDModel, TimeStampedModel, SlugMixin):
     )
 
     description = models.TextField(blank=True)
-    # TODO: Remove after ProductVariant migration.
-    price = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        validators=[MinValueValidator(0.01)],
-    )
-    # TODO: Remove after ProductVariant migration.
-    stock = models.PositiveIntegerField(
-        default=0,
-    )
 
     status = models.CharField(
         max_length=20,
@@ -137,10 +127,6 @@ class ProductVariant(UUIDModel, TimeStampedModel):
         validators=[
             MinValueValidator(0.01),
         ],
-    )
-
-    stock = models.PositiveIntegerField(
-        default=0,
     )
 
     barcode = models.CharField(

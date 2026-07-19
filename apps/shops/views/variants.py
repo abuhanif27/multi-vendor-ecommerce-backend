@@ -57,6 +57,7 @@ class VariantQuerysetMixin:
         return (
             self.get_product()
             .variants
+            .select_related("inventory")
             .prefetch_related(
                 Prefetch(
                     "attribute_values",
