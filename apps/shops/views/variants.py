@@ -1,10 +1,6 @@
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
-from rest_framework import (
-    generics,
-    status,
-)
-from rest_framework.response import Response
+from rest_framework import generics
 
 from apps.shops.models import (
     Product,
@@ -14,6 +10,9 @@ from apps.shops.models import (
 from apps.shops.serializers import (
     VariantReadSerializer,
     VariantWriteSerializer,
+)
+from apps.common.mixins import (
+    ReadResponseMixin,
 )
 
 
@@ -33,10 +32,26 @@ class ProductLookupMixin:
         return self._product
 
 
-class VariantSerializerMixin:
+class ReadSerializerMixin:
+    read_serializer_class = None
+
+    def get_read_serializer(self, instance):
+        if self.read_serializer_class is None:
+            raise NotImplementedError(
+                "read_serializer_class must be defined."
+            )
+
+        return self.read_serializer_class(
+            instance,
+            context=self.get_serializer_context(),
+        )
+
+
+class VariantSerializerMixin(ReadSerializerMixin):
     """
     Configure serializers for variant APIs.
     """
+    read_serializer_class = VariantReadSerializer
 
     def get_serializer_class(self):
         if self.request.method in (
@@ -52,15 +67,6 @@ class VariantSerializerMixin:
         context = super().get_serializer_context()
         context["product"] = self.get_product()
         return context
-
-    def get_read_serializer(
-        self,
-        instance,
-    ):
-        return VariantReadSerializer(
-            instance,
-            context=self.get_serializer_context(),
-        )
 
 
 class VariantQuerysetMixin:
@@ -88,6 +94,7 @@ class ProductVariantListCreateAPIView(
     ProductLookupMixin,
     VariantSerializerMixin,
     VariantQuerysetMixin,
+    ReadResponseMixin,
     generics.ListCreateAPIView,
 ):
     """
@@ -95,40 +102,12 @@ class ProductVariantListCreateAPIView(
     """
     queryset = ProductVariant.objects.all()
 
-    def create(
-        self,
-        request,
-        *args,
-        **kwargs,
-    ):
-        serializer = self.get_serializer(
-            data=request.data,
-        )
-        serializer.is_valid(
-            raise_exception=True,
-        )
-
-        instance = serializer.save()
-
-        read_serializer = self.get_read_serializer(
-            instance,
-        )
-
-        headers = self.get_success_headers(
-            read_serializer.data,
-        )
-
-        return Response(
-            read_serializer.data,
-            status=status.HTTP_201_CREATED,
-            headers=headers,
-        )
-
 
 class ProductVariantDetailAPIView(
     ProductLookupMixin,
     VariantSerializerMixin,
     VariantQuerysetMixin,
+    ReadResponseMixin,
     generics.RetrieveUpdateDestroyAPIView,
 ):
     """
@@ -137,32 +116,3 @@ class ProductVariantDetailAPIView(
     queryset = ProductVariant.objects.all()
     lookup_field = "sku"
     lookup_url_kwarg = "sku"
-
-    def update(
-        self,
-        request,
-        *args,
-        **kwargs,
-    ):
-        partial = kwargs.pop(
-            "partial",
-            False,
-        )
-
-        instance = self.get_object()
-
-        serializer = self.get_serializer(
-            instance,
-            data=request.data,
-            partial=partial,
-        )
-
-        serializer.is_valid(
-            raise_exception=True,
-        )
-
-        instance = serializer.save()
-
-        return Response(
-            self.get_read_serializer(instance).data,
-        )
