@@ -46,15 +46,23 @@ class IsShopOwner(BasePermission):
 class IsProductOwner(BasePermission):
     """
     Allows access only to the owner of a product.
-
-    Expected object:
-        Product
     """
 
     message = (
         "You do not have permission to perform "
         "this action on this product."
     )
+
+    def has_permission(self, request, view):
+        if request.method != "POST":
+            return True
+
+        product = view.get_product()
+
+        return (
+            request.user.is_authenticated
+            and product.shop.owner == request.user
+        )
 
     def has_object_permission(
         self,

@@ -18,7 +18,10 @@ from apps.shops.serializers import (
 from apps.common.mixins import (
     ReadResponseMixin,
 )
-from apps.shops.permissions import IsVariantOwner
+from apps.shops.permissions import (
+    IsVariantOwner,
+    IsProductOwner,
+)
 
 
 class ProductLookupMixin:
@@ -103,6 +106,9 @@ class VariantPermissionMixin:
     def get_permissions(self):
         if self.request.method in ("GET", "HEAD", "OPTIONS"):
             return [AllowAny()]
+
+        if self.request.method == "POST":
+            return [IsProductOwner()]
 
         return [
             IsAuthenticated(),
