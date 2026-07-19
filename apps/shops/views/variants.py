@@ -1,8 +1,10 @@
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
-from rest_framework import status
+from rest_framework import (
+    generics,
+    status,
+)
 from rest_framework.response import Response
-from rest_framework import generics
 
 from apps.shops.models import (
     Product,
@@ -61,12 +63,10 @@ class VariantSerializerMixin:
         )
 
 
-class ProductVariantListCreateAPIView(
-    ProductLookupMixin,
-    VariantSerializerMixin,
-    generics.ListCreateAPIView,
-):
-    queryset = ProductVariant.objects.all()
+class VariantQuerysetMixin:
+    """
+    Provide an optimized queryset for product variants.
+    """
 
     def get_queryset(self):
         return (
@@ -82,6 +82,18 @@ class ProductVariantListCreateAPIView(
                 )
             )
         )
+
+
+class ProductVariantListCreateAPIView(
+    ProductLookupMixin,
+    VariantSerializerMixin,
+    VariantQuerysetMixin,
+    generics.ListCreateAPIView,
+):
+    """
+    List and create product variants.
+    """
+    queryset = ProductVariant.objects.all()
 
     def create(
         self,
@@ -116,24 +128,15 @@ class ProductVariantListCreateAPIView(
 class ProductVariantDetailAPIView(
     ProductLookupMixin,
     VariantSerializerMixin,
+    VariantQuerysetMixin,
     generics.RetrieveUpdateDestroyAPIView,
 ):
+    """
+    Retrieve, update, and delete a product variant.
+    """
     queryset = ProductVariant.objects.all()
-
-    def get_object(self):
-        return get_object_or_404(
-            ProductVariant.objects.prefetch_related(
-                Prefetch(
-                    "attribute_values",
-                    queryset=VariantAttributeValue.objects.select_related(
-                        "category_attribute_value",
-                        "category_attribute_value__category_attribute",
-                    ),
-                )
-            ),
-            product=self.get_product(),
-            sku=self.kwargs["sku"],
-        )
+    lookup_field = "sku"
+    lookup_url_kwarg = "sku"
 
     def update(
         self,
