@@ -44,8 +44,6 @@ class ProductImageViewsTest(APITestCase):
             shop=self.shop,
             category=self.category,
             name="Test Product",
-            price=10.00,
-            stock=10,
             status=Product.ProductStatus.ACTIVE
         )
 

@@ -35,8 +35,6 @@ class VariantImageViewsTest(APITestCase):
             shop=self.shop,
             category=self.category,
             name="Test Product",
-            price=10.00,
-            stock=10,
             status=Product.ProductStatus.ACTIVE
         )
         
@@ -44,7 +42,6 @@ class VariantImageViewsTest(APITestCase):
             product=self.product,
             sku="TEST-SKU",
             price=15.00,
-            stock=5,
         )
 
         self.image_create_url = reverse(
