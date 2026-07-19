@@ -96,3 +96,63 @@ class IsVariantOwner(BasePermission):
             obj.product.shop.owner
             == request.user
         )
+
+
+class IsProductImageOwner(BasePermission):
+    """
+    Allows access only to the owner of a product image.
+
+    Expected object:
+        ProductImage
+    """
+
+    message = (
+        "You do not have permission to perform "
+        "this action on this product image."
+    )
+
+    def has_object_permission(
+        self,
+        request,
+        view,
+        obj,
+    ):
+        return (
+            obj.product.shop.owner
+            == request.user
+        )
+
+
+class IsVariantImageOwner(BasePermission):
+    """
+    Allows access only to the owner of a variant image.
+
+    Expected object:
+        VariantImage
+    """
+
+    message = (
+        "You do not have permission to perform "
+        "this action on this variant image."
+    )
+
+    def has_permission(self, request, view):
+        if request.method != "POST":
+            return True
+
+        variant = view.get_variant()
+        return (
+            request.user.is_authenticated
+            and variant.product.shop.owner == request.user
+        )
+
+    def has_object_permission(
+        self,
+        request,
+        view,
+        obj,
+    ):
+        return (
+            obj.variant.product.shop.owner
+            == request.user
+        )

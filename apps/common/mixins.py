@@ -5,6 +5,21 @@ from rest_framework import (
 from django.utils.text import slugify
 
 
+class ReadSerializerMixin:
+    read_serializer_class = None
+
+    def get_read_serializer(self, instance):
+        if self.read_serializer_class is None:
+            raise NotImplementedError(
+                "read_serializer_class must be defined."
+            )
+
+        return self.read_serializer_class(
+            instance,
+            context=self.get_serializer_context(),
+        )
+
+
 class SlugMixin:
     def _create_unique_slug(self, value):
         base_slug = slugify(value)

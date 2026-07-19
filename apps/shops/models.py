@@ -223,20 +223,52 @@ class ProductImage(UUIDModel, TimeStampedModel):
         upload_to="products/",
     )
 
-    sort_order = models.PositiveSmallIntegerField(
-        default=1,
-        help_text=(
-            "Display order of the image. "
-            "The image with the lowest sort_order is treated as the primary image."
-        ),
+    alt_text = models.CharField(
+        max_length=255,
+        blank=True,
     )
 
-    @property
-    def is_primary(self):
-        return self.sort_order == 1
+    display_order = models.PositiveSmallIntegerField(
+        default=1,
+    )
+
+    is_primary = models.BooleanField(
+        default=False,
+    )
 
     class Meta:
-        ordering = ["sort_order", "created_at"]
+        ordering = ("display_order", "created_at")
 
     def __str__(self):
-        return f"{self.product.name} - Image {self.sort_order}"
+        return f"{self.product.name} - Image {self.display_order}"
+
+
+class VariantImage(UUIDModel, TimeStampedModel):
+    variant = models.ForeignKey(
+        ProductVariant,
+        on_delete=models.CASCADE,
+        related_name="images",
+    )
+
+    image = models.ImageField(
+        upload_to="variants/",
+    )
+
+    alt_text = models.CharField(
+        max_length=255,
+        blank=True,
+    )
+
+    display_order = models.PositiveSmallIntegerField(
+        default=1,
+    )
+
+    is_primary = models.BooleanField(
+        default=False,
+    )
+
+    class Meta:
+        ordering = ("display_order", "created_at")
+
+    def __str__(self):
+        return f"{self.variant.sku} - Image {self.display_order}"

@@ -1,229 +1,137 @@
 from django.db import transaction
 from django.db.models import F
 
-from apps.shops.models import ProductImage
+from apps.shops.models import Product, ProductImage
 
 
 class ProductImageService:
     """
-    Business logic for product image ordering.
+    Business logic for product images.
     """
 
-    # ==========================================================
-    # Private Helpers
-    # ==========================================================
-
-    @staticmethod
-    def _resolve_sort_order(
+    @classmethod
+    def create(
+        cls,
         *,
-        requested_sort_order,
-        current_image_count,
-    ):
-        """
-        Resolve the final sort order.
-
-        Examples
-        --------
-        Images = 3
-
-        None -> 4
-        1    -> 1
-        2    -> 2
-        3    -> 3
-        4    -> 4
-        999  -> 4
-        """
-
-        if requested_sort_order is None:
-            return current_image_count + 1
-
-        return min(
-            requested_sort_order,
-            current_image_count + 1,
-        )
-
-    @staticmethod
-    def _shift_down(
-        *,
-        product,
-        from_sort_order,
-    ):
-        """
-        Shift images down.
-
-        Before
-
-        1
-        2
-        3
-
-        insert at 2
-
-        After
-
-        1
-        3
-        4
-        """
-
-        ProductImage.objects.filter(
-            product=product,
-            sort_order__gte=from_sort_order,
-        ).update(
-            sort_order=F("sort_order") + 1,
-        )
-
-    @staticmethod
-    def _shift_up(
-        *,
-        product,
-        from_sort_order,
-    ):
-        """
-        Close the gap after deletion.
-
-        Before
-
-        1
-        2
-        3
-        4
-
-        delete 2
-
-        After
-
-        1
-        2
-        3
-        """
-
-        ProductImage.objects.filter(
-            product=product,
-            sort_order__gt=from_sort_order,
-        ).update(
-            sort_order=F("sort_order") - 1,
-        )
-
-    # ==========================================================
-    # Public API
-    # ==========================================================
-
-    @staticmethod
-    def insert(
-        *,
-        product,
+        product: Product,
         image,
-        sort_order=None,
-    ):
+        alt_text: str = "",
+    ) -> ProductImage:
         """
-        Insert a new image.
+        Create a product image. 
+        If it's the first image, it becomes primary automatically.
+        Appended at the end of the display order.
         """
-
-        current_image_count = product.images.count()
-
-        sort_order = ProductImageService._resolve_sort_order(
-            requested_sort_order=sort_order,
-            current_image_count=current_image_count,
-        )
-
         with transaction.atomic():
-
-            ProductImageService._shift_down(
-                product=product,
-                from_sort_order=sort_order,
-            )
+            current_image_count = product.images.count()
+            
+            is_primary = current_image_count == 0
+            display_order = current_image_count + 1
 
             return ProductImage.objects.create(
                 product=product,
                 image=image,
-                sort_order=sort_order,
+                alt_text=alt_text,
+                display_order=display_order,
+                is_primary=is_primary,
             )
 
-    @staticmethod
-    def delete(
+    @classmethod
+    def update(
+        cls,
         *,
-        product_image,
-    ):
+        product_image: ProductImage,
+        alt_text: str,
+    ) -> ProductImage:
         """
-        Delete an image and close the ordering gap.
+        Update a product image.
         """
+        product_image.alt_text = alt_text
+        product_image.save(update_fields=["alt_text", "updated_at"])
+        return product_image
 
+    @classmethod
+    def delete(
+        cls,
+        *,
+        product_image: ProductImage,
+    ) -> None:
+        """
+        Delete a product image, close the display order gap,
+        and reassign primary status if necessary.
+        """
         with transaction.atomic():
-
-            deleted_sort_order = product_image.sort_order
             product = product_image.product
+            deleted_display_order = product_image.display_order
+            was_primary = product_image.is_primary
 
             product_image.delete()
 
-            ProductImageService._shift_up(
-                product=product,
-                from_sort_order=deleted_sort_order,
+            # Shift up the remaining images to close the gap
+            product.images.filter(
+                display_order__gt=deleted_display_order
+            ).update(
+                display_order=F("display_order") - 1
             )
 
-    @staticmethod
-    def move(
+            # Reassign primary if the deleted one was primary
+            if was_primary:
+                new_primary = product.images.order_by("display_order").first()
+                if new_primary:
+                    new_primary.is_primary = True
+                    new_primary.save(update_fields=["is_primary", "updated_at"])
+
+    @classmethod
+    def set_primary(
+        cls,
         *,
-        product_image,
-        requested_sort_order,
-    ):
+        product_image: ProductImage,
+    ) -> None:
         """
-        Move an image to another position.
+        Set the given image as primary, and remove primary status from others.
         """
-
-        product = product_image.product
-
-        current_image_count = product.images.count()
-
-        new_sort_order = ProductImageService._resolve_sort_order(
-            requested_sort_order=requested_sort_order,
-            current_image_count=current_image_count,
-        )
-
-        old_sort_order = product_image.sort_order
-
-        if old_sort_order == new_sort_order:
-            return product_image
-
         with transaction.atomic():
+            if product_image.is_primary:
+                return
 
-            #
-            # Moving DOWN
-            #
-            # 2 -> 5
-            #
+            product = product_image.product
+            
+            # Remove primary from all
+            product.images.filter(is_primary=True).update(is_primary=False)
+            
+            # Set as primary
+            product_image.is_primary = True
+            product_image.save(update_fields=["is_primary", "updated_at"])
 
-            if old_sort_order < new_sort_order:
-
-                ProductImage.objects.filter(
-                    product=product,
-                    sort_order__gt=old_sort_order,
-                    sort_order__lte=new_sort_order,
-                ).update(
-                    sort_order=F("sort_order") - 1,
-                )
-
-            #
-            # Moving UP
-            #
-            # 5 -> 2
-            #
-
-            else:
-
-                ProductImage.objects.filter(
-                    product=product,
-                    sort_order__gte=new_sort_order,
-                    sort_order__lt=old_sort_order,
-                ).update(
-                    sort_order=F("sort_order") + 1,
-                )
-
-            product_image.sort_order = new_sort_order
-            product_image.save(
-                update_fields=[
-                    "sort_order",
-                ]
-            )
-
-        return product_image
+    @classmethod
+    def reorder(
+        cls,
+        *,
+        product: Product,
+        image_ids: list[str],
+    ) -> None:
+        """
+        Update the display order of all images for the product.
+        image_ids should be a list of UUIDs in the desired order.
+        """
+        with transaction.atomic():
+            # Validate that the provided IDs match the product's images exactly
+            existing_images = list(product.images.all())
+            existing_ids = {str(img.id) for img in existing_images}
+            provided_ids = {str(img_id) for img_id in image_ids}
+            
+            if existing_ids != provided_ids:
+                raise ValueError("Provided image IDs do not match the product's images.")
+            
+            # Bulk update display_order
+            images_to_update = []
+            for order, image_id in enumerate(image_ids, start=1):
+                for img in existing_images:
+                    if str(img.id) == str(image_id):
+                        if img.display_order != order:
+                            img.display_order = order
+                            images_to_update.append(img)
+                        break
+            
+            if images_to_update:
+                ProductImage.objects.bulk_update(images_to_update, ["display_order"])

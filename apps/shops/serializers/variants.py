@@ -42,6 +42,24 @@ class VariantReadSerializer(
         read_only=True,
     )
 
+    images = serializers.SerializerMethodField()
+
+    def get_images(self, obj):
+        from .variant_images import VariantImageReadSerializer
+        from .product_images import ProductImageReadSerializer
+
+        # Use prefetch_related if available, else query
+        variant_images = obj.images.all()
+        if variant_images:
+            return VariantImageReadSerializer(variant_images, many=True, context=self.context).data
+        
+        # Fallback to product primary image
+        primary_product_image = obj.product.images.filter(is_primary=True).first()
+        if primary_product_image:
+            return ProductImageReadSerializer([primary_product_image], many=True, context=self.context).data
+        
+        return []
+
     class Meta:
         model = ProductVariant
 
@@ -53,6 +71,7 @@ class VariantReadSerializer(
             "barcode",
             "status",
             "attributes",
+            "images",
         )
 
         read_only_fields = fields

@@ -1,9 +1,12 @@
 from rest_framework import serializers
 
 from apps.shops.models import Product
+from apps.shops.serializers.product_images import ProductImageReadSerializer
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    images = ProductImageReadSerializer(many=True, read_only=True)
+
     class Meta:
         model = Product
         fields = (
@@ -16,6 +19,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "price",
             "stock",
             "status",
+            "images",
         )
 
         read_only_fields = (

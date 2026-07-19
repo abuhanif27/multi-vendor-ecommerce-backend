@@ -16,6 +16,11 @@ from apps.shops.views.variants import (
     ProductVariantListCreateAPIView,
 )
 
+from apps.shops.views.variant_images import (
+    VariantImageCreateAPIView,
+    VariantImageDetailAPIView,
+)
+
 urlpatterns = [
     path('shops/', ShopListCreateAPIView.as_view(), name='shop-list'),
     path(
@@ -55,14 +60,23 @@ urlpatterns = [
         name="my-product-list",
     ),
     path(
-        "products/<slug:product_slug>/images/",
+        "shops/<slug:shop_slug>/products/<slug:product_slug>/images/",
         ProductImageCreateAPIView.as_view(),
         name="product-image-create",
     ),
     path(
-        "products/<slug:product_slug>/images/<int:pk>/",
+        "shops/<slug:shop_slug>/products/<slug:product_slug>/images/<uuid:pk>/",
         ProductImageDetailAPIView.as_view(),
         name="product-image-detail",
     ),
-
+    path(
+        "shops/<slug:shop_slug>/products/<slug:product_slug>/variants/<str:sku>/images/",
+        VariantImageCreateAPIView.as_view(),
+        name="variant-image-create",
+    ),
+    path(
+        "shops/<slug:shop_slug>/products/<slug:product_slug>/variants/<str:sku>/images/<uuid:pk>/",
+        VariantImageDetailAPIView.as_view(),
+        name="variant-image-detail",
+    ),
 ]

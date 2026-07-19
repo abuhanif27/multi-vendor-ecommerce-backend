@@ -17,42 +17,13 @@ from apps.shops.serializers import (
 )
 from apps.common.mixins import (
     ReadResponseMixin,
+    ReadSerializerMixin,
 )
 from apps.shops.permissions import (
     IsVariantOwner,
     IsProductOwner,
 )
-
-
-class ProductLookupMixin:
-    """
-    Resolve the parent product from the URL.
-    """
-
-    def get_product(self):
-        if not hasattr(self, "_product"):
-            self._product = get_object_or_404(
-                Product,
-                shop__slug=self.kwargs["shop_slug"],
-                slug=self.kwargs["product_slug"],
-            )
-
-        return self._product
-
-
-class ReadSerializerMixin:
-    read_serializer_class = None
-
-    def get_read_serializer(self, instance):
-        if self.read_serializer_class is None:
-            raise NotImplementedError(
-                "read_serializer_class must be defined."
-            )
-
-        return self.read_serializer_class(
-            instance,
-            context=self.get_serializer_context(),
-        )
+from apps.shops.mixins import ProductLookupMixin
 
 
 class VariantSerializerMixin(ReadSerializerMixin):
@@ -93,7 +64,9 @@ class VariantQuerysetMixin:
                         "category_attribute_value",
                         "category_attribute_value__category_attribute",
                     ),
-                )
+                ),
+                "images",
+                "product__images",
             )
         )
 
