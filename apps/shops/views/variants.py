@@ -1,6 +1,7 @@
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
-
+from rest_framework import status
+from rest_framework.response import Response
 from rest_framework import generics
 
 from apps.shops.models import (
@@ -30,8 +31,39 @@ class ProductLookupMixin:
         return self._product
 
 
+class VariantSerializerMixin:
+    """
+    Configure serializers for variant APIs.
+    """
+
+    def get_serializer_class(self):
+        if self.request.method in (
+            "GET",
+            "HEAD",
+            "OPTIONS",
+        ):
+            return VariantReadSerializer
+
+        return VariantWriteSerializer
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["product"] = self.get_product()
+        return context
+
+    def get_read_serializer(
+        self,
+        instance,
+    ):
+        return VariantReadSerializer(
+            instance,
+            context=self.get_serializer_context(),
+        )
+
+
 class ProductVariantListCreateAPIView(
     ProductLookupMixin,
+    VariantSerializerMixin,
     generics.ListCreateAPIView,
 ):
     queryset = ProductVariant.objects.all()
@@ -51,24 +83,39 @@ class ProductVariantListCreateAPIView(
             )
         )
 
-    def get_serializer_class(self):
-        if self.request.method in (
-            "GET",
-            "HEAD",
-            "OPTIONS",
-        ):
-            return VariantReadSerializer
+    def create(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
+        serializer = self.get_serializer(
+            data=request.data,
+        )
+        serializer.is_valid(
+            raise_exception=True,
+        )
 
-        return VariantWriteSerializer
+        instance = serializer.save()
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context["product"] = self.get_product()
-        return context
+        read_serializer = self.get_read_serializer(
+            instance,
+        )
+
+        headers = self.get_success_headers(
+            read_serializer.data,
+        )
+
+        return Response(
+            read_serializer.data,
+            status=status.HTTP_201_CREATED,
+            headers=headers,
+        )
 
 
 class ProductVariantDetailAPIView(
     ProductLookupMixin,
+    VariantSerializerMixin,
     generics.RetrieveUpdateDestroyAPIView,
 ):
     queryset = ProductVariant.objects.all()
@@ -88,17 +135,31 @@ class ProductVariantDetailAPIView(
             sku=self.kwargs["sku"],
         )
 
-    def get_serializer_class(self):
-        if self.request.method in (
-            "GET",
-            "HEAD",
-            "OPTIONS",
-        ):
-            return VariantReadSerializer
+    def update(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
+        partial = kwargs.pop(
+            "partial",
+            False,
+        )
 
-        return VariantWriteSerializer
+        instance = self.get_object()
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context["product"] = self.get_product()
-        return context
+        serializer = self.get_serializer(
+            instance,
+            data=request.data,
+            partial=partial,
+        )
+
+        serializer.is_valid(
+            raise_exception=True,
+        )
+
+        instance = serializer.save()
+
+        return Response(
+            self.get_read_serializer(instance).data,
+        )
