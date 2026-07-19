@@ -99,3 +99,27 @@ class InventoryActionAPITest(APITestCase):
         # Verify ordering (latest first)
         self.assertEqual(results[0]["transaction_type"], "OUT")
         self.assertEqual(results[1]["transaction_type"], "IN")
+
+    def test_reserve_stock(self):
+        from apps.inventory.services import InventoryService
+        InventoryService.reserve_stock(self.inventory.id, 20)
+        self.inventory.refresh_from_db()
+        self.assertEqual(self.inventory.quantity_reserved, 20)
+        
+        # Test failure
+        from django.core.exceptions import ValidationError
+        with self.assertRaises(ValidationError):
+            InventoryService.reserve_stock(self.inventory.id, 90) # Only 80 available now
+
+    def test_release_stock(self):
+        from apps.inventory.services import InventoryService
+        InventoryService.reserve_stock(self.inventory.id, 30)
+        
+        InventoryService.release_stock(self.inventory.id, 10)
+        self.inventory.refresh_from_db()
+        self.assertEqual(self.inventory.quantity_reserved, 20)
+        
+        # Test failure
+        from django.core.exceptions import ValidationError
+        with self.assertRaises(ValidationError):
+            InventoryService.release_stock(self.inventory.id, 30) # Only 20 reserved now

@@ -90,3 +90,30 @@ class InventoryService:
             created_by=user,
         )
         return inventory
+
+    @staticmethod
+    @transaction.atomic
+    def reserve_stock(inventory_id, quantity):
+        from django.core.exceptions import ValidationError
+        inventory = Inventory.objects.select_for_update().get(id=inventory_id)
+        
+        available = inventory.quantity_on_hand - inventory.quantity_reserved
+        if available < quantity:
+            raise ValidationError(f"Insufficient stock. Available: {available}, Requested: {quantity}")
+            
+        inventory.quantity_reserved += quantity
+        inventory.save(update_fields=["quantity_reserved"])
+        return inventory
+
+    @staticmethod
+    @transaction.atomic
+    def release_stock(inventory_id, quantity):
+        from django.core.exceptions import ValidationError
+        inventory = Inventory.objects.select_for_update().get(id=inventory_id)
+        
+        if inventory.quantity_reserved < quantity:
+            raise ValidationError("Cannot release more stock than currently reserved.")
+            
+        inventory.quantity_reserved -= quantity
+        inventory.save(update_fields=["quantity_reserved"])
+        return inventory
