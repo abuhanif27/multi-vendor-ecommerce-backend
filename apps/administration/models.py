@@ -81,3 +81,79 @@ class AdminAuditLog(models.Model):
 
     def __str__(self):
         return f"{self.actor} - {self.action} ({self.result}) - {self.resource_type}:{self.resource_id}"
+
+class FeatureFlag(models.Model):
+    """Controls the availability of platform features."""
+    key = models.CharField(max_length=100, unique=True)
+    is_active = models.BooleanField(default=False)
+    description = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        permissions = [
+            ("can_manage_feature_flags", "Can manage feature flags"),
+        ]
+
+    def __str__(self):
+        return f"FeatureFlag: {self.key} (Active: {self.is_active})"
+
+
+class PlatformSetting(models.Model):
+    """Strongly typed global configuration settings."""
+    CATEGORY_CHOICES = [
+        ('MARKETPLACE', 'Marketplace'),
+        ('ORDERS', 'Orders'),
+        ('PAYMENTS', 'Payments'),
+        ('SHIPPING', 'Shipping'),
+        ('PROMOTIONS', 'Promotions'),
+        ('NOTIFICATIONS', 'Notifications'),
+        ('SECURITY', 'Security'),
+        ('ANALYTICS', 'Analytics'),
+        ('SYSTEM', 'System'),
+    ]
+
+    TYPE_CHOICES = [
+        ('BOOLEAN', 'Boolean'),
+        ('INTEGER', 'Integer'),
+        ('DECIMAL', 'Decimal'),
+        ('STRING', 'String'),
+        ('JSON', 'JSON'),
+    ]
+
+    key = models.CharField(max_length=100, unique=True)
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+    value_type = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    value = models.JSONField(help_text="Stored as JSON internally to support exact typing.")
+    default_value = models.JSONField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    description = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        permissions = [
+            ("can_manage_platform_settings", "Can manage platform configuration"),
+        ]
+
+    def clean(self):
+        super().clean()
+        if self.value is not None:
+            self._validate_type(self.value, self.value_type)
+        if self.default_value is not None:
+            self._validate_type(self.default_value, self.value_type)
+
+    def _validate_type(self, val, val_type):
+        if val_type == 'BOOLEAN' and not isinstance(val, bool):
+            raise ValidationError(f"Value '{val}' is not a valid Boolean.")
+        elif val_type == 'INTEGER' and not isinstance(val, int) or isinstance(val, bool):
+            raise ValidationError(f"Value '{val}' is not a valid Integer.")
+        elif val_type == 'DECIMAL' and not isinstance(val, (float, int)):
+            raise ValidationError(f"Value '{val}' is not a valid Decimal/Float.")
+        elif val_type == 'STRING' and not isinstance(val, str):
+            raise ValidationError(f"Value '{val}' is not a valid String.")
+        elif val_type == 'JSON' and not isinstance(val, (dict, list)):
+            raise ValidationError(f"Value '{val}' is not valid JSON object/array.")
+
+    def __str__(self):
+        return f"Setting: {self.key} ({self.value_type})"
