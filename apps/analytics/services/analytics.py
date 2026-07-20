@@ -127,7 +127,7 @@ class AnalyticsService:
         qs = ProductVelocityRollup.objects.filter(
             shop_id=shop_id, 
             period=MetricPeriod.ALL_TIME
-        ).order_by('-units_sold', '-gross_revenue')[:limit]
+        ).select_related('product').order_by('-units_sold', '-gross_revenue')[:limit]
         
         return [
             TopProductDTO(

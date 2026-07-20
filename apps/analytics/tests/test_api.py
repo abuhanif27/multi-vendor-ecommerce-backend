@@ -63,6 +63,14 @@ class AnalyticsAPITestCase(APITestCase):
         self.assertEqual(len(data['top_products']), 1)
         self.assertEqual(data['top_products'][0]['product_name'], "Laptop")
         
+    def test_invalid_date_range(self):
+        self.client.force_authenticate(user=self.vendor)
+        url = reverse('analytics-dashboard')
+        
+        response = self.client.get(f"{url}?start_date=2023-12-31&end_date=2023-01-01")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("start_date cannot be after end_date", response.json()['detail'])
+
     def test_unauthorized_access(self):
         url = reverse('analytics-dashboard')
         response = self.client.get(url)

@@ -2,6 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.throttling import UserRateThrottle
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
 from datetime import datetime, date, timedelta
@@ -66,6 +67,9 @@ class AnalyticsViewSet(viewsets.ViewSet):
         else:
             start_date = end_date - timedelta(days=30)
             
+        if start_date > end_date:
+            return Response({"detail": "start_date cannot be after end_date."}, status=status.HTTP_400_BAD_REQUEST)
+            
         # For a custom range, we just query DAILY period and aggregate
         summary = AnalyticsService.get_sales_summary(shop_id, 'DAILY', start_date, end_date)
         top_products = AnalyticsService.get_top_products(shop_id, limit=5)
@@ -101,7 +105,7 @@ class AnalyticsViewSet(viewsets.ViewSet):
             OpenApiParameter('shop_id', OpenApiTypes.UUID)
         ]
     )
-    @action(detail=False, methods=['post'], url_path='export-sales')
+    @action(detail=False, methods=['post'], url_path='export-sales', throttle_classes=[UserRateThrottle])
     def export_sales(self, request):
         """
         Triggers an asynchronous export of sales data.
@@ -115,6 +119,11 @@ class AnalyticsViewSet(viewsets.ViewSet):
         
         if not start_date or not end_date:
             return Response({"detail": "start_date and end_date are required."}, status=status.HTTP_400_BAD_REQUEST)
+            
+        start_date_obj = datetime.strptime(start_date, "%Y-%m-%d").date()
+        end_date_obj = datetime.strptime(end_date, "%Y-%m-%d").date()
+        if start_date_obj > end_date_obj:
+            return Response({"detail": "start_date cannot be after end_date."}, status=status.HTTP_400_BAD_REQUEST)
             
         # In a real app, this would be: generate_vendor_sales_report.delay(...)
         # We will just return a 202 Accepted.
