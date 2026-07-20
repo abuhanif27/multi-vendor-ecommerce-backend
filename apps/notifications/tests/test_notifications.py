@@ -15,17 +15,21 @@ class NotificationModuleTestCase(TestCase):
 
     def test_event_publishing(self):
         """Test the explicit EventBus safely dispatches and catches errors."""
+        class TestEvent:
+            pass
+        
         mock_handler = MagicMock()
         mock_error_handler = MagicMock(side_effect=Exception("Boom"))
         
-        EventBus.subscribe("test_event", mock_handler)
-        EventBus.subscribe("test_event", mock_error_handler)
+        EventBus.subscribe(TestEvent, mock_handler)
+        EventBus.subscribe(TestEvent, mock_error_handler)
         
         # Publish. The error handler should raise an exception internally but NOT crash the bus.
-        EventBus.publish("test_event", foo="bar")
+        event = TestEvent()
+        EventBus.publish(event)
         
-        mock_handler.assert_called_once_with(foo="bar")
-        mock_error_handler.assert_called_once_with(foo="bar")
+        mock_handler.assert_called_once_with(event)
+        mock_error_handler.assert_called_once_with(event)
 
     @patch('apps.notifications.tasks.send_delivery_task.delay')
     def test_notification_creation_and_dispatch(self, mock_task):
