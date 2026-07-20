@@ -1,4 +1,5 @@
-from rest_framework import viewsets, mixins, status
+from rest_framework import viewsets, mixins, status, filters
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -20,15 +21,20 @@ class PromotionViewSet(viewsets.ModelViewSet):
     """
     serializer_class = PromotionSerializer
     permission_classes = [IsVendorOwnerOrAdmin]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['status', 'is_exclusive']
+    search_fields = ['name', 'description']
+    ordering_fields = ['created_at', 'priority', 'start_date', 'end_date']
     
     def get_queryset(self):
         user = self.request.user
+        qs = Promotion.objects.select_related('shop', 'reward').prefetch_related('conditions')
         if user.is_staff or user.is_superuser:
-            return Promotion.objects.all().order_by('-created_at')
+            return qs.order_by('-created_at')
         shop = user.shops.first()
         if shop:
-            return Promotion.objects.filter(shop=shop).order_by('-created_at')
-        return Promotion.objects.none()
+            return qs.filter(shop=shop).order_by('-created_at')
+        return qs.none()
 
     def perform_create(self, serializer):
         user = self.request.user
