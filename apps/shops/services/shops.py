@@ -23,3 +23,25 @@ class ShopService:
         shop.status = Shop.ShopStatus.APPROVED
         shop.save()
         return shop, True
+
+    @staticmethod
+    def suspend_shop(shop_id: str) -> Tuple[Shop, bool]:
+        shop = Shop.objects.select_for_update().get(id=shop_id)
+        if shop.status == Shop.ShopStatus.SUSPENDED:
+            return shop, False
+        if shop.status != Shop.ShopStatus.APPROVED:
+            raise ValidationError(f"Cannot suspend shop in status {shop.status}")
+        shop.status = Shop.ShopStatus.SUSPENDED
+        shop.save()
+        return shop, True
+
+    @staticmethod
+    def restore_shop(shop_id: str) -> Tuple[Shop, bool]:
+        shop = Shop.objects.select_for_update().get(id=shop_id)
+        if shop.status == Shop.ShopStatus.APPROVED:
+            return shop, False
+        if shop.status != Shop.ShopStatus.SUSPENDED:
+            raise ValidationError(f"Cannot restore shop in status {shop.status}")
+        shop.status = Shop.ShopStatus.APPROVED
+        shop.save()
+        return shop, True
