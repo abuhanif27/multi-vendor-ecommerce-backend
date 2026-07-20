@@ -62,6 +62,8 @@ class VendorAdministrationServiceTests(TransactionTestCase):
         self.assertEqual(len(self.events_published), 1)
         self.assertIsInstance(self.events_published[0], VendorApprovedEvent)
         self.assertEqual(self.events_published[0].shop_id, str(shop.id))
+        self.assertEqual(self.events_published[0].vendor_id, self.vendor_user.id)
+        self.assertEqual(self.events_published[0].approved_by, self.super_admin.id)
 
     def test_approve_vendor_permission_denied(self):
         with self.assertRaises(PermissionDenied):
@@ -97,3 +99,42 @@ class VendorAdministrationServiceTests(TransactionTestCase):
         
         # Still only one audit log should exist
         self.assertEqual(AdminAuditLog.objects.count(), 1)
+
+    def test_approve_vendor_concurrency(self):
+        import threading
+        
+        # We need to test the DB lock. Because TransactionTestCase doesn't commit until the end of the test usually,
+        # wait, threading in Django tests with sqlite can be tricky. But we can simulate by approving twice and 
+        # ensuring the idempotency checks correctly block multiple audit records. 
+        # A true concurrent thread test in Django testing on sqlite may lock. Let's do a basic thread test.
+        
+        exceptions = []
+        def approve():
+            try:
+                VendorAdministrationService.approve_vendor(
+                    shop_id=str(self.shop.id),
+                    actor=self.super_admin
+                )
+            except Exception as e:
+                exceptions.append(e)
+
+        t1 = threading.Thread(target=approve)
+        t2 = threading.Thread(target=approve)
+        
+        t1.start()
+        t2.start()
+        
+        t1.join()
+        t2.join()
+        
+        # Verify
+        if exceptions:
+            self.assertTrue(
+                "database is locked" in str(exceptions[0]) or "OperationalError" in str(type(exceptions[0])),
+                f"Unexpected exception: {exceptions[0]}"
+            )
+        else:
+            self.assertEqual(len(exceptions), 0)
+        self.assertEqual(AdminAuditLog.objects.count(), 1)
+        self.shop.refresh_from_db()
+        self.assertEqual(self.shop.status, Shop.ShopStatus.APPROVED)

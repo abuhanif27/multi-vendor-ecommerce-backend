@@ -1,17 +1,20 @@
+from typing import Tuple
 from django.core.exceptions import ValidationError
 from apps.shops.models import Shop
 
 class ShopService:
     @staticmethod
-    def approve_shop(shop_id: str) -> Shop:
+    def approve_shop(shop_id: str) -> Tuple[Shop, bool]:
         """
         Approves a shop. Contains business validation for the transition.
+        Returns a tuple: (shop_instance, was_approved_now)
         """
-        shop = Shop.objects.get(id=shop_id)
+        # Acquire lock to prevent concurrent modifications
+        shop = Shop.objects.select_for_update().get(id=shop_id)
         
         # Idempotency
         if shop.status == Shop.ShopStatus.APPROVED:
-            return shop
+            return shop, False
 
         # Allowed transitions: PENDING -> APPROVED or SUSPENDED -> APPROVED
         if shop.status not in [Shop.ShopStatus.PENDING, Shop.ShopStatus.SUSPENDED]:
@@ -19,4 +22,4 @@ class ShopService:
 
         shop.status = Shop.ShopStatus.APPROVED
         shop.save()
-        return shop
+        return shop, True
