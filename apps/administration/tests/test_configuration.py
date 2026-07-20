@@ -109,3 +109,57 @@ class PlatformConfigurationServiceTests(TestCase):
         self.assertEqual(audits[0].action, "UPDATE")
         self.assertEqual(audits[1].resource_id, "magic_wand")
         self.assertEqual(audits[1].action, "CREATE")
+
+    def test_immutable_system_setting(self):
+        PlatformSetting.objects.filter(key="base_commission").update(is_system=True)
+        with self.assertRaises(ValidationError) as context:
+            PlatformConfigurationService.update_setting(
+                key="base_commission",
+                value=20.0,
+                actor=self.admin
+            )
+        self.assertIn("is a system setting and cannot be modified", str(context.exception))
+
+    def test_reserved_key_prefix_validation(self):
+        setting = PlatformSetting(
+            key="sys_core_debug",
+            category="SYSTEM",
+            value_type="BOOLEAN",
+            value=True,
+            is_system=False
+        )
+        with self.assertRaises(ValidationError) as context:
+            setting.clean()
+        self.assertIn("Non-system settings cannot use the 'sys_' prefix", str(context.exception))
+        
+        # Should work if is_system=True
+        setting.is_system = True
+        setting.clean()  # Should not raise
+
+    def test_inactive_feature_flags_behavior(self):
+        # We already have 'enable_new_checkout' = False in setUp
+        self.assertFalse(PlatformConfigurationService.is_feature_enabled("enable_new_checkout"))
+        
+        # Test it populates cache
+        cache_key = f"{PlatformConfigurationService.FEATURE_FLAG_CACHE_PREFIX}enable_new_checkout"
+        self.assertFalse(cache.get(cache_key))
+
+    def test_cache_miss_after_invalidation(self):
+        # Warm cache
+        val = PlatformConfigurationService.get_setting("base_commission")
+        self.assertEqual(val, 10.5)
+        
+        cache_key = f"{PlatformConfigurationService.SETTING_CACHE_PREFIX}base_commission"
+        self.assertEqual(cache.get(cache_key), 10.5)
+        
+        # Invalidate via update
+        PlatformConfigurationService.update_setting("base_commission", 11.0, self.admin)
+        
+        # Internal cache should be cleared
+        self.assertIsNone(cache.get(cache_key))
+        
+        # Next read should hit DB and set cache
+        new_val = PlatformConfigurationService.get_setting("base_commission")
+        self.assertEqual(new_val, 11.0)
+        self.assertEqual(cache.get(cache_key), 11.0)
+

@@ -1,4 +1,5 @@
 from typing import Any, Optional
+from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
@@ -10,7 +11,10 @@ User = get_user_model()
 class PlatformConfigurationService:
     SETTING_CACHE_PREFIX = "platform_setting:"
     FEATURE_FLAG_CACHE_PREFIX = "feature_flag:"
-    CACHE_TIMEOUT = 3600  # 1 hour, invalidated on save
+    
+    @classmethod
+    def get_cache_timeout(cls) -> int:
+        return getattr(settings, 'PLATFORM_CONFIGURATION_CACHE_TTL', 3600)
 
     @classmethod
     def get_setting(cls, key: str) -> Any:
@@ -32,7 +36,7 @@ class PlatformConfigurationService:
             raise ValueError(f"Platform setting '{key}' does not exist.")
 
         val = setting.value if setting.is_active and setting.value is not None else setting.default_value
-        cache.set(cache_key, val, cls.CACHE_TIMEOUT)
+        cache.set(cache_key, val, cls.get_cache_timeout())
         return val
 
     @classmethod
@@ -50,6 +54,9 @@ class PlatformConfigurationService:
             setting = PlatformSetting.objects.get(key=key)
         except PlatformSetting.DoesNotExist:
             raise ValueError(f"Platform setting '{key}' does not exist.")
+
+        if setting.is_system:
+            raise ValidationError(f"Platform setting '{key}' is a system setting and cannot be modified.")
 
         before_state = {"value": setting.value}
         
@@ -94,7 +101,7 @@ class PlatformConfigurationService:
         except FeatureFlag.DoesNotExist:
             is_active = False
             
-        cache.set(cache_key, is_active, cls.CACHE_TIMEOUT)
+        cache.set(cache_key, is_active, cls.get_cache_timeout())
         return is_active
 
     @classmethod

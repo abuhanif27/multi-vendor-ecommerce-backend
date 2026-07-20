@@ -4,10 +4,14 @@
 The Administration domain orchestrates the platform and maintains the immutable ledger of staff actions. It does not duplicate business rules from core domains.
 
 ### 1.1 Core Entities
-*   **AdminAuditLog:** Immutable ledger recording all state-changing actions performed by staff.
-*   **FeatureFlag:** Global toggles for enabling/disabling platform features.
-*   **PlatformSetting:** Key-value pairs for global configuration (e.g., base commission rate).
-*   **SystemAnnouncement:** Sitewide banners or alerts for vendors/buyers.
+*   **AdminAuditLog:** Generic, immutable platform infrastructure recording state-changing actions across all domains. Includes success/failure results.
+*   **FeatureFlag:** Simple boolean toggles controlling the availability of platform features.
+*   **PlatformSetting:** Strongly typed global configuration settings (e.g., base commission rate).
+
+### 1.2 Architecture Decision Record (ADR): Configuration Value Storage
+**Context:** Storing strongly typed values in a relational database for global configuration.
+**Decision:** We chose "Option B" (a single `JSONField` paired with a `value_type` string) instead of storing everything as plain text strings.
+**Justification:** While text strings require explicit parsing (e.g., `if type == 'boolean': return value == 'True'`), a `JSONField` natively deserializes Python primitives (booleans, integers, floats, dictionaries) at the ORM boundary. The service layer guarantees the JSON conforms to the declared `value_type` using strict `.clean()` validation. This provides runtime safety and elegant type coercion without complex parsing logic.
 
 ## 2. RBAC Architecture Evaluation
 Rather than reinventing a custom Role-Based Access Control system, we will leverage **Django's native `Group` and `Permission` system**.
@@ -45,8 +49,10 @@ The Administration domain publishes strictly typed events to the global `EventBu
 *   `PlatformSettingUpdatedEvent(key, new_value, admin_id)`
 
 ## 5. Implementation Plan (Sequential Flow)
-1. **Staff Permissions:** Define custom permissions using Django's native model `Meta`.
-2. **Audit Logging:** Implement `AdminAuditLog` model and `AuditService`.
-3. **Platform Configuration:** Implement `FeatureFlag`, `PlatformSetting`, and `PlatformConfigurationService`.
-4. **Vendor Administration:** Implement `VendorAdministrationService` APIs.
-5. **Product Moderation:** Implement `ProductModerationService` APIs.
+1. **Staff Permissions:** Native Django Groups mapping to capability string permissions.
+2. **Audit Logging:** Immutable `AdminAuditLog` enforcing immutability natively.
+3. **Platform Configuration:** `FeatureFlag` and `PlatformSetting`. 
+    - **Cache Flow:** Read-through cache with configurable TTL (default 3600s). `update_setting` performs synchronous cache invalidation.
+    - **Audit Flow:** Settings actively wrap `AuditService.log_action()` creating immutable traces of `before_state` and `after_state`.
+4. **Vendor Administration:** Orchestrates existing modules to manage shop statuses.
+5. **Product Moderation:** Orchestrates Catalog to un-list items.

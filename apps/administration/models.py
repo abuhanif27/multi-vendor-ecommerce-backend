@@ -127,6 +127,7 @@ class PlatformSetting(models.Model):
     value = models.JSONField(help_text="Stored as JSON internally to support exact typing.")
     default_value = models.JSONField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
+    is_system = models.BooleanField(default=False, help_text="System settings cannot be modified by staff.")
     description = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -138,6 +139,9 @@ class PlatformSetting(models.Model):
 
     def clean(self):
         super().clean()
+        if self.key and self.key.startswith('sys_') and not self.is_system:
+            raise ValidationError("Non-system settings cannot use the 'sys_' prefix.")
+            
         if self.value is not None:
             self._validate_type(self.value, self.value_type)
         if self.default_value is not None:
@@ -146,7 +150,7 @@ class PlatformSetting(models.Model):
     def _validate_type(self, val, val_type):
         if val_type == 'BOOLEAN' and not isinstance(val, bool):
             raise ValidationError(f"Value '{val}' is not a valid Boolean.")
-        elif val_type == 'INTEGER' and not isinstance(val, int) or isinstance(val, bool):
+        elif val_type == 'INTEGER' and (not isinstance(val, int) or isinstance(val, bool)):
             raise ValidationError(f"Value '{val}' is not a valid Integer.")
         elif val_type == 'DECIMAL' and not isinstance(val, (float, int)):
             raise ValidationError(f"Value '{val}' is not a valid Decimal/Float.")
