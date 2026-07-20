@@ -98,3 +98,22 @@ class PaymentService:
         OrderService.cancel_order(payment.order.id)
         
         return payment
+
+    @staticmethod
+    @transaction.atomic
+    def capture_cod_payment(order_id):
+        """
+        Internal business logic hook.
+        Triggered when ShippingService reports that the order was successfully delivered.
+        """
+        payment = Payment.objects.select_for_update().get(order_id=order_id, provider=Payment.Provider.COD)
+        
+        if payment.status == Payment.PaymentStatus.CAPTURED:
+            return payment
+            
+        payment.status = Payment.PaymentStatus.CAPTURED
+        payment.paid_at = timezone.now()
+        payment.provider_reference = "COD_DELIVERED"
+        payment.save(update_fields=['status', 'paid_at', 'provider_reference'])
+        
+        return payment

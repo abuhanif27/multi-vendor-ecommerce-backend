@@ -16,6 +16,7 @@ class Order(UUIDModel, TimeStampedModel):
         FAILED = 'FAILED', 'Failed'
         CANCELLED = 'CANCELLED', 'Cancelled'
         REFUNDED = 'REFUNDED', 'Refunded'
+        COMPLETED = 'COMPLETED', 'Completed'
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

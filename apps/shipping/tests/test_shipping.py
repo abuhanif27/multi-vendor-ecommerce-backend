@@ -1,3 +1,4 @@
+import uuid
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from django.contrib.auth import get_user_model
@@ -100,3 +101,64 @@ class ShippingModuleServiceTestCase(APITestCase):
                 shipment.id, 
                 Shipment.ShipmentStatus.DELIVERED
             )
+            
+    def test_cod_delivery_completes_order_and_payment(self):
+        """When the last shipment for a COD order is delivered, Payment should capture and Order complete."""
+        # 1. Setup Payment
+        from apps.payments.models import Payment
+        payment = Payment.objects.create(
+            order=self.order,
+            provider=Payment.Provider.COD,
+            amount=self.order.grand_total,
+            status=Payment.PaymentStatus.PENDING,
+            idempotency_key=uuid.uuid4()
+        )
+        
+        # 2. Setup Shipment
+        shipment = ShippingService.initialize_shipment(self.vendor_order.id)
+        ShippingService.update_shipment_status(shipment.id, Shipment.ShipmentStatus.SHIPPED)
+        ShippingService.update_shipment_status(shipment.id, Shipment.ShipmentStatus.OUT_FOR_DELIVERY)
+        
+        # 3. Mark Delivered
+        ShippingService.update_shipment_status(shipment.id, Shipment.ShipmentStatus.DELIVERED)
+        
+        # 4. Assertions
+        self.vendor_order.refresh_from_db()
+        self.assertEqual(self.vendor_order.status, VendorOrder.FulfillmentStatus.DELIVERED)
+        
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.status, Order.OrderStatus.COMPLETED)
+        
+        payment.refresh_from_db()
+        self.assertEqual(payment.status, Payment.PaymentStatus.CAPTURED)
+        self.assertEqual(payment.provider_reference, "COD_DELIVERED")
+
+    def test_partial_shipment_delivery(self):
+        """If one shipment delivers, VendorOrder shouldn't flip until all do."""
+        # Create a second shipment for the same vendor order
+        shipment1 = ShippingService.initialize_shipment(self.vendor_order.id)
+        
+        # Manually create another shipment (Simulating a split order)
+        shipment2 = Shipment.objects.create(
+            vendor_order=self.vendor_order,
+            status=Shipment.ShipmentStatus.PENDING,
+            shipping_address_snapshot={}
+        )
+        
+        # Deliver shipment 1
+        ShippingService.update_shipment_status(shipment1.id, Shipment.ShipmentStatus.READY_FOR_PICKUP)
+        ShippingService.update_shipment_status(shipment1.id, Shipment.ShipmentStatus.SHIPPED)
+        ShippingService.update_shipment_status(shipment1.id, Shipment.ShipmentStatus.OUT_FOR_DELIVERY)
+        ShippingService.update_shipment_status(shipment1.id, Shipment.ShipmentStatus.DELIVERED)
+        
+        self.vendor_order.refresh_from_db()
+        # Still PENDING because shipment2 is not delivered
+        self.assertEqual(self.vendor_order.status, VendorOrder.FulfillmentStatus.PENDING)
+        
+        # Deliver shipment 2
+        ShippingService.update_shipment_status(shipment2.id, Shipment.ShipmentStatus.SHIPPED)
+        ShippingService.update_shipment_status(shipment2.id, Shipment.ShipmentStatus.OUT_FOR_DELIVERY)
+        ShippingService.update_shipment_status(shipment2.id, Shipment.ShipmentStatus.DELIVERED)
+        
+        self.vendor_order.refresh_from_db()
+        self.assertEqual(self.vendor_order.status, VendorOrder.FulfillmentStatus.DELIVERED)

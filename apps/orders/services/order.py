@@ -114,6 +114,11 @@ class OrderService:
         # Vendors can now start fulfilling
         order.vendor_orders.update(status=VendorOrder.FulfillmentStatus.PROCESSING)
         
+        # Initialize shipments
+        from apps.shipping.services.shipping import ShippingService
+        for vendor_order in order.vendor_orders.all():
+            ShippingService.initialize_shipment(vendor_order.id)
+        
         # Future: InventoryService.commit_stock(...)
         # items = OrderItem.objects.filter(vendor_order__order=order).select_related('variant__inventory')
         # for item in items:
@@ -131,4 +136,47 @@ class OrderService:
         order = Order.objects.get(id=order_id)
         # We leave parent status as PENDING (awaiting payment), but vendors can start processing
         order.vendor_orders.update(status=VendorOrder.FulfillmentStatus.PROCESSING)
+        
+        from apps.shipping.services.shipping import ShippingService
+        for vendor_order in order.vendor_orders.all():
+            ShippingService.initialize_shipment(vendor_order.id)
+            
         return order
+        
+    @staticmethod
+    @transaction.atomic
+    def mark_vendor_order_delivered(vendor_order_id):
+        """
+        Triggered by ShippingService when a shipment arrives.
+        """
+        vendor_order = VendorOrder.objects.select_for_update().get(id=vendor_order_id)
+        
+        if vendor_order.status == VendorOrder.FulfillmentStatus.DELIVERED:
+            return vendor_order
+            
+        # Check if ALL shipments for this vendor order are delivered
+        from apps.shipping.models import Shipment
+        pending_shipments = vendor_order.shipments.exclude(status=Shipment.ShipmentStatus.DELIVERED)
+        if pending_shipments.exists():
+            return vendor_order # Partial delivery, wait for the rest
+            
+        vendor_order.status = VendorOrder.FulfillmentStatus.DELIVERED
+        vendor_order.save(update_fields=['status'])
+        
+        # Check if parent Order is fully delivered
+        order = vendor_order.order
+        pending_vendors = order.vendor_orders.exclude(status=VendorOrder.FulfillmentStatus.DELIVERED)
+        
+        if not pending_vendors.exists():
+            order.status = Order.OrderStatus.COMPLETED
+            order.save(update_fields=['status'])
+            
+            # COD Capture Trigger
+            from apps.payments.models import Payment
+            payment = Payment.objects.filter(order=order, status=Payment.PaymentStatus.PENDING, provider=Payment.Provider.COD).first()
+            if payment:
+                # We need to capture COD
+                from apps.payments.services.payment import PaymentService
+                PaymentService.capture_cod_payment(order.id)
+                
+        return vendor_order
