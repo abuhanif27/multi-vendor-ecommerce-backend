@@ -1,8 +1,9 @@
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
 from apps.shops.models import Shop, Product
 from apps.shops.serializers import ProductSerializer
+from apps.common.pagination import DefaultPagination
 from apps.shops.permissions import IsProductOwner, IsVendor
 from apps.shops.filters import ProductFilter
 
@@ -17,6 +18,7 @@ from apps.shops.schema.products import (
 class ProductListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = ProductSerializer
     filterset_class = ProductFilter
+    pagination_class = DefaultPagination
 
     search_fields = ["name", "description", "shop__name", "category__name"]
     ordering_fields = ["price", "created_at", "name"]
@@ -63,7 +65,8 @@ class ProductDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 @MY_PRODUCTS_SCHEMA
 class MyProductListAPIView(generics.ListAPIView):
     serializer_class = ProductSerializer
-    permission_classes = [IsVendor]
+    permission_classes = [IsAuthenticated, IsVendor]
+    pagination_class = DefaultPagination
 
     def get_queryset(self):
         return (

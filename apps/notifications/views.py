@@ -7,6 +7,7 @@ from drf_spectacular.utils import extend_schema
 
 from apps.notifications.models import Notification, NotificationDelivery
 from apps.notifications.serializers import NotificationSerializer
+from apps.common.pagination import DefaultPagination
 
 class NotificationListAPIView(generics.ListAPIView):
     """
@@ -14,6 +15,7 @@ class NotificationListAPIView(generics.ListAPIView):
     """
     serializer_class = NotificationSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = DefaultPagination
 
     def get_queryset(self):
         # We fetch Notifications that have an IN_APP delivery attached.

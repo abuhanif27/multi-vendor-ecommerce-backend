@@ -1,5 +1,5 @@
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from apps.common.permissions import IsVendor
 from apps.shops.models import Shop
 from apps.shops.permissions import IsShopOwner
@@ -10,6 +10,7 @@ from apps.shops.schema.shops import (
 )
 
 
+from apps.common.pagination import DefaultPagination
 from apps.shops.serializers import ShopSerializer
 
 
@@ -61,7 +62,8 @@ class ShopDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 @MY_SHOPS_SCHEMA
 class MyShopListAPIView(generics.ListAPIView):
     serializer_class = ShopSerializer
-    permission_classes = [IsVendor]
+    permission_classes = [IsAuthenticated, IsVendor]
+    pagination_class = DefaultPagination
 
     def get_queryset(self):
         return (

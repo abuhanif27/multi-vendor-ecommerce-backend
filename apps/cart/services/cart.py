@@ -18,7 +18,9 @@ class CartService:
         if quantity <= 0:
             raise ValidationError("Quantity must be greater than zero.")
 
+        # Lock the cart to serialize access for this user's cart
         cart = CartService.get_or_create_cart(user)
+        cart = Cart.objects.select_for_update().get(id=cart.id)
         
         try:
             variant = ProductVariant.objects.select_related('inventory').get(
@@ -29,8 +31,7 @@ class CartService:
         except ProductVariant.DoesNotExist:
             raise ValidationError("Variant not found or inactive.")
 
-        # Concurrency: we lock the row if it exists
-        item = CartItem.objects.select_for_update().filter(cart=cart, variant=variant).first()
+        item = CartItem.objects.filter(cart=cart, variant=variant).first()
         
         new_quantity = (item.quantity + quantity) if item else quantity
 

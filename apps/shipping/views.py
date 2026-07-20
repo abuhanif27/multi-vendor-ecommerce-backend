@@ -8,6 +8,7 @@ from drf_spectacular.utils import extend_schema
 
 from apps.common.permissions import IsVendor
 from apps.shipping.models import Shipment, Courier
+from apps.common.pagination import DefaultPagination
 from apps.shipping.serializers import (
     ShipmentReadSerializer,
     ShipmentCourierAssignSerializer,
@@ -21,6 +22,7 @@ class BuyerShipmentListAPIView(generics.ListAPIView):
     """
     serializer_class = ShipmentReadSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = DefaultPagination
 
     def get_queryset(self):
         order_id = self.request.query_params.get('order_id')
