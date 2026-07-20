@@ -26,7 +26,10 @@ class ShopMetricRollup(models.Model):
     period = models.CharField(max_length=20, choices=MetricPeriod.choices)
     
     # The starting boundary of the period. For ALL_TIME, this can be a fixed epoch or null.
-    date = models.DateField(null=True, blank=True)
+    period_start = models.DateField(null=True, blank=True)
+    period_end = models.DateField(null=True, blank=True)
+    
+    schema_version = models.PositiveIntegerField(default=1)
     
     # Sales Metrics
     order_count = models.PositiveIntegerField(default=0)
@@ -49,17 +52,17 @@ class ShopMetricRollup(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['shop', 'period', 'date'], 
-                name='unique_shop_metric_period_date'
+                fields=['shop', 'period', 'period_start', 'period_end'], 
+                name='unique_shop_metric_period_boundaries'
             )
         ]
         indexes = [
-            models.Index(fields=['shop', 'period', 'date']),
+            models.Index(fields=['shop', 'period', 'period_start', 'period_end']),
         ]
 
     def __str__(self):
         shop_name = self.shop.name if self.shop else "Marketplace"
-        return f"{shop_name} - {self.period} ({self.date})"
+        return f"{shop_name} - {self.period} ({self.period_start} to {self.period_end})"
 
 class ProductVelocityRollup(models.Model):
     """
@@ -71,7 +74,10 @@ class ProductVelocityRollup(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='velocity_rollups')
     
     period = models.CharField(max_length=20, choices=MetricPeriod.choices)
-    date = models.DateField(null=True, blank=True)
+    period_start = models.DateField(null=True, blank=True)
+    period_end = models.DateField(null=True, blank=True)
+    
+    schema_version = models.PositiveIntegerField(default=1)
     
     units_sold = models.PositiveIntegerField(default=0)
     gross_revenue = models.DecimalField(max_digits=14, decimal_places=2, default=Decimal('0.00'))
@@ -82,14 +88,14 @@ class ProductVelocityRollup(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['product', 'period', 'date'], 
-                name='unique_product_velocity_period_date'
+                fields=['product', 'period', 'period_start', 'period_end'], 
+                name='unique_product_velocity_period_boundaries'
             )
         ]
         indexes = [
-            models.Index(fields=['shop', 'period', 'date']),
-            models.Index(fields=['period', 'date', 'units_sold']), # Optimize "Top Selling" queries
+            models.Index(fields=['shop', 'period', 'period_start', 'period_end']),
+            models.Index(fields=['period', 'period_start', 'period_end', 'units_sold']), # Optimize "Top Selling" queries
         ]
 
     def __str__(self):
-        return f"{self.product.name} - {self.period} ({self.date})"
+        return f"{self.product.name} - {self.period} ({self.period_start} to {self.period_end})"
