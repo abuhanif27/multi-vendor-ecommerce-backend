@@ -33,6 +33,10 @@ class Shop(UUIDModel, TimeStampedModel, SlugMixin):
         choices=ShopStatus.choices,
         default=ShopStatus.PENDING,
     )
+    
+    # Reputation metrics
+    average_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)
+    review_count = models.PositiveIntegerField(default=0)
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -78,6 +82,10 @@ class Product(UUIDModel, TimeStampedModel, SlugMixin):
         choices=ProductStatus.choices,
         default=ProductStatus.DRAFT,
     )
+
+    # Reputation metrics
+    average_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)
+    review_count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.name
