@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant Domain Event (e.g. Checkout)
+    participant Analytics Event Handler
+    participant PostgreSQL Rollup Table
+    participant Celery Beat (Nightly)
+
+    Domain Event (e.g. Checkout)->>Analytics Event Handler: OrderCompletedEvent
+    Analytics Event Handler->>PostgreSQL Rollup Table: UPDATE gross = gross + X WHERE date = today
+    
+    Note right of PostgreSQL Rollup Table: Lock-free F() expression increment
+    
+    Analytics Event Handler->>Redis Cache: bump_cache_version()
+    
+    Note over Celery Beat (Nightly), PostgreSQL Rollup Table: 2:00 AM Nightly Reconciliation
+    Celery Beat (Nightly)->>PostgreSQL Rollup Table: Recalculate yesterday from raw Order tables
+    Celery Beat (Nightly)->>PostgreSQL Rollup Table: Overwrite yesterday's row to heal drift

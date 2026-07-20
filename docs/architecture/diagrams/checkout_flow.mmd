@@ -1,0 +1,31 @@
+sequenceDiagram
+    participant User
+    participant DRF View
+    participant CheckoutService
+    participant InventoryService
+    participant PromotionService
+    participant Database
+
+    User->>DRF View: POST /api/v1/checkout/ (Cart ID, Coupon)
+    DRF View->>CheckoutService: process_checkout(cart_id, coupon_code)
+    
+    rect rgb(200, 220, 240)
+        Note right of CheckoutService: BEGIN transaction.atomic()
+        
+        CheckoutService->>PromotionService: evaluate_cart()
+        PromotionService-->>CheckoutService: PromotionEvaluationResult DTO
+        
+        CheckoutService->>InventoryService: lock_inventory(items)
+        InventoryService->>Database: select_for_update()
+        Database-->>InventoryService: Locked Rows
+        
+        CheckoutService->>Database: INSERT Order
+        
+        CheckoutService->>PromotionService: consume_coupon()
+        PromotionService->>Database: INSERT CouponUsage (select_for_update)
+        
+        Note right of CheckoutService: COMMIT transaction.atomic()
+    end
+    
+    CheckoutService->>DRF View: OrderCreatedDTO
+    DRF View->>User: 201 Created (Order Details)
