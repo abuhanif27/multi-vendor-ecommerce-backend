@@ -65,6 +65,7 @@ LOCAL_APPS = [
     "apps.promotions",
     "apps.analytics",
     'apps.api',
+    "apps.administration",
 ]
 
 INSTALLED_APPS = (
