@@ -1,9 +1,11 @@
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 class AdminAuditLog(models.Model):
     """
-    Immutable ledger recording all state-changing actions performed by staff.
+    Generic platform audit infrastructure.
+    Immutable ledger recording all state-changing actions performed by staff across all domains.
     """
     ACTION_CHOICES = [
         ('CREATE', 'Create'),
@@ -14,6 +16,11 @@ class AdminAuditLog(models.Model):
         ('REJECT', 'Reject'),
         ('REFUND', 'Refund'),
         ('OTHER', 'Other'),
+    ]
+
+    RESULT_CHOICES = [
+        ('SUCCESS', 'Success'),
+        ('FAILURE', 'Failure'),
     ]
 
     actor = models.ForeignKey(
@@ -33,15 +40,16 @@ class AdminAuditLog(models.Model):
         help_text="The ID of the modified resource"
     )
     timestamp = models.DateTimeField(auto_now_add=True)
+    result = models.CharField(max_length=10, choices=RESULT_CHOICES, default='SUCCESS')
     before_state = models.JSONField(
         null=True, 
         blank=True,
-        help_text="JSON representation of the resource before modification"
+        help_text="Optional JSON representation of the resource before modification. Avoid large payloads."
     )
     after_state = models.JSONField(
         null=True, 
         blank=True,
-        help_text="JSON representation of the resource after modification"
+        help_text="Optional JSON representation of the resource after modification. Avoid large payloads."
     )
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     user_agent = models.TextField(null=True, blank=True)
@@ -54,19 +62,22 @@ class AdminAuditLog(models.Model):
     class Meta:
         ordering = ['-timestamp']
         permissions = [
-            ("can_read_platform", "Can read platform configuration"),
-            ("can_write_platform", "Can write platform configuration"),
-            ("can_read_rbac", "Can read staff roles and permissions"),
-            ("can_write_rbac", "Can write staff roles and permissions"),
-            ("can_read_vendors", "Can read vendor administration"),
-            ("can_write_vendors", "Can write vendor administration"),
-            ("can_read_products", "Can read product moderation"),
-            ("can_write_products", "Can write product moderation"),
-            ("can_read_orders", "Can read order administration"),
-            ("can_write_orders", "Can write order administration"),
-            ("can_read_finance", "Can read financial administration"),
-            ("can_write_finance", "Can write financial administration"),
+            ("can_approve_vendor", "Can approve a vendor shop"),
+            ("can_suspend_vendor", "Can suspend a vendor shop"),
+            ("can_force_refund", "Can force a refund on an order"),
+            ("can_manage_platform_settings", "Can manage platform configuration"),
+            ("can_moderate_products", "Can moderate products"),
+            ("can_moderate_reviews", "Can moderate reviews"),
+            ("can_read_audit_logs", "Can read audit logs"),
         ]
 
+    def save(self, *args, **kwargs):
+        if self.pk is not None:
+            raise ValidationError("AdminAuditLog entries are immutable and cannot be modified.")
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("AdminAuditLog entries are immutable and cannot be deleted.")
+
     def __str__(self):
-        return f"{self.actor} - {self.action} - {self.resource_type}:{self.resource_id}"
+        return f"{self.actor} - {self.action} ({self.result}) - {self.resource_type}:{self.resource_id}"

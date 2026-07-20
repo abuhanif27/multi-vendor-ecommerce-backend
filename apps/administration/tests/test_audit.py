@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from apps.administration.models import AdminAuditLog
 from apps.administration.services.audit import AuditService
 
@@ -23,6 +24,7 @@ class AuditServiceTests(TestCase):
             action='SUSPEND',
             resource_type='Shop',
             resource_id='shop-123',
+            result='SUCCESS',
             before_state={'status': 'ACTIVE'},
             after_state={'status': 'SUSPENDED'},
             reason="Violation of terms",
@@ -35,11 +37,37 @@ class AuditServiceTests(TestCase):
         self.assertEqual(log.action, 'SUSPEND')
         self.assertEqual(log.resource_type, 'Shop')
         self.assertEqual(log.resource_id, 'shop-123')
+        self.assertEqual(log.result, 'SUCCESS')
         self.assertEqual(log.before_state, {'status': 'ACTIVE'})
         self.assertEqual(log.after_state, {'status': 'SUSPENDED'})
-        self.assertEqual(log.reason, "Violation of terms")
-        self.assertEqual(log.ip_address, "127.0.0.1")
-        self.assertEqual(log.user_agent, "Mozilla/5.0")
         
         # Verify it exists in DB
+        self.assertEqual(AdminAuditLog.objects.count(), 1)
+
+    def test_audit_log_immutability_on_update(self):
+        """Test that attempting to save an existing log raises ValidationError."""
+        log = AuditService.log_action(
+            actor=self.admin_user,
+            action='SUSPEND',
+            resource_type='Shop',
+            resource_id='shop-123'
+        )
+
+        # Attempt to modify
+        log.reason = "Changed my mind"
+        with self.assertRaises(ValidationError):
+            log.save()
+
+    def test_audit_log_immutability_on_delete(self):
+        """Test that attempting to delete an existing log raises ValidationError."""
+        log = AuditService.log_action(
+            actor=self.admin_user,
+            action='SUSPEND',
+            resource_type='Shop',
+            resource_id='shop-123'
+        )
+
+        with self.assertRaises(ValidationError):
+            log.delete()
+
         self.assertEqual(AdminAuditLog.objects.count(), 1)

@@ -12,33 +12,45 @@ class RBACTests(TestCase):
             is_staff=True
         )
         
-        # We assume the migration has run and created the custom permissions attached to AdminAuditLog
-        self.vendor_read_perm = Permission.objects.get(codename="can_read_vendors")
-        self.vendor_write_perm = Permission.objects.get(codename="can_write_vendors")
-        self.finance_read_perm = Permission.objects.get(codename="can_read_finance")
+        # New permissions
+        self.approve_vendor_perm = Permission.objects.get(codename="can_approve_vendor")
+        self.suspend_vendor_perm = Permission.objects.get(codename="can_suspend_vendor")
+        self.force_refund_perm = Permission.objects.get(codename="can_force_refund")
+        self.manage_platform_perm = Permission.objects.get(codename="can_manage_platform_settings")
 
         self.vendor_manager_group = Group.objects.create(name="Vendor Manager")
-        self.vendor_manager_group.permissions.add(self.vendor_read_perm, self.vendor_write_perm)
+        self.vendor_manager_group.permissions.add(self.approve_vendor_perm, self.suspend_vendor_perm)
+
+        self.support_agent_group = Group.objects.create(name="Support Agent")
+        self.support_agent_group.permissions.add(self.force_refund_perm)
 
     def test_user_without_role_lacks_permission(self):
-        self.assertFalse(self.user.has_perm('administration.can_read_vendors'))
-        self.assertFalse(self.user.has_perm('administration.can_write_vendors'))
+        self.assertFalse(self.user.has_perm('administration.can_approve_vendor'))
+        self.assertFalse(self.user.has_perm('administration.can_force_refund'))
 
-    def test_user_with_role_has_permission(self):
+    def test_user_with_single_role_has_permission(self):
         self.user.groups.add(self.vendor_manager_group)
-        # We need to fetch from db or use a fresh instance to clear permission cache
         user = User.objects.get(id=self.user.id)
         
-        self.assertTrue(user.has_perm('administration.can_read_vendors'))
-        self.assertTrue(user.has_perm('administration.can_write_vendors'))
-        self.assertFalse(user.has_perm('administration.can_read_finance'))
+        self.assertTrue(user.has_perm('administration.can_approve_vendor'))
+        self.assertTrue(user.has_perm('administration.can_suspend_vendor'))
+        self.assertFalse(user.has_perm('administration.can_force_refund'))
+
+    def test_user_with_multiple_roles_has_combined_permissions(self):
+        self.user.groups.add(self.vendor_manager_group)
+        self.user.groups.add(self.support_agent_group)
+        user = User.objects.get(id=self.user.id)
+
+        self.assertTrue(user.has_perm('administration.can_approve_vendor'))
+        self.assertTrue(user.has_perm('administration.can_force_refund'))
+        self.assertFalse(user.has_perm('administration.can_manage_platform_settings'))
 
     def test_superuser_has_all_permissions(self):
         superuser = User.objects.create_superuser(
             email="super@example.com",
             password="password"
         )
-        self.assertTrue(superuser.has_perm('administration.can_read_vendors'))
-        self.assertTrue(superuser.has_perm('administration.can_write_vendors'))
-        self.assertTrue(superuser.has_perm('administration.can_read_finance'))
-        self.assertTrue(superuser.has_perm('administration.can_write_finance'))
+        self.assertTrue(superuser.has_perm('administration.can_approve_vendor'))
+        self.assertTrue(superuser.has_perm('administration.can_suspend_vendor'))
+        self.assertTrue(superuser.has_perm('administration.can_force_refund'))
+        self.assertTrue(superuser.has_perm('administration.can_manage_platform_settings'))

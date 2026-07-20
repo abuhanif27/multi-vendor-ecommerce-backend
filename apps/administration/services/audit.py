@@ -15,7 +15,8 @@ class AuditService:
         after_state: Optional[Dict[str, Any]] = None,
         reason: Optional[str] = None,
         ip_address: Optional[str] = None,
-        user_agent: Optional[str] = None
+        user_agent: Optional[str] = None,
+        result: str = 'SUCCESS'
     ) -> AdminAuditLog:
         """
         Creates an immutable audit log entry for a privileged staff action.
@@ -25,6 +26,7 @@ class AuditService:
             action=action,
             resource_type=resource_type,
             resource_id=resource_id,
+            result=result,
             before_state=before_state,
             after_state=after_state,
             reason=reason,
