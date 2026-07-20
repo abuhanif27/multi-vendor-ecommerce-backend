@@ -10,17 +10,39 @@ class PromotionLineDTO:
     promotion_name: str
     discount_amount: Decimal
     is_free_shipping: bool = False
+
+@dataclass
+class CouponRejectionDTO:
+    """Structured rejection information for coupons that fail validation."""
+    code: str
+    reason_code: str
+    reason_message: str
+
+@dataclass
+class PricingBreakdownDTO:
+    """
+    Extensible pricing contract. 
+    Promotions domain calculates discount_total. 
+    Checkout domain can later add shipping_total, tax_total, etc.
+    """
+    subtotal: Decimal = Decimal('0.00')
+    discount_total: Decimal = Decimal('0.00')
+    shipping_total: Decimal = Decimal('0.00')
+    tax_total: Decimal = Decimal('0.00')
     
+    @property
+    def grand_total(self) -> Decimal:
+        return max(Decimal('0.00'), self.subtotal - self.discount_total + self.shipping_total + self.tax_total)
+
 @dataclass
 class PromotionEvaluationResult:
     """
     Contract between Promotions domain and Checkout domain.
-    Passed back after evaluating Cart DTO against all active promotions and user coupons.
     """
-    total_discount: Decimal = Decimal('0.00')
+    pricing: PricingBreakdownDTO = field(default_factory=PricingBreakdownDTO)
     is_free_shipping: bool = False
     applied_promotions: List[PromotionLineDTO] = field(default_factory=list)
-    errors: List[str] = field(default_factory=list) # E.g. "Coupon CODE invalid"
+    rejections: List[CouponRejectionDTO] = field(default_factory=list)
 
 @dataclass
 class CheckoutContextDTO:

@@ -80,9 +80,9 @@ class PromotionServiceTestCase(TestCase):
         # We also have the active automatic promo (min 500 subtotal). Since subtotal is 100, auto promo fails condition.
         result = PromotionService.evaluate_cart(context)
         
-        self.assertEqual(len(result.errors), 0)
+        self.assertEqual(len(result.rejections), 0)
         self.assertEqual(len(result.applied_promotions), 1)
-        self.assertEqual(result.total_discount, Decimal('10.00'))
+        self.assertEqual(result.pricing.discount_total, Decimal('10.00'))
 
     def test_coupon_validation_invalid_code(self):
         context = CheckoutContextDTO(
@@ -92,9 +92,9 @@ class PromotionServiceTestCase(TestCase):
             coupon_codes=["FAKECODE"]
         )
         result = PromotionService.evaluate_cart(context)
-        self.assertEqual(len(result.errors), 1)
-        self.assertIn("invalid", result.errors[0])
-        self.assertEqual(result.total_discount, Decimal('0.00'))
+        self.assertEqual(len(result.rejections), 1)
+        self.assertEqual(result.rejections[0].reason_code, "INVALID_CODE")
+        self.assertEqual(result.pricing.discount_total, Decimal('0.00'))
 
     def test_automatic_promotion_applies(self):
         context = CheckoutContextDTO(
@@ -108,7 +108,7 @@ class PromotionServiceTestCase(TestCase):
         
         self.assertEqual(len(result.applied_promotions), 1)
         self.assertEqual(result.applied_promotions[0].promotion_id, self.exclusive_promo.id)
-        self.assertEqual(result.total_discount, Decimal('150.00'))
+        self.assertEqual(result.pricing.discount_total, Decimal('150.00'))
 
     def test_exclusive_stacking_resolution(self):
         context = CheckoutContextDTO(
@@ -123,7 +123,7 @@ class PromotionServiceTestCase(TestCase):
         
         self.assertEqual(len(result.applied_promotions), 1)
         self.assertEqual(result.applied_promotions[0].promotion_id, self.exclusive_promo.id)
-        self.assertEqual(result.total_discount, Decimal('150.00'))
+        self.assertEqual(result.pricing.discount_total, Decimal('150.00'))
         
     def test_consume_coupon_success(self):
         PromotionService.consume_coupon("WINTER10", self.user.id, self.order.id)

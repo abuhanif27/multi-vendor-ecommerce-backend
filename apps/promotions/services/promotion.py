@@ -3,8 +3,11 @@ from django.utils import timezone
 from django.db import transaction
 from django.core.exceptions import ValidationError
 
+from apps.promotions.dtos import (
+    CheckoutContextDTO, PromotionEvaluationResult, PromotionLineDTO, 
+    CouponRejectionDTO, PricingBreakdownDTO
+)
 from apps.promotions.models import Promotion, Coupon, PromotionStatus, CouponUsage
-from apps.promotions.dtos import CheckoutContextDTO, PromotionEvaluationResult, PromotionLineDTO
 from apps.promotions.services.engine import PromotionEngine
 from apps.notifications.events import EventBus
 from apps.promotions.event_types import CouponUsageRecordedEvent, PromotionExhaustedEvent
@@ -32,6 +35,7 @@ class PromotionService:
         Fetches relevant promotions, verifies conditions, resolves conflicts, and calculates discount.
         """
         result = PromotionEvaluationResult()
+        result.pricing.subtotal = context.subtotal
         
         # 1. Fetch relevant user-supplied coupons
         valid_coupons = []
@@ -40,21 +44,21 @@ class PromotionService:
                 coupon = Coupon.objects.select_related('promotion', 'promotion__reward').prefetch_related('promotion__conditions').get(code=code)
                 # Max uses check
                 if coupon.max_uses and coupon.current_uses >= coupon.max_uses:
-                    result.errors.append(f"Coupon {code} has reached its usage limit.")
+                    result.rejections.append(CouponRejectionDTO(code, "MAX_USES_REACHED", "Coupon has reached its usage limit."))
                     continue
                 # Per user limit check
                 user_uses = CouponUsage.objects.filter(coupon=coupon, user_id=context.user_id).count()
                 if coupon.max_uses_per_user and user_uses >= coupon.max_uses_per_user:
-                    result.errors.append(f"You have already used coupon {code} the maximum allowed times.")
+                    result.rejections.append(CouponRejectionDTO(code, "USER_LIMIT_REACHED", "You have already used this coupon the maximum allowed times."))
                     continue
                     
                 if not cls._is_promotion_active(coupon.promotion):
-                    result.errors.append(f"Coupon {code} is not currently active.")
+                    result.rejections.append(CouponRejectionDTO(code, "INACTIVE", "Coupon is not currently active."))
                     continue
                     
                 valid_coupons.append(coupon)
             except Coupon.DoesNotExist:
-                result.errors.append(f"Coupon {code} is invalid.")
+                result.rejections.append(CouponRejectionDTO(code, "INVALID_CODE", "Coupon is invalid."))
 
         # Extract promotions from valid coupons
         promotions = [c.promotion for c in valid_coupons]
@@ -88,8 +92,9 @@ class PromotionService:
             if conditions_met:
                 eligible_promotions.append(promo)
 
-        # 4. Conflict Resolution (Stacking Rules)
-        eligible_promotions.sort(key=lambda p: p.priority, reverse=True)
+        # 4. Conflict Resolution (Stacking Rules) & Deterministic Sorting
+        # Sort priority descending, then UUID ascending to break ties
+        eligible_promotions.sort(key=lambda p: (-p.priority, str(p.id)))
         
         current_subtotal = context.subtotal
         
@@ -108,7 +113,7 @@ class PromotionService:
                     discount_amount=discount,
                     is_free_shipping=is_free_shipping
                 ))
-                result.total_discount += discount
+                result.pricing.discount_total += discount
                 if is_free_shipping:
                     result.is_free_shipping = True
                     
