@@ -69,20 +69,26 @@ class ShopReviewMedia(UUIDModel, TimeStampedModel):
     def __str__(self):
         return f"Media for ShopReview {self.review.id}"
 
-class ReviewReport(UUIDModel, TimeStampedModel):
+class ProductReviewReport(UUIDModel, TimeStampedModel):
     """
-    Allows users to report abusive reviews.
+    Allows users to report abusive product reviews.
     """
     reporter = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    product_review = models.ForeignKey(ProductReview, on_delete=models.CASCADE, null=True, blank=True)
-    shop_review = models.ForeignKey(ShopReview, on_delete=models.CASCADE, null=True, blank=True)
+    review = models.ForeignKey(ProductReview, on_delete=models.CASCADE, related_name="reports")
     reason = models.TextField()
     is_resolved = models.BooleanField(default=False)
 
-    class Meta:
-        constraints = [
-            models.CheckConstraint(
-                check=models.Q(product_review__isnull=False) | models.Q(shop_review__isnull=False),
-                name='report_must_have_review_target'
-            )
-        ]
+    def __str__(self):
+        return f"Report on ProductReview {self.review_id}"
+
+class ShopReviewReport(UUIDModel, TimeStampedModel):
+    """
+    Allows users to report abusive shop reviews.
+    """
+    reporter = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    review = models.ForeignKey(ShopReview, on_delete=models.CASCADE, related_name="reports")
+    reason = models.TextField()
+    is_resolved = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Report on ShopReview {self.review_id}"
