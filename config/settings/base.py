@@ -211,3 +211,20 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
+
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'expire_abandoned_orders': {
+        'task': 'apps.orders.tasks.expire_abandoned_orders_task',
+        'schedule': crontab(minute='*/15'),  # Every 15 minutes
+    },
+    'expire_pending_payments': {
+        'task': 'apps.payments.tasks.expire_pending_payments_task',
+        'schedule': crontab(minute='*/15'),
+    },
+    'cleanup_expired_tokens': {
+        'task': 'apps.accounts.tasks.cleanup_expired_tokens_task',
+        'schedule': crontab(hour=0, minute=0),  # Daily at midnight
+    },
+}

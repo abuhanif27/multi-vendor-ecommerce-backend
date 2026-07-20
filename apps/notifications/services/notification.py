@@ -5,6 +5,9 @@ from apps.notifications.models import Notification, NotificationDelivery
 from apps.notifications.channels.in_app import InAppChannel
 from apps.notifications.channels.email import EmailChannel
 from apps.notifications.channels.sms import SMSChannel
+import logging
+
+logger = logging.getLogger(__name__)
 
 class NotificationService:
     @staticmethod
@@ -29,9 +32,9 @@ class NotificationService:
                 channel=channel,
                 status=NotificationDelivery.DeliveryStatus.PENDING
             )
-            # Dispatch async task. We use transaction.on_commit to ensure
-            # the task is only queued if the DB transaction successfully commits.
+            # Dispatch async task
             transaction.on_commit(lambda d_id=delivery.id: send_delivery_task.delay(d_id))
+            logger.info(f"Delivery queued: Channel={channel} for Notification={notification.id}")
             
         return notification
 
@@ -63,10 +66,11 @@ class NotificationService:
             strategy.send(delivery)
             delivery.status = NotificationDelivery.DeliveryStatus.SENT
             delivery.sent_at = timezone.now()
+            logger.info(f"Delivery sent: Channel={delivery.channel} for Notification={delivery.notification.id}")
         except Exception as e:
             delivery.last_error = str(e)
-            # We let the caller (Celery) catch this to trigger a retry
             delivery.save(update_fields=['attempts', 'last_error'])
+            logger.warning(f"Delivery failed (will retry): Channel={delivery.channel}, Error={str(e)}")
             raise e
             
         delivery.save(update_fields=['attempts', 'status', 'sent_at'])
@@ -82,4 +86,5 @@ class NotificationService:
         delivery.status = NotificationDelivery.DeliveryStatus.FAILED
         delivery.last_error = error_message
         delivery.save(update_fields=['status', 'last_error'])
+        logger.error(f"Delivery permanently failed: Channel={delivery.channel}, DeliveryID={delivery.id}, Error={error_message}")
         return delivery
