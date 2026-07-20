@@ -48,6 +48,44 @@ class ReviewService:
 
     @staticmethod
     @transaction.atomic
+    def update_product_review(user, review_id, rating=None, comment=None):
+        try:
+            review = ProductReview.objects.get(id=review_id)
+        except ProductReview.DoesNotExist:
+            raise ValidationError("Review does not exist.")
+            
+        if review.user != user:
+            raise ValidationError("You can only edit your own reviews.")
+            
+        if rating is not None:
+            review.rating = rating
+        if comment is not None:
+            review.comment = comment
+            
+        review.is_edited = True
+        review.save(update_fields=['rating', 'comment', 'is_edited', 'updated_at'])
+        
+        transaction.on_commit(lambda: EventBus.publish(ProductReviewChangedEvent(product_id=review.product_id)))
+        return review
+
+    @staticmethod
+    @transaction.atomic
+    def delete_product_review(user, review_id):
+        try:
+            review = ProductReview.objects.get(id=review_id)
+        except ProductReview.DoesNotExist:
+            raise ValidationError("Review does not exist.")
+            
+        if review.user != user:
+            raise ValidationError("You can only delete your own reviews.")
+            
+        product_id = review.product_id
+        review.delete()
+        
+        transaction.on_commit(lambda: EventBus.publish(ProductReviewChangedEvent(product_id=product_id)))
+
+    @staticmethod
+    @transaction.atomic
     def create_shop_review(user, shop_id, vendor_order_id, rating, comment=""):
         """
         Creates a shop review. Enforces verified purchase constraints.
@@ -81,6 +119,44 @@ class ReviewService:
         transaction.on_commit(lambda: EventBus.publish(ShopReviewChangedEvent(shop_id=shop_id)))
         
         return review
+
+    @staticmethod
+    @transaction.atomic
+    def update_shop_review(user, review_id, rating=None, comment=None):
+        try:
+            review = ShopReview.objects.get(id=review_id)
+        except ShopReview.DoesNotExist:
+            raise ValidationError("Review does not exist.")
+            
+        if review.user != user:
+            raise ValidationError("You can only edit your own reviews.")
+            
+        if rating is not None:
+            review.rating = rating
+        if comment is not None:
+            review.comment = comment
+            
+        review.is_edited = True
+        review.save(update_fields=['rating', 'comment', 'is_edited', 'updated_at'])
+        
+        transaction.on_commit(lambda: EventBus.publish(ShopReviewChangedEvent(shop_id=review.shop_id)))
+        return review
+
+    @staticmethod
+    @transaction.atomic
+    def delete_shop_review(user, review_id):
+        try:
+            review = ShopReview.objects.get(id=review_id)
+        except ShopReview.DoesNotExist:
+            raise ValidationError("Review does not exist.")
+            
+        if review.user != user:
+            raise ValidationError("You can only delete your own reviews.")
+            
+        shop_id = review.shop_id
+        review.delete()
+        
+        transaction.on_commit(lambda: EventBus.publish(ShopReviewChangedEvent(shop_id=shop_id)))
         
     @staticmethod
     def sync_product_rating(product_id):
