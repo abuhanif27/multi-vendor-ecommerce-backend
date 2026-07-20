@@ -2,14 +2,22 @@ from django.test import TestCase
 from django.contrib.auth import get_user_model
 from decimal import Decimal
 from datetime import date
+from unittest.mock import patch
 
 from apps.shops.models import Shop
 from apps.analytics.models import ShopMetricRollup, MetricPeriod
 from apps.analytics.services.analytics import AnalyticsService
 from apps.analytics.services.reporting import ReportingService
-from apps.analytics.events import update_shop_metric
+from apps.analytics.events import handle_order_completed_event
 
 User = get_user_model()
+
+class MockEvent:
+    def __init__(self, shop_id, gross_total, net_total, discount_total):
+        self.shop_id = shop_id
+        self.gross_total = gross_total
+        self.net_total = net_total
+        self.discount_total = discount_total
 
 class AnalyticsServiceTestCase(TestCase):
     def setUp(self):
@@ -18,31 +26,25 @@ class AnalyticsServiceTestCase(TestCase):
         
         self.today = date(2023, 10, 15)
         
-    def test_update_shop_metric_event(self):
-        # Fire a mock event
-        update_shop_metric(
-            shop_id=self.shop.id, 
-            event_date=self.today, 
-            gross=Decimal('100.00'), 
-            net=Decimal('90.00'), 
-            discount=Decimal('10.00')
-        )
+    @patch('apps.analytics.events.timezone.now')
+    def test_update_shop_metric_event(self, mock_now):
+        # Mock timezone.now()
+        from datetime import datetime, timezone
+        mock_now.return_value = datetime(2023, 10, 15, tzinfo=timezone.utc)
+        
+        event = MockEvent(self.shop.id, Decimal('100.00'), Decimal('90.00'), Decimal('10.00'))
+        handle_order_completed_event(event)
         
         # Verify DAILY rollup created
         daily = ShopMetricRollup.objects.get(shop=self.shop, period=MetricPeriod.DAILY, period_start=self.today)
         self.assertEqual(daily.gross_revenue, Decimal('100.00'))
         self.assertEqual(daily.order_count, 1)
         
-        # Fire a second mock event
-        update_shop_metric(
-            shop_id=self.shop.id, 
-            event_date=self.today, 
-            gross=Decimal('50.00'), 
-            net=Decimal('50.00'), 
-            discount=Decimal('0.00')
-        )
+        # Fire a second mock event (zero discount)
+        event2 = MockEvent(self.shop.id, Decimal('50.00'), Decimal('50.00'), Decimal('0.00'))
+        handle_order_completed_event(event2)
         
-        # Verify DAILY rollup accumulated
+        # Verify DAILY rollup accumulated atomically
         daily.refresh_from_db()
         self.assertEqual(daily.gross_revenue, Decimal('150.00'))
         self.assertEqual(daily.order_count, 2)
@@ -51,6 +53,11 @@ class AnalyticsServiceTestCase(TestCase):
         monthly = ShopMetricRollup.objects.get(shop=self.shop, period=MetricPeriod.MONTHLY)
         self.assertEqual(monthly.period_start, date(2023, 10, 1))
         self.assertEqual(monthly.gross_revenue, Decimal('150.00'))
+        
+        # Verify MARKETPLACE rollup created
+        marketplace_daily = ShopMetricRollup.objects.get(shop__isnull=True, period=MetricPeriod.DAILY, period_start=self.today)
+        self.assertEqual(marketplace_daily.gross_revenue, Decimal('150.00'))
+        self.assertEqual(marketplace_daily.order_count, 2)
         
     def test_analytics_service_derived_kpis(self):
         # Create mock data
@@ -79,6 +86,29 @@ class AnalyticsServiceTestCase(TestCase):
         self.assertEqual(summary.average_order_value, Decimal('75.00'))
         self.assertEqual(summary.return_rate, Decimal('50.00'))
         self.assertEqual(summary.cancellation_rate, Decimal('0.00'))
+        
+    def test_zero_value_edge_case(self):
+        # Create mock data with 0 orders
+        ShopMetricRollup.objects.create(
+            shop=self.shop,
+            period=MetricPeriod.DAILY,
+            period_start=self.today,
+            period_end=self.today,
+            gross_revenue=Decimal('0.00'),
+            net_revenue=Decimal('0.00'),
+            order_count=0,
+            cancellation_count=0,
+            return_count=0
+        )
+        
+        summary = AnalyticsService.get_sales_summary(
+            shop_id=self.shop.id,
+            period='DAILY',
+            period_start=self.today,
+            period_end=self.today
+        )
+        self.assertEqual(summary.average_order_value, Decimal('0.00'))
+        self.assertEqual(summary.return_rate, Decimal('0.00'))
         
     def test_reporting_service_csv(self):
         ShopMetricRollup.objects.create(
