@@ -169,3 +169,23 @@ class ReviewAPITestCase(APITestCase):
         # Vendor cannot update
         update_res = self.client.patch(url, {"rating": 1})
         self.assertEqual(update_res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_report_abuse(self):
+        ProductReview.objects.create(
+            user=self.buyer,
+            product=self.product,
+            order_item=self.order_item,
+            rating=5,
+            status=ReviewStatus.PUBLISHED
+        )
+        # Fetch list to get ID
+        res = self.client.get(self.list_create_url)
+        review_id = res.data['results'][0]['id']
+        
+        url = reverse('product-review-report', args=[review_id])
+        
+        self.client.force_authenticate(user=self.other_buyer)
+        report_res = self.client.post(url, {"reason": "Spam content"})
+        self.assertEqual(report_res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(report_res.data['reason'], "Spam content")
+        self.assertEqual(str(report_res.data['review']), str(review_id))

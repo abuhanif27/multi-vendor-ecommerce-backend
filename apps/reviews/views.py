@@ -4,11 +4,12 @@ from rest_framework.decorators import action
 from django.core.exceptions import ValidationError
 from django.db.models import Prefetch
 
-from apps.reviews.models import ProductReview, ShopReview, ReviewStatus
-from apps.reviews.serializers import ProductReviewSerializer, ShopReviewSerializer
+from apps.reviews.models import ProductReview, ShopReview, ReviewStatus, ProductReviewReport, ShopReviewReport
+from apps.reviews.serializers import ProductReviewSerializer, ShopReviewSerializer, ProductReviewReportSerializer, ShopReviewReportSerializer
 from apps.reviews.permissions import IsReviewOwnerOrReadOnly
 from apps.reviews.services.review import ReviewService
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema
 
 class ProductReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ProductReviewSerializer
@@ -85,6 +86,15 @@ class ProductReviewViewSet(viewsets.ModelViewSet):
         except ValidationError as e:
             return Response({"detail": list(e.messages)}, status=status.HTTP_400_BAD_REQUEST)
 
+    @extend_schema(request=ProductReviewReportSerializer, responses={201: ProductReviewReportSerializer})
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def report(self, request, pk=None):
+        review = self.get_object()
+        serializer = ProductReviewReportSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        report = serializer.save(reporter=request.user, review=review)
+        return Response(ProductReviewReportSerializer(report).data, status=status.HTTP_201_CREATED)
+
 class ShopReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ShopReviewSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsReviewOwnerOrReadOnly]
@@ -157,3 +167,12 @@ class ShopReviewViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except ValidationError as e:
             return Response({"detail": list(e.messages)}, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(request=ShopReviewReportSerializer, responses={201: ShopReviewReportSerializer})
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def report(self, request, pk=None):
+        review = self.get_object()
+        serializer = ShopReviewReportSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        report = serializer.save(reporter=request.user, review=review)
+        return Response(ShopReviewReportSerializer(report).data, status=status.HTTP_201_CREATED)

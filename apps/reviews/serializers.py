@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.reviews.models import ProductReview, ProductReviewMedia, ShopReview, ShopReviewMedia
+from apps.reviews.models import ProductReview, ProductReviewMedia, ShopReview, ShopReviewMedia, ProductReviewReport, ShopReviewReport
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -9,6 +9,18 @@ class SimpleUserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'email', 'first_name', 'last_name']
         read_only_fields = fields
+
+class ProductReviewReportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductReviewReport
+        fields = ['id', 'reporter', 'review', 'reason', 'is_resolved', 'created_at']
+        read_only_fields = ['id', 'reporter', 'review', 'is_resolved', 'created_at']
+
+class ShopReviewReportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShopReviewReport
+        fields = ['id', 'reporter', 'review', 'reason', 'is_resolved', 'created_at']
+        read_only_fields = ['id', 'reporter', 'review', 'is_resolved', 'created_at']
 
 class ProductReviewMediaSerializer(serializers.ModelSerializer):
     class Meta:
