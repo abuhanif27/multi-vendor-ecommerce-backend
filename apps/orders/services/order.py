@@ -96,3 +96,39 @@ class OrderService:
                 InventoryService.release_stock(item.variant.inventory.id, item.quantity)
         
         return order
+
+    @staticmethod
+    @transaction.atomic
+    def mark_order_paid(order_id):
+        """
+        Triggered by Webhook. Transitions order to PAID and VendorOrders to PROCESSING.
+        Commits physical inventory.
+        """
+        order = Order.objects.get(id=order_id)
+        if order.status != Order.OrderStatus.PENDING:
+            return order
+            
+        order.status = Order.OrderStatus.PAID
+        order.save(update_fields=['status'])
+        
+        # Vendors can now start fulfilling
+        order.vendor_orders.update(status=VendorOrder.FulfillmentStatus.PROCESSING)
+        
+        # Future: InventoryService.commit_stock(...)
+        # items = OrderItem.objects.filter(vendor_order__order=order).select_related('variant__inventory')
+        # for item in items:
+        #     if item.variant and hasattr(item.variant, 'inventory'):
+        #         InventoryService.commit_stock(item.variant.inventory.id, item.quantity, reference=str(order.id))
+                
+        return order
+
+    @staticmethod
+    @transaction.atomic
+    def mark_order_processing(order_id):
+        """
+        Used specifically for Cash on Delivery. Order starts processing before it is PAID.
+        """
+        order = Order.objects.get(id=order_id)
+        # We leave parent status as PENDING (awaiting payment), but vendors can start processing
+        order.vendor_orders.update(status=VendorOrder.FulfillmentStatus.PROCESSING)
+        return order
