@@ -54,7 +54,10 @@ class Shop(UUIDModel, TimeStampedModel, SlugMixin):
 class Product(UUIDModel, TimeStampedModel, SlugMixin):
     class ProductStatus(models.TextChoices):
         DRAFT = "draft", "Draft"
+        PENDING = "pending", "Pending"
         ACTIVE = "active", "Active"
+        REJECTED = "rejected", "Rejected"
+        SUSPENDED = "suspended", "Suspended"
         ARCHIVED = "archived", "Archived"
 
     shop = models.ForeignKey(
