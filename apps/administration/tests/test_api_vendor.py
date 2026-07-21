@@ -74,8 +74,8 @@ class VendorAdministrationAPITests(APITransactionTestCase):
         # Verify payload integrity
         self.assertEqual(event.shop_id, str(self.shop.id))
         self.assertEqual(event.vendor_id, self.vendor_user.id)
-        self.assertEqual(event.approved_by, self.super_admin.id)
-        self.assertIsNotNone(event.approved_at)
+        self.assertEqual(event.actor_id, self.super_admin.id)
+        self.assertIsNotNone(event.occurred_at)
 
     def test_successful_suspension(self):
         self.shop.status = Shop.ShopStatus.APPROVED

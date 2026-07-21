@@ -65,7 +65,7 @@ class VendorAdministrationServiceTests(TransactionTestCase):
         self.assertIsInstance(self.events_published[0], VendorApprovedEvent)
         self.assertEqual(self.events_published[0].shop_id, str(shop.id))
         self.assertEqual(self.events_published[0].vendor_id, self.vendor_user.id)
-        self.assertEqual(self.events_published[0].approved_by, self.super_admin.id)
+        self.assertEqual(self.events_published[0].actor_id, self.super_admin.id)
 
     def test_approve_vendor_permission_denied(self):
         with self.assertRaises(PermissionDenied):
@@ -154,8 +154,9 @@ class VendorAdministrationServiceTests(TransactionTestCase):
         self.assertEqual(len(events), 1)
         self.assertIsInstance(events[0], VendorSuspendedEvent)
         self.assertEqual(events[0].shop_id, str(shop.id))
+        self.assertEqual(events[0].actor_id, self.super_admin.id)
         
-        audit = AdminAuditLog.objects.get(resource_type="Shop", resource_id=str(shop.id), action="SUSPEND")
+        audit = AdminAuditLog.objects.get(resource_type="Shop", resource_id=str(shop.id), action="VENDOR_SUSPENDED")
         self.assertEqual(audit.after_state["status"], Shop.ShopStatus.SUSPENDED)
         
     def test_restore_vendor_success(self):
@@ -176,8 +177,9 @@ class VendorAdministrationServiceTests(TransactionTestCase):
         self.assertEqual(len(events), 1)
         self.assertIsInstance(events[0], VendorRestoredEvent)
         self.assertEqual(events[0].shop_id, str(shop.id))
+        self.assertEqual(events[0].actor_id, self.super_admin.id)
         
-        audit = AdminAuditLog.objects.get(resource_type="Shop", resource_id=str(shop.id), action="UPDATE")
+        audit = AdminAuditLog.objects.get(resource_type="Shop", resource_id=str(shop.id), action="VENDOR_RESTORED")
         self.assertEqual(audit.after_state["status"], Shop.ShopStatus.APPROVED)
 
     def test_reject_vendor_success(self):
@@ -199,6 +201,7 @@ class VendorAdministrationServiceTests(TransactionTestCase):
         self.assertIsInstance(events[0], VendorRejectedEvent)
         self.assertEqual(events[0].shop_id, str(shop.id))
         self.assertEqual(events[0].reason, "Incomplete documents")
+        self.assertEqual(events[0].actor_id, self.super_admin.id)
         
-        audit = AdminAuditLog.objects.get(resource_type="Shop", resource_id=str(shop.id), action="REJECT")
+        audit = AdminAuditLog.objects.get(resource_type="Shop", resource_id=str(shop.id), action="VENDOR_REJECTED")
         self.assertEqual(audit.after_state["status"], Shop.ShopStatus.REJECTED)

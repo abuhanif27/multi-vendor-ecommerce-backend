@@ -5,28 +5,28 @@ from datetime import datetime
 class VendorApprovedEvent:
     shop_id: str
     vendor_id: int
-    approved_by: int
-    approved_at: datetime
+    actor_id: int
+    occurred_at: datetime
 
 @dataclass
 class VendorSuspendedEvent:
     shop_id: str
     vendor_id: int
-    suspended_by: int
-    suspended_at: datetime
+    actor_id: int
+    occurred_at: datetime
     reason: str
 
 @dataclass
 class VendorRestoredEvent:
     shop_id: str
     vendor_id: int
-    restored_by: int
-    restored_at: datetime
+    actor_id: int
+    occurred_at: datetime
 
 @dataclass
 class VendorRejectedEvent:
     shop_id: str
     vendor_id: int
-    rejected_by: int
-    rejected_at: datetime
+    actor_id: int
+    occurred_at: datetime
     reason: str

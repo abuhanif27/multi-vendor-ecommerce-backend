@@ -61,8 +61,8 @@ class VendorAdministrationService:
             event = VendorApprovedEvent(
                 shop_id=str(shop.id),
                 vendor_id=shop.owner_id,
-                approved_by=actor.id,
-                approved_at=timezone.now()
+                actor_id=actor.id,
+                occurred_at=timezone.now()
             )
             transaction.on_commit(lambda: EventBus.publish(event))
 
@@ -82,7 +82,7 @@ class VendorAdministrationService:
 
             AuditService.log_action(
                 actor=actor,
-                action="SUSPEND",
+                action="VENDOR_SUSPENDED",
                 resource_type="Shop",
                 resource_id=str(shop.id),
                 result="SUCCESS",
@@ -96,8 +96,8 @@ class VendorAdministrationService:
             event = VendorSuspendedEvent(
                 shop_id=str(shop.id),
                 vendor_id=shop.owner_id,
-                suspended_by=actor.id,
-                suspended_at=timezone.now(),
+                actor_id=actor.id,
+                occurred_at=timezone.now(),
                 reason=reason
             )
             transaction.on_commit(lambda: EventBus.publish(event))
@@ -118,7 +118,7 @@ class VendorAdministrationService:
 
             AuditService.log_action(
                 actor=actor,
-                action="UPDATE",
+                action="VENDOR_RESTORED",
                 resource_type="Shop",
                 resource_id=str(shop.id),
                 result="SUCCESS",
@@ -132,8 +132,8 @@ class VendorAdministrationService:
             event = VendorRestoredEvent(
                 shop_id=str(shop.id),
                 vendor_id=shop.owner_id,
-                restored_by=actor.id,
-                restored_at=timezone.now()
+                actor_id=actor.id,
+                occurred_at=timezone.now()
             )
             transaction.on_commit(lambda: EventBus.publish(event))
 
@@ -153,7 +153,7 @@ class VendorAdministrationService:
 
             AuditService.log_action(
                 actor=actor,
-                action="REJECT",
+                action="VENDOR_REJECTED",
                 resource_type="Shop",
                 resource_id=str(shop.id),
                 result="SUCCESS",
@@ -167,8 +167,8 @@ class VendorAdministrationService:
             event = VendorRejectedEvent(
                 shop_id=str(shop.id),
                 vendor_id=shop.owner_id,
-                rejected_by=actor.id,
-                rejected_at=timezone.now(),
+                actor_id=actor.id,
+                occurred_at=timezone.now(),
                 reason=reason
             )
             transaction.on_commit(lambda: EventBus.publish(event))
