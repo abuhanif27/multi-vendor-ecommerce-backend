@@ -64,3 +64,21 @@ class ProductRestoredEvent:
     vendor_id: int
     actor_id: int
     occurred_at: datetime
+
+@dataclass
+class ProductReviewModeratedEvent:
+    review_id: str
+    product_id: str
+    new_status: str
+    actor_id: int
+    occurred_at: datetime
+    reason: Optional[str] = None
+
+@dataclass
+class ShopReviewModeratedEvent:
+    review_id: str
+    shop_id: str
+    new_status: str
+    actor_id: int
+    occurred_at: datetime
+    reason: Optional[str] = None

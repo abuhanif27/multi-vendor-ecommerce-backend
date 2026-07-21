@@ -8,7 +8,6 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 class ReviewStatus(models.TextChoices):
     PUBLISHED = 'PUBLISHED', 'Published'
     HIDDEN = 'HIDDEN', 'Hidden'
-    FLAGGED = 'FLAGGED', 'Flagged for Moderation'
     REMOVED = 'REMOVED', 'Removed by Admin'
 
 class MediaType(models.TextChoices):

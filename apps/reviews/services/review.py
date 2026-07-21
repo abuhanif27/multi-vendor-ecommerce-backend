@@ -1,6 +1,7 @@
 from django.db import transaction
 from django.core.exceptions import ValidationError
 from django.db.models import Avg
+from typing import Tuple
 
 from apps.reviews.models import ProductReview, ShopReview, ReviewStatus
 from apps.shops.models import Product, Shop
@@ -186,3 +187,45 @@ class ReviewService:
         shop.review_count = reviews.count()
         shop.average_rating = data['avg_rating'] or 0.00
         shop.save(update_fields=['review_count', 'average_rating'])
+
+    @staticmethod
+    @transaction.atomic
+    def moderate_product_review(review_id: str, new_status: str) -> Tuple[ProductReview, bool]:
+        from apps.reviews.models import ProductReviewReport
+        try:
+            review = ProductReview.objects.get(id=review_id)
+        except ProductReview.DoesNotExist:
+            raise ValidationError("Review does not exist.")
+            
+        if review.status == new_status:
+            return review, False
+            
+        review.status = new_status
+        review.save(update_fields=['status', 'updated_at'])
+        
+        # Atomically resolve related reports
+        ProductReviewReport.objects.filter(review=review, is_resolved=False).update(is_resolved=True)
+        
+        transaction.on_commit(lambda: EventBus.publish(ProductReviewChangedEvent(product_id=review.product_id)))
+        return review, True
+
+    @staticmethod
+    @transaction.atomic
+    def moderate_shop_review(review_id: str, new_status: str) -> Tuple[ShopReview, bool]:
+        from apps.reviews.models import ShopReviewReport
+        try:
+            review = ShopReview.objects.get(id=review_id)
+        except ShopReview.DoesNotExist:
+            raise ValidationError("Review does not exist.")
+            
+        if review.status == new_status:
+            return review, False
+            
+        review.status = new_status
+        review.save(update_fields=['status', 'updated_at'])
+        
+        # Atomically resolve related reports
+        ShopReviewReport.objects.filter(review=review, is_resolved=False).update(is_resolved=True)
+        
+        transaction.on_commit(lambda: EventBus.publish(ShopReviewChangedEvent(shop_id=review.shop_id)))
+        return review, True

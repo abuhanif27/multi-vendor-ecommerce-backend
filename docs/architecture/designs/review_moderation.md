@@ -4,19 +4,19 @@
 Implement Review Moderation for both Product Reviews and Shop Reviews utilizing the frozen Platform Foundation v1 administration patterns. This enables platform administrators to handle user reports and enforce community guidelines.
 
 ## 1. Review State Machine
-The existing `ReviewStatus` enum contains: `PUBLISHED`, `HIDDEN`, `FLAGGED`, `REMOVED`.
+The `ReviewStatus` enum contains only strict moderation outcomes: `PUBLISHED`, `HIDDEN`, `REMOVED`.
 
-Allowed Moderation Transitions (from Admin):
-- `PUBLISHED` | `FLAGGED` → `HIDDEN` (Admin hides the review temporarily pending investigation)
-- `PUBLISHED` | `FLAGGED` | `HIDDEN` → `REMOVED` (Admin permanently removes the review for violating guidelines)
-- `HIDDEN` | `FLAGGED` → `PUBLISHED` (Admin restores the review, clearing flags/hidden status)
+The reporting workflow (`FLAGGED`) is separated from the moderation state. User reports accumulate in `ProductReviewReport` or `ShopReviewReport`. The review itself retains its structural moderation state (e.g., `PUBLISHED`) regardless of how many open reports exist, unless thresholds automatically hide it or an administrator takes action.
 
-*Note: Transitioning to `FLAGGED` is typically triggered by user reports, not directly by admin moderation action, but admins can resolve reports by executing one of the above terminal transitions.*
+Allowed Moderation Transitions:
+- `PUBLISHED` → `HIDDEN` (Admin hides the review temporarily pending investigation)
+- `PUBLISHED` | `HIDDEN` → `REMOVED` (Admin permanently removes the review for violating guidelines)
+- `HIDDEN` → `PUBLISHED` (Admin restores the review)
 
 ## 2. Business Rules Validation
 - **Visibility:** Only `PUBLISHED` reviews are visible on the storefront.
-- **Reporting:** When a review is reported, the report is logged in `ProductReviewReport` or `ShopReviewReport`. The review status may automatically shift to `FLAGGED` if a threshold is reached (handled outside this specific admin API), but the admin APIs will handle the manual state overrides.
-- **Resolution:** When an admin modifies the state of a `FLAGGED` review (e.g., restores or removes it), all pending `ProductReviewReport` / `ShopReviewReport` objects associated with that review should be marked `is_resolved = True`.
+- **Reporting:** When a review is reported, the report is logged in `ProductReviewReport` or `ShopReviewReport`. The review status does not change automatically.
+- **Resolution:** When an admin modifies the state of a review (e.g., restores, hides, or removes it), all pending `ProductReviewReport` / `ShopReviewReport` objects associated with that review should be atomically marked `is_resolved = True` in the same transaction.
 
 ## 3. Domain Services
 Create `ReviewModerationService` in `apps.administration.services.review_moderation`.
