@@ -77,6 +77,11 @@ class ProductReviewReport(UUIDModel, TimeStampedModel):
     reason = models.TextField()
     is_resolved = models.BooleanField(default=False)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['review', 'is_resolved']),
+        ]
+
     def __str__(self):
         return f"Report on ProductReview {self.review_id}"
 
@@ -88,6 +93,11 @@ class ShopReviewReport(UUIDModel, TimeStampedModel):
     review = models.ForeignKey(ShopReview, on_delete=models.CASCADE, related_name="reports")
     reason = models.TextField()
     is_resolved = models.BooleanField(default=False)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['review', 'is_resolved']),
+        ]
 
     def __str__(self):
         return f"Report on ShopReview {self.review_id}"
