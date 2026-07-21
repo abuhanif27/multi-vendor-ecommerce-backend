@@ -27,8 +27,12 @@ RC2 extends the Platform Foundation v1 with fully integrated administrative capa
   - Published `PaymentRefundedEvent` as a synchronous Domain Event to correctly orchestrate Order state changes within the transaction boundary.
   - Executed internal domain tests for partial refund calculation and idempotency validation.
 
+- [x] **Returns Foundation (Phase 2):**
+  - Implemented `Return` and `ReturnItem` aggregates.
+  - Implemented synchronous Domain Event `ReturnReceivedEvent` triggering `InventoryService.restock_inventory()` and dynamically calculating `VendorOrder` status updates (`PARTIALLY_RETURNED`, `RETURNED`).
+  - Added robust DB constraints and validation protecting against duplicated refunds/returns.
+  
 ## 3. Pending Capabilities (Backlog)
-- [ ] Returns Foundation (Phase 2)
 - [ ] Dispute Management (Phase 3)
 - [ ] Platform Configuration & Global Settings
 - [ ] Promotion & Discount Moderation

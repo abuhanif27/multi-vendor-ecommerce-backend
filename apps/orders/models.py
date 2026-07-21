@@ -17,6 +17,8 @@ class Order(UUIDModel, TimeStampedModel):
         CANCELLED = 'CANCELLED', 'Cancelled'
         REFUNDED = 'REFUNDED', 'Refunded'
         COMPLETED = 'COMPLETED', 'Completed'
+        PARTIALLY_RETURNED = 'PARTIALLY_RETURNED', 'Partially Returned'
+        RETURNED = 'RETURNED', 'Returned'
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -59,6 +61,8 @@ class VendorOrder(UUIDModel, TimeStampedModel):
         DELIVERED = 'DELIVERED', 'Delivered'
         CANCELLED = 'CANCELLED', 'Cancelled'
         REFUNDED = 'REFUNDED', 'Refunded'
+        PARTIALLY_RETURNED = 'PARTIALLY_RETURNED', 'Partially Returned'
+        RETURNED = 'RETURNED', 'Returned'
 
     order = models.ForeignKey(
         Order,
@@ -142,7 +146,7 @@ class ReturnStatus(models.TextChoices):
 
 class Return(UUIDModel, TimeStampedModel):
     vendor_order = models.ForeignKey(VendorOrder, on_delete=models.PROTECT, related_name='returns')
-    status = models.CharField(max_length=20, choices=ReturnStatus.choices, default=ReturnStatus.REQUESTED)
+    status = models.CharField(max_length=20, choices=ReturnStatus.choices, default=ReturnStatus.REQUESTED, db_index=True)
     reason = models.TextField()
     tracking_number = models.CharField(max_length=100, blank=True)
     

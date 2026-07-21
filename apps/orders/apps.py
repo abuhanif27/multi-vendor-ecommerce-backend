@@ -26,6 +26,7 @@ class OrdersConfig(AppConfig):
         from apps.inventory.services.inventory import InventoryService
         
         def handle_return_received(event):
+            from django.db.models import Sum
             return_req = Return.objects.prefetch_related('items__order_item__variant').get(id=event.return_id)
             for item in return_req.items.all():
                 if item.order_item.variant:
@@ -37,9 +38,19 @@ class OrdersConfig(AppConfig):
             
             # Check if all items are returned
             vendor_order = return_req.vendor_order
-            # Check total items ordered vs total items returned (across all received returns)
-            # Simplified for Phase 2: If we want to mark VendorOrder as RETURNED
-            pass
+            total_purchased = vendor_order.items.aggregate(Sum('quantity'))['quantity__sum'] or 0
+            
+            total_returned = ReturnItem.objects.filter(
+                return_request__vendor_order=vendor_order,
+                return_request__status=ReturnStatus.RECEIVED
+            ).aggregate(Sum('quantity'))['quantity__sum'] or 0
+            
+            if total_returned >= total_purchased:
+                vendor_order.status = VendorOrder.FulfillmentStatus.RETURNED
+            else:
+                vendor_order.status = VendorOrder.FulfillmentStatus.PARTIALLY_RETURNED
+                
+            vendor_order.save(update_fields=['status'])
             
         EventBus.subscribe(
             ReturnReceivedEvent,

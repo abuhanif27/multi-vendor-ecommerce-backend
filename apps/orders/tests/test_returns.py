@@ -42,6 +42,7 @@ class ReturnServiceTests(TransactionTestCase):
         EventBus.subscribe(ReturnApprovedEvent, lambda e: self.events.append(e))
         
         def test_received_subscriber(e):
+            from django.db.models import Sum
             self.events.append(e)
             # Re-implement apps.py subscriber for testing since we cleared the EventBus
             return_req = Return.objects.prefetch_related('items__order_item__variant').get(id=e.return_id)
@@ -52,6 +53,21 @@ class ReturnServiceTests(TransactionTestCase):
                         quantity=item.quantity,
                         reference=f"Return {return_req.id}"
                     )
+            
+            vendor_order = return_req.vendor_order
+            total_purchased = vendor_order.items.aggregate(Sum('quantity'))['quantity__sum'] or 0
+            
+            total_returned = ReturnItem.objects.filter(
+                return_request__vendor_order=vendor_order,
+                return_request__status=ReturnStatus.RECEIVED
+            ).aggregate(Sum('quantity'))['quantity__sum'] or 0
+            
+            if total_returned >= total_purchased:
+                vendor_order.status = VendorOrder.FulfillmentStatus.RETURNED
+            else:
+                vendor_order.status = VendorOrder.FulfillmentStatus.PARTIALLY_RETURNED
+                
+            vendor_order.save(update_fields=['status'])
         
         EventBus.subscribe(ReturnReceivedEvent, test_received_subscriber)
 
