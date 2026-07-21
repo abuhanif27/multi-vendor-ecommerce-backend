@@ -120,7 +120,7 @@ class PaymentService:
 
     @staticmethod
     @transaction.atomic
-    def process_refund(payment_id: str, amount, reason_code: str, admin_notes: str = "", vendor_order_id: str = None, actor=None):
+    def process_refund(payment_id: str, amount, reason_code: str, admin_notes: str = "", vendor_order_id: str = None, actor=None, idempotency_key: str = None):
         """
         Process a partial or full refund for a payment.
         """
@@ -133,6 +133,14 @@ class PaymentService:
         from django.db.models import Sum
         from decimal import Decimal
         
+        # Idempotency check
+        if idempotency_key:
+            existing_refund = Refund.objects.filter(payment=payment, idempotency_key=idempotency_key).first()
+            if existing_refund:
+                return existing_refund
+        else:
+            idempotency_key = uuid.uuid4()
+            
         # Calculate available refund amount
         successful_refunds = payment.refunds.filter(
             status__in=[RefundStatus.SUCCEEDED, RefundStatus.PENDING]
@@ -150,7 +158,7 @@ class PaymentService:
             reason_code=reason_code,
             admin_notes=admin_notes,
             status=RefundStatus.PENDING,
-            idempotency_key=uuid.uuid4()
+            idempotency_key=idempotency_key
         )
         
         # Call Gateway
@@ -195,6 +203,7 @@ class PaymentService:
                 status=refund.status,
                 occurred_at=timezone.now()
             )
-            transaction.on_commit(lambda: EventBus.publish(event))
+            # Domain Event: Synchronous execution to coordinate Orders state
+            EventBus.publish(event)
             
         return refund

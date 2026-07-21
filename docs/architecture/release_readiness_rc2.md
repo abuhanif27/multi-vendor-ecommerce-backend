@@ -21,9 +21,16 @@ RC2 extends the Platform Foundation v1 with fully integrated administrative capa
   - Added full REST API coverage in `apps.administration.api.reviews`.
   - Tested end-to-end with `APITransactionTestCase`.
 
+- [x] **Financial Refund Foundation (Phase 1):**
+  - Implemented `Refund` aggregate in the Payments domain with `RefundStatus` and structured `RefundReason`.
+  - Upgraded `PaymentService.process_refund()` with strict validations and idempotency constraints.
+  - Published `PaymentRefundedEvent` as a synchronous Domain Event to correctly orchestrate Order state changes within the transaction boundary.
+  - Executed internal domain tests for partial refund calculation and idempotency validation.
+
 ## 3. Pending Capabilities (Backlog)
+- [ ] Returns Foundation (Phase 2)
+- [ ] Dispute Management (Phase 3)
 - [ ] Platform Configuration & Global Settings
-- [ ] Refund & Dispute Moderation
 - [ ] Promotion & Discount Moderation
 
 *Status: In Progress.*
