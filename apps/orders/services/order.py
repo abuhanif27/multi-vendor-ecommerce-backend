@@ -180,3 +180,48 @@ class OrderService:
                 PaymentService.capture_cod_payment(order.id)
                 
         return vendor_order
+
+    @staticmethod
+    @transaction.atomic
+    def process_refund_event(event):
+        """
+        Updates the Order and VendorOrder status when a payment refund succeeds.
+        """
+        if event.status != "SUCCEEDED":
+            return
+            
+        from apps.payments.models import Payment
+        from decimal import Decimal
+        from django.db.models import Sum
+        
+        payment = Payment.objects.get(id=event.payment_id)
+        order = payment.order
+        
+        # If the refund is targeting a specific vendor order
+        if event.vendor_order_id:
+            vendor_order = VendorOrder.objects.get(id=event.vendor_order_id)
+            # Find total successful refunds for this vendor order
+            from apps.payments.models import Refund, RefundStatus
+            vendor_refunds = Refund.objects.filter(
+                payment=payment,
+                vendor_order=vendor_order,
+                status=RefundStatus.SUCCEEDED
+            ).aggregate(Sum('amount'))['amount__sum'] or Decimal('0.00')
+            
+            if vendor_refunds >= vendor_order.vendor_total:
+                vendor_order.status = VendorOrder.FulfillmentStatus.REFUNDED
+            else:
+                # If there's partial refund tracking status, set it. Otherwise we just leave it.
+                pass
+            vendor_order.save(update_fields=['status'])
+            
+        # Update parent order
+        from apps.payments.models import Refund, RefundStatus
+        total_refunds = Refund.objects.filter(
+            payment=payment,
+            status=RefundStatus.SUCCEEDED
+        ).aggregate(Sum('amount'))['amount__sum'] or Decimal('0.00')
+        
+        if total_refunds >= payment.amount:
+            order.status = Order.OrderStatus.REFUNDED
+            order.save(update_fields=['status'])

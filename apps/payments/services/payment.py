@@ -117,3 +117,84 @@ class PaymentService:
         payment.save(update_fields=['status', 'paid_at', 'provider_reference'])
         
         return payment
+
+    @staticmethod
+    @transaction.atomic
+    def process_refund(payment_id: str, amount, reason_code: str, admin_notes: str = "", vendor_order_id: str = None, actor=None):
+        """
+        Process a partial or full refund for a payment.
+        """
+        payment = Payment.objects.select_for_update().get(id=payment_id)
+        
+        if payment.status != Payment.PaymentStatus.CAPTURED:
+            raise ValidationError("Only captured payments can be refunded.")
+            
+        from apps.payments.models import Refund, RefundStatus
+        from django.db.models import Sum
+        from decimal import Decimal
+        
+        # Calculate available refund amount
+        successful_refunds = payment.refunds.filter(
+            status__in=[RefundStatus.SUCCEEDED, RefundStatus.PENDING]
+        ).aggregate(Sum('amount'))['amount__sum'] or Decimal('0.00')
+        
+        amount_decimal = Decimal(str(amount))
+        if amount_decimal > (payment.amount - successful_refunds):
+            raise ValidationError("Refund amount exceeds available payment balance.")
+            
+        # Create PENDING Refund record
+        refund = Refund.objects.create(
+            payment=payment,
+            vendor_order_id=vendor_order_id,
+            amount=amount_decimal,
+            reason_code=reason_code,
+            admin_notes=admin_notes,
+            status=RefundStatus.PENDING,
+            idempotency_key=uuid.uuid4()
+        )
+        
+        # Call Gateway
+        gateway = PaymentService._get_gateway(payment.provider)
+        try:
+            gateway_resp = gateway.refund_payment(payment, amount_decimal)
+            refund.status = RefundStatus.SUCCEEDED
+            if gateway_resp and 'provider_reference' in gateway_resp:
+                refund.provider_reference = gateway_resp['provider_reference']
+        except NotImplementedError:
+            # Fallback for gateways that don't support automated refunds (e.g. COD)
+            refund.status = RefundStatus.SUCCEEDED
+            refund.provider_reference = "MANUAL_REFUND"
+        except Exception as e:
+            refund.status = RefundStatus.FAILED
+            refund.raw_metadata = {"error": str(e)}
+            
+        refund.save()
+        
+        # Log Audit Action if actor provided
+        if actor:
+            from apps.administration.services.audit import AuditService
+            AuditService.log_action(
+                actor=actor,
+                action="REFUND",
+                resource_type="Payment",
+                resource_id=str(payment.id),
+                result="SUCCESS" if refund.status == RefundStatus.SUCCEEDED else "FAILED",
+                after_state={"refund_id": str(refund.id), "amount": str(refund.amount)},
+                reason=reason_code
+            )
+        
+        if refund.status == RefundStatus.SUCCEEDED:
+            from apps.payments.events import PaymentRefundedEvent
+            from apps.notifications.events import EventBus
+            
+            event = PaymentRefundedEvent(
+                refund_id=str(refund.id),
+                payment_id=str(payment.id),
+                vendor_order_id=str(vendor_order_id) if vendor_order_id else None,
+                amount=str(refund.amount),
+                status=refund.status,
+                occurred_at=timezone.now()
+            )
+            transaction.on_commit(lambda: EventBus.publish(event))
+            
+        return refund

@@ -14,3 +14,9 @@ class OrdersConfig(AppConfig):
             ShipmentDeliveredEvent,
             lambda event: OrderService.mark_vendor_order_delivered(event.vendor_order_id)
         )
+        
+        from apps.payments.events import PaymentRefundedEvent
+        EventBus.subscribe(
+            PaymentRefundedEvent,
+            lambda event: OrderService.process_refund_event(event)
+        )

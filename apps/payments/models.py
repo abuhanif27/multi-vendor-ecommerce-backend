@@ -53,3 +53,37 @@ class Payment(UUIDModel, TimeStampedModel):
 
     def __str__(self):
         return f"Payment {self.id} for Order {self.order.id} - {self.status}"
+
+class RefundReason(models.TextChoices):
+    CUSTOMER_REQUEST = 'CUSTOMER_REQUEST', 'Customer Request'
+    ADMIN_DECISION = 'ADMIN_DECISION', 'Admin Decision'
+    DISPUTE_RESOLUTION = 'DISPUTE_RESOLUTION', 'Dispute Resolution'
+    FRAUD = 'FRAUD', 'Fraud'
+    DUPLICATE_PAYMENT = 'DUPLICATE_PAYMENT', 'Duplicate Payment'
+    OTHER = 'OTHER', 'Other'
+
+class RefundStatus(models.TextChoices):
+    PENDING = 'PENDING', 'Pending Gateway Processing'
+    SUCCEEDED = 'SUCCEEDED', 'Refund Succeeded'
+    FAILED = 'FAILED', 'Refund Failed'
+
+class Refund(UUIDModel, TimeStampedModel):
+    payment = models.ForeignKey(Payment, on_delete=models.PROTECT, related_name='refunds')
+    vendor_order = models.ForeignKey('orders.VendorOrder', on_delete=models.SET_NULL, null=True, blank=True, related_name='refunds')
+    
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    reason_code = models.CharField(max_length=50, choices=RefundReason.choices)
+    admin_notes = models.TextField(blank=True)
+    
+    status = models.CharField(max_length=20, choices=RefundStatus.choices, default=RefundStatus.PENDING)
+    
+    provider_reference = models.CharField(max_length=255, blank=True)
+    idempotency_key = models.UUIDField(unique=True)
+    
+    raw_metadata = models.JSONField(default=dict, blank=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Refund {self.id} for Payment {self.payment.id} - {self.status}"
