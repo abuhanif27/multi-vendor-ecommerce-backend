@@ -33,14 +33,3 @@ class OrderSerializer(serializers.ModelSerializer):
         ]
 
 
-class VendorOrderUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = VendorOrder
-        fields = ['status']
-        
-    def validate_status(self, value):
-        valid_transitions = {
-            VendorOrder.FulfillmentStatus.PENDING: [VendorOrder.FulfillmentStatus.CANCELLED], # Actually vendors shouldn't move from PENDING to PROCESSING, only payments do. But let's allow basic transitions.
-        }
-        # In a real app we would strictly enforce FSM transitions here.
-        return value

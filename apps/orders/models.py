@@ -27,7 +27,8 @@ class Order(UUIDModel, TimeStampedModel):
     status = models.CharField(
         max_length=20,
         choices=OrderStatus.choices,
-        default=OrderStatus.PENDING
+        default=OrderStatus.PENDING,
+        db_index=True
     )
     
     # Financials (Immutable snapshots for the entire cart)
@@ -73,7 +74,8 @@ class VendorOrder(UUIDModel, TimeStampedModel):
     status = models.CharField(
         max_length=20,
         choices=FulfillmentStatus.choices,
-        default=FulfillmentStatus.PENDING
+        default=FulfillmentStatus.PENDING,
+        db_index=True
     )
     
     # Financials (The cut/portion belonging to this vendor)
@@ -84,6 +86,12 @@ class VendorOrder(UUIDModel, TimeStampedModel):
 
     class Meta:
         ordering = ['-created_at']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['order', 'shop'],
+                name='unique_vendor_order_per_shop'
+            )
+        ]
 
     def __str__(self):
         return f"SubOrder {self.id} - {self.shop.name} - {self.status}"

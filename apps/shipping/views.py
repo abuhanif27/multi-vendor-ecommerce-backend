@@ -40,7 +40,7 @@ class VendorShipmentDetailAPIView(generics.RetrieveAPIView):
     """
     serializer_class = ShipmentReadSerializer
     permission_classes = [IsVendor]
-    queryset = Shipment.objects.all()
+    queryset = Shipment.objects.select_related('vendor_order__shop').all()
 
     def get_object(self):
         obj = super().get_object()
@@ -57,7 +57,7 @@ class VendorShipmentAssignCourierAPIView(generics.GenericAPIView):
     
     @extend_schema(responses={200: ShipmentReadSerializer})
     def post(self, request, pk, *args, **kwargs):
-        shipment = get_object_or_404(Shipment, pk=pk)
+        shipment = get_object_or_404(Shipment.objects.select_related('vendor_order__shop'), pk=pk)
         
         if shipment.vendor_order.shop.owner != request.user:
             raise PermissionDenied("You do not have permission to modify this shipment.")
@@ -86,7 +86,7 @@ class VendorShipmentStatusUpdateAPIView(generics.GenericAPIView):
     
     @extend_schema(responses={200: ShipmentReadSerializer})
     def patch(self, request, pk, *args, **kwargs):
-        shipment = get_object_or_404(Shipment, pk=pk)
+        shipment = get_object_or_404(Shipment.objects.select_related('vendor_order__shop'), pk=pk)
         
         if shipment.vendor_order.shop.owner != request.user:
             raise PermissionDenied("You do not have permission to modify this shipment.")

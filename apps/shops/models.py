@@ -32,6 +32,7 @@ class Shop(UUIDModel, TimeStampedModel, SlugMixin):
         max_length=20,
         choices=ShopStatus.choices,
         default=ShopStatus.PENDING,
+        db_index=True,
     )
     
     # Reputation metrics
@@ -81,6 +82,7 @@ class Product(UUIDModel, TimeStampedModel, SlugMixin):
         max_length=20,
         choices=ProductStatus.choices,
         default=ProductStatus.DRAFT,
+        db_index=True,
     )
 
     # Reputation metrics
@@ -232,6 +234,13 @@ class ProductImage(UUIDModel, TimeStampedModel):
 
     class Meta:
         ordering = ("display_order", "created_at")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("product",),
+                condition=models.Q(is_primary=True),
+                name="unique_primary_product_image",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.product.name} - Image {self.display_order}"
@@ -263,6 +272,13 @@ class VariantImage(UUIDModel, TimeStampedModel):
 
     class Meta:
         ordering = ("display_order", "created_at")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("variant",),
+                condition=models.Q(is_primary=True),
+                name="unique_primary_variant_image",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.variant.sku} - Image {self.display_order}"

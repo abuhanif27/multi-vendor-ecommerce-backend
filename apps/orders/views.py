@@ -1,6 +1,6 @@
 from rest_framework import generics, permissions
 from apps.orders.models import Order, VendorOrder
-from apps.orders.serializers import OrderSerializer, VendorOrderSerializer, VendorOrderUpdateSerializer
+from apps.orders.serializers import OrderSerializer, VendorOrderSerializer
 from apps.common.permissions import IsVendor
 from apps.common.pagination import DefaultPagination
 
@@ -52,16 +52,12 @@ class VendorOrderListView(generics.ListAPIView):
         return VendorOrder.objects.filter(shop__owner=self.request.user).select_related('shop', 'order').prefetch_related('items')
 
 
-class VendorOrderDetailView(generics.RetrieveUpdateAPIView):
+class VendorOrderDetailView(generics.RetrieveAPIView):
     """
-    Retrieve or update a specific vendor order.
+    Retrieve a specific vendor order.
     """
     permission_classes = [permissions.IsAuthenticated, IsVendor]
-
-    def get_serializer_class(self):
-        if self.request.method in ['PUT', 'PATCH']:
-            return VendorOrderUpdateSerializer
-        return VendorOrderSerializer
+    serializer_class = VendorOrderSerializer
 
     def get_queryset(self):
         return VendorOrder.objects.filter(shop__owner=self.request.user).prefetch_related('items')

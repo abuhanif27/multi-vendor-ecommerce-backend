@@ -104,8 +104,15 @@ class ShippingService:
         
         # Fire Business Hooks
         if new_status == Shipment.ShipmentStatus.DELIVERED:
-            from apps.orders.services.order import OrderService
-            OrderService.mark_vendor_order_delivered(shipment.vendor_order.id)
+            from apps.shipping.events import ShipmentDeliveredEvent
+            from apps.notifications.events import EventBus
+            
+            event = ShipmentDeliveredEvent(
+                shipment_id=str(shipment.id),
+                vendor_order_id=str(shipment.vendor_order.id),
+                occurred_at=timezone.now()
+            )
+            EventBus.publish(event)
             
         elif new_status == Shipment.ShipmentStatus.RETURNED:
             # Future: Restore inventory, trigger refund

@@ -51,6 +51,16 @@ class ShippingModuleServiceTestCase(APITestCase):
             name="Test Courier",
             tracking_url_template="https://test.com/track?id={tracking_number}"
         )
+        
+        # Ensure event subscription survives EventBus.clear() from other tests
+        from apps.notifications.events import EventBus
+        from apps.shipping.events import ShipmentDeliveredEvent
+        from apps.orders.services.order import OrderService
+        
+        EventBus.subscribe(
+            ShipmentDeliveredEvent,
+            lambda event: OrderService.mark_vendor_order_delivered(event.vendor_order_id)
+        )
 
     def test_initialize_shipment(self):
         """Test creating a shipment locks the correct status and creates a history event."""
