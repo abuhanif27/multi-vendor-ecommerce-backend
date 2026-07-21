@@ -132,3 +132,33 @@ class OrderItem(UUIDModel, TimeStampedModel):
 
     def __str__(self):
         return f"{self.quantity}x {self.product_name} ({self.sku})"
+
+class ReturnStatus(models.TextChoices):
+    REQUESTED = 'REQUESTED', 'Return Requested'
+    APPROVED = 'APPROVED', 'Return Approved'
+    SHIPPED = 'SHIPPED', 'Item Shipped Back'
+    RECEIVED = 'RECEIVED', 'Item Received by Vendor'
+    REJECTED = 'REJECTED', 'Return Rejected'
+
+class Return(UUIDModel, TimeStampedModel):
+    vendor_order = models.ForeignKey(VendorOrder, on_delete=models.PROTECT, related_name='returns')
+    status = models.CharField(max_length=20, choices=ReturnStatus.choices, default=ReturnStatus.REQUESTED)
+    reason = models.TextField()
+    tracking_number = models.CharField(max_length=100, blank=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Return {self.id} for VendorOrder {self.vendor_order.id} - {self.status}"
+
+class ReturnItem(UUIDModel, TimeStampedModel):
+    return_request = models.ForeignKey(Return, on_delete=models.CASCADE, related_name='items')
+    order_item = models.ForeignKey(OrderItem, on_delete=models.PROTECT)
+    quantity = models.PositiveIntegerField(validators=[MinValueValidator(1)])
+    
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f"{self.quantity}x {self.order_item.product_name} (Return {self.return_request.id})"

@@ -29,26 +29,28 @@ class ReturnItem(UUIDModel, TimeStampedModel):
 
 ## 3. Return Lifecycle (State Machine)
 1. **REQUESTED:** A return request is initialized for specific items.
-2. **APPROVED/REJECTED:** The vendor (or admin) reviews the request.
+2. **APPROVED/REJECTED:** The vendor reviews the request. (Dispute escalation to Admins is intentionally excluded from this phase and reserved for Phase 3).
 3. **SHIPPED:** Buyer provides tracking info and ships it back.
 4. **RECEIVED:** Vendor confirms receipt. Inventory is restocked. VendorOrder transitions.
 
 ## 4. Service Responsibilities
-**`OrderService` additions (or new `ReturnService` within Orders):**
-- `request_return(vendor_order_id, items: list[dict], reason)`: Validates items belong to `vendor_order`, order is `DELIVERED`.
-- `approve_return(return_id)`: Transitions to `APPROVED`.
-- `mark_return_received(return_id)`: Transitions to `RECEIVED`.
-  - Triggers Inventory Restock.
-  - Checks if all items in `VendorOrder` are returned. If so, updates `VendorOrder.status = RETURNED`.
+**`ReturnService` (within Orders domain):**
+- `request_return(vendor_order_id, items: list[dict], reason)`: Validates items belong to `vendor_order`, order is `DELIVERED`. Represents normal customer intent.
+- `approve_return(return_id, vendor_actor)`: Vendor transitions to `APPROVED`.
+- `reject_return(return_id, vendor_actor, reason)`: Vendor transitions to `REJECTED`.
+- `mark_return_received(return_id, vendor_actor)`: Vendor confirms receipt. Transitions to `RECEIVED`.
+  - Emits a Domain Event which synchronously triggers Inventory Restock and evaluates if `VendorOrder.status` should be updated to `RETURNED`.
 
 **`InventoryService` updates:**
 - `restock_inventory(variant_id, quantity)`: Modifies inventory stock physically upon return receipt.
 
 ## 5. Event Publication
-Published via `EventBus` (Synchronous Domain Events where appropriate, or Integration Events for notifications):
-- `ReturnRequestedEvent`
-- `ReturnApprovedEvent`
-- `ReturnReceivedEvent`
+- **Domain Events (Synchronous within transaction boundary):**
+  - `ReturnReceivedEvent`: Coordinates Inventory restocking and Order state updates securely. Failure to execute rolls back the `mark_return_received` transaction.
+- **Integration Events (Asynchronous via `on_commit`):**
+  - `ReturnRequestedEvent`: Used for sending email/push notifications to the Vendor.
+  - `ReturnApprovedEvent`: Used for sending notifications to the Customer.
+  - `ReturnRejectedEvent`: Used for sending notifications to the Customer.
 
 ## 6. Business Rules & Validations
 - Returns can only be initiated on `DELIVERED` VendorOrders.

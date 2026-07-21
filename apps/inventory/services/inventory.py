@@ -117,3 +117,24 @@ class InventoryService:
         inventory.quantity_reserved -= quantity
         inventory.save(update_fields=["quantity_reserved"])
         return inventory
+
+    @staticmethod
+    @transaction.atomic
+    def restock_inventory(variant_id: str, quantity: int, note: str = "Return Restock", reference: str = ""):
+        """
+        Restocks inventory when a returned item is received by the vendor.
+        """
+        from apps.inventory.models import InventoryTransaction
+        inventory = Inventory.objects.select_for_update().get(variant_id=variant_id)
+        
+        inventory.quantity_on_hand += quantity
+        inventory.save(update_fields=["quantity_on_hand"])
+        
+        InventoryTransaction.objects.create(
+            inventory=inventory,
+            transaction_type=InventoryTransaction.TransactionType.IN,
+            quantity=quantity,
+            note=note,
+            reference=reference
+        )
+        return inventory
