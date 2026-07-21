@@ -98,3 +98,14 @@ class VendorAdministrationAPITests(APITransactionTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.shop.refresh_from_db()
         self.assertEqual(self.shop.status, Shop.ShopStatus.APPROVED)
+
+    def test_successful_rejection(self):
+        self.shop.status = Shop.ShopStatus.PENDING
+        self.shop.save()
+        self.client.force_authenticate(user=self.super_admin)
+        url = reverse('admin-vendor-reject', kwargs={'shop_id': str(self.shop.id)})
+        response = self.client.post(url, {"reason": "Not real business"})
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.shop.refresh_from_db()
+        self.assertEqual(self.shop.status, Shop.ShopStatus.REJECTED)

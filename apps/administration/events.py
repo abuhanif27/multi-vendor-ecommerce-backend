@@ -14,6 +14,7 @@ class VendorSuspendedEvent:
     vendor_id: int
     suspended_by: int
     suspended_at: datetime
+    reason: str
 
 @dataclass
 class VendorRestoredEvent:
@@ -21,3 +22,11 @@ class VendorRestoredEvent:
     vendor_id: int
     restored_by: int
     restored_at: datetime
+
+@dataclass
+class VendorRejectedEvent:
+    shop_id: str
+    vendor_id: int
+    rejected_by: int
+    rejected_at: datetime
+    reason: str

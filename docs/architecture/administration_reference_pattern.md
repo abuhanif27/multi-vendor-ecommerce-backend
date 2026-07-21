@@ -55,3 +55,12 @@ class VendorAdministrationService:
 
         return resource
 ```
+
+## Suspension and Rejection Workflows
+- **Reasons:** Destructive or punitive actions (Suspension, Rejection) **must** require a string `reason`. This reason is stored in the Audit Log and attached to the domain event.
+- **Idempotency against Audit:** Duplicate requests for suspension/rejection must bounce early without writing a duplicate audit record or firing an event.
+- **State transitions:** 
+  - `SUSPENDED` -> `APPROVED` (Restore)
+  - `APPROVED` -> `SUSPENDED` (Suspend)
+  - `PENDING` -> `REJECTED` (Reject)
+  - `REJECTED` -> `PENDING` (Reapply)

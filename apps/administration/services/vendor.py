@@ -7,7 +7,12 @@ from django.utils import timezone
 from apps.shops.models import Shop
 from apps.shops.services.shops import ShopService
 from apps.administration.services.audit import AuditService
-from apps.administration.events import VendorApprovedEvent, VendorSuspendedEvent, VendorRestoredEvent
+from apps.administration.events import (
+    VendorApprovedEvent, 
+    VendorSuspendedEvent, 
+    VendorRestoredEvent,
+    VendorRejectedEvent
+)
 from apps.notifications.events import EventBus
 
 User = get_user_model()
@@ -92,7 +97,8 @@ class VendorAdministrationService:
                 shop_id=str(shop.id),
                 vendor_id=shop.owner_id,
                 suspended_by=actor.id,
-                suspended_at=timezone.now()
+                suspended_at=timezone.now(),
+                reason=reason
             )
             transaction.on_commit(lambda: EventBus.publish(event))
 
@@ -128,6 +134,42 @@ class VendorAdministrationService:
                 vendor_id=shop.owner_id,
                 restored_by=actor.id,
                 restored_at=timezone.now()
+            )
+            transaction.on_commit(lambda: EventBus.publish(event))
+
+        return shop
+
+    @staticmethod
+    def reject_vendor(shop_id: str, actor: User, reason: str) -> Shop:
+        if not actor.has_perm('administration.can_reject_vendor'):
+            raise PermissionDenied("You do not have permission to reject vendors.")
+            
+        with transaction.atomic():
+            shop, was_rejected_now = ShopService.reject_shop(shop_id)
+
+            if not was_rejected_now:
+                logger.info("Vendor rejection skipped", extra={"shop_id": str(shop.id), "result": "IDEMPOTENT"})
+                return shop
+
+            AuditService.log_action(
+                actor=actor,
+                action="REJECT",
+                resource_type="Shop",
+                resource_id=str(shop.id),
+                result="SUCCESS",
+                before_state={"status": Shop.ShopStatus.PENDING},
+                after_state={"status": shop.status},
+                reason=reason
+            )
+
+            logger.info("Vendor rejection successful", extra={"shop_id": str(shop.id), "admin_id": actor.id})
+
+            event = VendorRejectedEvent(
+                shop_id=str(shop.id),
+                vendor_id=shop.owner_id,
+                rejected_by=actor.id,
+                rejected_at=timezone.now(),
+                reason=reason
             )
             transaction.on_commit(lambda: EventBus.publish(event))
 

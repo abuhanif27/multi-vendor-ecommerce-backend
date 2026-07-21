@@ -13,10 +13,20 @@ class RBACTests(TestCase):
         )
         
         # New permissions
-        self.approve_vendor_perm = Permission.objects.get(codename="can_approve_vendor")
-        self.suspend_vendor_perm = Permission.objects.get(codename="can_suspend_vendor")
-        self.force_refund_perm = Permission.objects.get(codename="can_force_refund")
-        self.manage_platform_perm = Permission.objects.get(codename="can_manage_platform_settings")
+        from django.contrib.contenttypes.models import ContentType
+        from apps.administration.models import AdminAuditLog
+        content_type = ContentType.objects.get_for_model(AdminAuditLog)
+        
+        self.manage_platform_perm = Permission.objects.get(
+            codename="can_manage_platform_settings", 
+            content_type=content_type
+        )
+        self.approve_vendor_perm = Permission.objects.get(
+            codename="can_approve_vendor", 
+            content_type=content_type
+        )
+        self.suspend_vendor_perm = Permission.objects.get(codename="can_suspend_vendor", content_type=content_type)
+        self.force_refund_perm = Permission.objects.get(codename="can_force_refund", content_type=content_type)
 
         self.vendor_manager_group = Group.objects.create(name="Vendor Manager")
         self.vendor_manager_group.permissions.add(self.approve_vendor_perm, self.suspend_vendor_perm)

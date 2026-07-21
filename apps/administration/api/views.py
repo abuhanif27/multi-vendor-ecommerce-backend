@@ -101,3 +101,33 @@ class RestoreVendorView(APIView):
         except ValidationError as e:
             msg = e.messages[0] if hasattr(e, 'messages') else str(e)
             return Response({"detail": msg}, status=status.HTTP_400_BAD_REQUEST)
+
+class RejectVendorRequestSerializer(serializers.Serializer):
+    reason = serializers.CharField(required=True, allow_blank=False)
+
+class RejectVendorView(APIView):
+    permission_classes = [IsAdminUser]
+
+    @extend_schema(
+        request=RejectVendorRequestSerializer,
+        responses={200: inline_serializer("RejectVendorResponse", fields={"status": serializers.CharField()})}
+    )
+    def post(self, request, shop_id):
+        serializer = RejectVendorRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        reason = serializer.validated_data.get('reason')
+
+        try:
+            shop = VendorAdministrationService.reject_vendor(
+                shop_id=str(shop_id),
+                actor=request.user,
+                reason=reason
+            )
+            return Response({"status": shop.status}, status=status.HTTP_200_OK)
+        except Shop.DoesNotExist:
+            return Response({"detail": "Shop not found."}, status=status.HTTP_404_NOT_FOUND)
+        except PermissionDenied as e:
+            return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
+        except ValidationError as e:
+            msg = e.messages[0] if hasattr(e, 'messages') else str(e)
+            return Response({"detail": msg}, status=status.HTTP_400_BAD_REQUEST)

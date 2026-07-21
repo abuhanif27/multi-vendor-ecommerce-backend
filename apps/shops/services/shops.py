@@ -45,3 +45,14 @@ class ShopService:
         shop.status = Shop.ShopStatus.APPROVED
         shop.save()
         return shop, True
+
+    @staticmethod
+    def reject_shop(shop_id: str) -> Tuple[Shop, bool]:
+        shop = Shop.objects.select_for_update().get(id=shop_id)
+        if shop.status == Shop.ShopStatus.REJECTED:
+            return shop, False
+        if shop.status != Shop.ShopStatus.PENDING:
+            raise ValidationError(f"Cannot reject shop in status {shop.status}. Only pending applications can be rejected.")
+        shop.status = Shop.ShopStatus.REJECTED
+        shop.save()
+        return shop, True

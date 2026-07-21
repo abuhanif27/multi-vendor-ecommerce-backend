@@ -7,7 +7,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from apps.shops.models import Shop
 from apps.administration.models import AdminAuditLog
 from apps.administration.services.vendor import VendorAdministrationService
-from apps.administration.events import VendorApprovedEvent, VendorSuspendedEvent, VendorRestoredEvent
+from apps.administration.events import VendorApprovedEvent, VendorSuspendedEvent, VendorRestoredEvent, VendorRejectedEvent
 from apps.notifications.events import EventBus
 
 User = get_user_model()
@@ -179,3 +179,26 @@ class VendorAdministrationServiceTests(TransactionTestCase):
         
         audit = AdminAuditLog.objects.get(resource_type="Shop", resource_id=str(shop.id), action="UPDATE")
         self.assertEqual(audit.after_state["status"], Shop.ShopStatus.APPROVED)
+
+    def test_reject_vendor_success(self):
+        self.shop.status = Shop.ShopStatus.PENDING
+        self.shop.save()
+        
+        EventBus.clear()
+        events = []
+        EventBus.subscribe(VendorRejectedEvent, lambda e: events.append(e))
+
+        shop = VendorAdministrationService.reject_vendor(
+            shop_id=str(self.shop.id),
+            actor=self.super_admin,
+            reason="Incomplete documents"
+        )
+        
+        self.assertEqual(shop.status, Shop.ShopStatus.REJECTED)
+        self.assertEqual(len(events), 1)
+        self.assertIsInstance(events[0], VendorRejectedEvent)
+        self.assertEqual(events[0].shop_id, str(shop.id))
+        self.assertEqual(events[0].reason, "Incomplete documents")
+        
+        audit = AdminAuditLog.objects.get(resource_type="Shop", resource_id=str(shop.id), action="REJECT")
+        self.assertEqual(audit.after_state["status"], Shop.ShopStatus.REJECTED)

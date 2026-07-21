@@ -63,7 +63,9 @@ class AdminAuditLog(models.Model):
         ordering = ['-timestamp']
         permissions = [
             ("can_approve_vendor", "Can approve a vendor shop"),
+            ("can_reject_vendor", "Can reject a vendor shop"),
             ("can_suspend_vendor", "Can suspend a vendor shop"),
+            ("can_restore_vendor", "Can restore a vendor shop"),
             ("can_force_refund", "Can force a refund on an order"),
             ("can_manage_platform_settings", "Can manage platform configuration"),
             ("can_moderate_products", "Can moderate products"),
