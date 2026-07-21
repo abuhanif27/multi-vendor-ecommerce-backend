@@ -2,12 +2,14 @@
 
 The system utilizes an EventBus to decouple domains. However, not all events serve the same architectural purpose. Applying a single global publication strategy (e.g., strictly `transaction.on_commit` or strictly synchronous) leads to either data inconsistency or race conditions.
 
-Events in this architecture are strictly classified into two categories:
+Events in this architecture are strictly classified into a three-tier taxonomy:
 
-## 1. Internal Domain Events (Synchronous Choreography)
-**Purpose:** To coordinate state changes across different aggregates within the same database transaction. These enforce strong business invariants where failure in the downstream domain must roll back the upstream domain.
+## 1. Domain Events
+**Purpose:** To coordinate core business state changes across different aggregates. These enforce strong business invariants.
 
-**Strategy:** Publish **synchronously** inside the active transaction block. Do NOT use `transaction.on_commit`.
+**Behavior:**
+- **Execution:** Synchronous. Published directly inside the active transaction block (`EventBus.publish(event)`).
+- **Failure Policy:** Failures in downstream subscribers **must** roll back the upstream transaction to guarantee data consistency. If the domain listener crashes, the entire workflow is aborted.
 
 **Implementation Pattern:**
 ```python
@@ -21,14 +23,30 @@ def complete_shipment():
 ```
 
 **Current Examples:**
-- `ShipmentDeliveredEvent`: Consumed by the Orders domain to mark the `VendorOrder` and parent `Order` as complete. Must be synchronous to ensure database consistency (a delivered shipment must guarantee a delivered order).
+- `ShipmentDeliveredEvent`: Consumed by the Orders domain to mark the `VendorOrder` and parent `Order` as complete. A delivered shipment must guarantee a delivered order.
 
 ---
 
-## 2. Integration Events (Asynchronous / Side-Effects)
-**Purpose:** To trigger external side effects, cross-system integrations, or asynchronous eventual consistency. These must only fire if the database transaction successfully commits to prevent "phantom" side effects (e.g., sending an email for an order that rolled back).
+## 2. Application Events
+**Purpose:** To manage internal infrastructure concerns. These events inform auxiliary subsystems about data mutations.
 
-**Strategy:** Publish strictly using **`transaction.on_commit`**. 
+**Behavior:**
+- **Execution:** Asynchronous/Deferred. Published via `transaction.on_commit(lambda: EventBus.publish(event))` or handled out-of-band.
+- **Failure Policy:** Failures in downstream subscribers are **logged** but must **never** roll back the completed core business transaction.
+
+**Current Examples:**
+- Cache invalidation
+- Read model / CQRS projections refresh
+- Internal audit projections
+
+---
+
+## 3. Integration Events
+**Purpose:** To trigger external side effects, cross-system integrations, or asynchronous job delegation.
+
+**Behavior:**
+- **Execution:** Strictly post-commit. Published exclusively using `transaction.on_commit(lambda: EventBus.publish(event))`. This prevents phantom side effects (e.g., dispatching an email for a transaction that ultimately rolled back).
+- **Failure Policy:** Failures must not roll back committed data. Subscribers usually delegate to reliable queues (like Celery) which provide their own retry mechanisms.
 
 **Implementation Pattern:**
 ```python
@@ -44,6 +62,11 @@ def approve_vendor():
 ```
 
 **Current Examples:**
-- `VendorApprovedEvent`, `VendorSuspendedEvent`, `VendorRestoredEvent`, `VendorRejectedEvent`: Trigger external notifications (e.g., emails) and webhooks.
-- `CouponUsageRecordedEvent`, `PromotionExhaustedEvent`: Typically consumed by Analytics pipelines or marketing integrations.
-- `ProductReviewChangedEvent`, `ShopReviewChangedEvent`: These dispatch asynchronous Celery tasks (`.delay()`). The transaction must commit first so the Celery worker can read the new review from the database.
+- **Notifications & Webhooks:** `VendorApprovedEvent`, `VendorSuspendedEvent`, `VendorRestoredEvent`, `VendorRejectedEvent`
+- **Analytics:** `CouponUsageRecordedEvent`, `PromotionExhaustedEvent`
+- **Asynchronous Task Delegation:** `ProductReviewChangedEvent`, `ShopReviewChangedEvent` (These dispatch Celery `.delay()` tasks. The transaction must commit first so the Celery worker can read the new review from the database).
+- **Search Indexing**
+
+---
+
+> **Note:** This taxonomy is the platform standard. Future domains must follow this EventBus publication strategy unless there is a demonstrated business reason not to.
