@@ -50,6 +50,7 @@ Published via `EventBus` inside `transaction.on_commit()`:
 
 ## 6. Business Rules & Validations
 - **Idempotency:** Unique `idempotency_key` guarantees no double refunds.
+- **Concurrent Refund Guarding (PENDING State Reservation):** Both `SUCCEEDED` and `PENDING` refunds are summed to calculate the consumed refund balance. This is a critical correctness rule. A `PENDING` refund represents an ongoing API call to the gateway. By deducting `PENDING` amounts from the available balance under a `select_for_update()` lock, we strictly guarantee that two concurrent refund requests cannot both validate successfully and overdraw the payment before the gateway responds. If a `PENDING` refund ultimately fails, its amount is freed.
 - **Validation:** Total sum of `SUCCEEDED` and `PENDING` refunds cannot exceed the original `Payment.amount`.
 - **Eligibility:** Refunds can only be processed against `CAPTURED` payments.
 - **Audit:** Any refund execution must be logged via `AuditService`.
