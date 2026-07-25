@@ -26,7 +26,7 @@ class SSLCommerzGateway(PaymentGateway):
         self.timeout = (5.0, 15.0)  # (connect_timeout, read_timeout)
 
     def initialize_payment(self, payment_id: str, amount: Decimal, currency: str, customer_info: dict, return_url_base: str) -> str:
-        url = f"{self.base_url}/gwprocess/v3/api.php"
+        url = f"{self.base_url}/gwprocess/v4/api.php"
         
         payload = {
             'store_id': self.store_id,
