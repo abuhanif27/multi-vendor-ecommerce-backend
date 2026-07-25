@@ -28,3 +28,24 @@ class ReturnReceivedEvent:
     vendor_order_id: str
     actor_id: int
     occurred_at: datetime
+
+@dataclass
+class DisputeOpenedEvent:
+    dispute_id: str
+    vendor_order_id: str
+    occurred_at: datetime
+
+@dataclass
+class DisputeEscalatedEvent:
+    dispute_id: str
+    vendor_order_id: str
+    actor_id: int
+    occurred_at: datetime
+
+@dataclass
+class DisputeResolvedEvent:
+    dispute_id: str
+    vendor_order_id: str
+    actor_id: int
+    outcome: str
+    occurred_at: datetime

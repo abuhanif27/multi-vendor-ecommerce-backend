@@ -166,3 +166,32 @@ class ReturnItem(UUIDModel, TimeStampedModel):
 
     def __str__(self):
         return f"{self.quantity}x {self.order_item.product_name} (Return {self.return_request.id})"
+
+class DisputeStatus(models.TextChoices):
+    OPEN = 'OPEN', 'Open'
+    VENDOR_REVIEW = 'VENDOR_REVIEW', 'Vendor Review'
+    ESCALATED = 'ESCALATED', 'Escalated to Administration'
+    ADMIN_REVIEW = 'ADMIN_REVIEW', 'Admin Review'
+    RESOLVED = 'RESOLVED', 'Resolved'
+    REJECTED = 'REJECTED', 'Rejected'
+    CANCELLED = 'CANCELLED', 'Cancelled'
+
+class ResolutionOutcome(models.TextChoices):
+    CUSTOMER_FAVOUR = 'CUSTOMER_FAVOUR', 'Customer Favour'
+    VENDOR_FAVOUR = 'VENDOR_FAVOUR', 'Vendor Favour'
+    MUTUAL_SETTLEMENT = 'MUTUAL_SETTLEMENT', 'Mutual Settlement'
+    ADMIN_OVERRIDE = 'ADMIN_OVERRIDE', 'Admin Override'
+    OTHER = 'OTHER', 'Other'
+
+class Dispute(UUIDModel, TimeStampedModel):
+    vendor_order = models.ForeignKey(VendorOrder, on_delete=models.PROTECT, related_name='disputes')
+    status = models.CharField(max_length=20, choices=DisputeStatus.choices, default=DisputeStatus.OPEN, db_index=True)
+    reason = models.TextField()
+    outcome = models.CharField(max_length=30, choices=ResolutionOutcome.choices, null=True, blank=True)
+    resolution_notes = models.TextField(blank=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Dispute {self.id} for VendorOrder {self.vendor_order.id} - {self.status}"
