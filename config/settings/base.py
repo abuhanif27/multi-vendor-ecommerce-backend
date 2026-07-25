@@ -236,3 +236,9 @@ CELERY_BEAT_SCHEDULE = {
 SSLCOMMERZ_STORE_ID = os.environ.get("SSLCOMMERZ_STORE_ID", "")
 SSLCOMMERZ_STORE_PASSWORD = os.environ.get("SSLCOMMERZ_STORE_PASSWORD", "")
 SSLCOMMERZ_SANDBOX = os.environ.get("SSLCOMMERZ_SANDBOX", "True").lower() in ["true", "1", "yes"]
+
+# Stripe Configuration
+STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
+STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY", "")
+STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
+STRIPE_TEST_MODE = os.environ.get("STRIPE_TEST_MODE", "True").lower() in ["true", "1", "yes"]
