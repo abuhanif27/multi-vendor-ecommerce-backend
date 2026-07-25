@@ -39,11 +39,12 @@ def run_e2e_test():
     product, _ = Product.objects.get_or_create(
         shop=shop,
         name="E2E Laptop",
-        defaults={"description": "Test Laptop", "category": category, "status": "active"}
+        defaults={"description": "Test Laptop",
+                  "category": category, "status": "active"}
     )
     product.status = "active"
     product.save()
-    
+
     variant, _ = ProductVariant.objects.get_or_create(
         product=product,
         sku="E2E-LAPTOP-1",
@@ -96,4 +97,3 @@ def run_e2e_test():
 
 if __name__ == "__main__":
     run_e2e_test()
-run_e2e_test()
