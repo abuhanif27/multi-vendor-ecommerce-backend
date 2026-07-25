@@ -32,14 +32,18 @@ RC2 extends the Platform Foundation v1 with fully integrated administrative capa
   - Implemented synchronous Domain Event `ReturnReceivedEvent` triggering `InventoryService.restock_inventory()` and dynamically calculating `VendorOrder` status updates (`PARTIALLY_RETURNED`, `RETURNED`).
   - Added robust DB constraints and validation protecting against duplicated refunds/returns.
 
-- [x] **Payment Gateway Integration (Phase 4):**
-  - Integrated SSLCommerz Sandbox payment gateway.
-  - Implemented `PaymentGatewayRegistry` abstracting concrete gateway implementations.
-  - Secured webhooks processing via strict validation API (verifying `val_id` and strict amount matching).
-  - Webhooks enforce row-level locks and idempotency protecting the `CAPTURED` state machine transitions.
+- [x] **Dispute Management (Phase 3):**
+  - Implemented `Dispute` aggregate tracking escalation lifecycle.
+  - Implemented `DisputeService` to act as an Orchestrator spanning `ReturnService` and `PaymentService`.
+  - Introduced `ResolutionOutcome` to decouple financial settlements from operational workflows.
+
+- [x] **Multi-Gateway Payment Platform (Phase 4):**
+  - Integrated SSLCommerz (Sandbox) and Stripe (Test Mode).
+  - Implemented agnostic `PaymentGatewayRegistry` abstracting concrete gateway implementations.
+  - Secured webhooks processing via strict signature and API validation (`val_id`, `STRIPE_WEBHOOK_SECRET`).
+  - Webhooks enforce row-level locks and idempotency protecting the `CAPTURED` state transitions without duplicating business logic across providers.
   
-## 3. Pending Capabilities (Backlog)
-- [ ] Dispute Management (Phase 3)
+## 3. Pending Capabilities (RC3 Backlog)
 - [ ] Platform Configuration & Global Settings
 - [ ] Promotion & Discount Moderation
 

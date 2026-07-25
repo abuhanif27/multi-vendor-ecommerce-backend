@@ -48,3 +48,4 @@ See the [Checkout Architecture Diagram](diagrams/checkout_flow.mmd) for a visual
 - [RC2 Release Readiness](release_readiness_rc2.md)
 - [RC2 Platform Audit](rc2_platform_audit.md)
 - [Technical Debt Triage](technical_debt_triage.md)
+- [Adding a New Payment Gateway](adding_a_new_gateway.md)
