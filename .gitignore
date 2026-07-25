@@ -5,4 +5,5 @@ db.sqlite3
 *.png
 *.jpg
 *.jpeg
-*.webp.env
+*.webp
+.env
