@@ -42,3 +42,8 @@ In highly complex mutations (like Checkout), a single `CheckoutService` acts as 
 
 ## System Diagram
 See the [Checkout Architecture Diagram](diagrams/checkout_flow.mmd) for a visual representation.
+
+## 5. Milestones & Audits
+- [RC1 Release Readiness](release_readiness_rc1.md)
+- [RC2 Release Readiness](release_readiness_rc2.md)
+- [RC2 Platform Audit](rc2_platform_audit.md)
