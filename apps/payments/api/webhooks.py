@@ -35,7 +35,8 @@ class SSLCommerzWebhookView(APIView):
                 PaymentService.process_webhook_success(
                     payment_id=tran_id,
                     provider_reference=validation_result['tran_id'],
-                    raw_metadata=validation_result['raw_metadata']
+                    raw_metadata=validation_result['raw_metadata'],
+                    verified_amount=validation_result['amount']
                 )
                 # Successful processing
                 return Response({"status": "success"}, status=status.HTTP_200_OK)

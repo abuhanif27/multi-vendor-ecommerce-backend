@@ -31,6 +31,12 @@ RC2 extends the Platform Foundation v1 with fully integrated administrative capa
   - Implemented `Return` and `ReturnItem` aggregates.
   - Implemented synchronous Domain Event `ReturnReceivedEvent` triggering `InventoryService.restock_inventory()` and dynamically calculating `VendorOrder` status updates (`PARTIALLY_RETURNED`, `RETURNED`).
   - Added robust DB constraints and validation protecting against duplicated refunds/returns.
+
+- [x] **Payment Gateway Integration (Phase 4):**
+  - Integrated SSLCommerz Sandbox payment gateway.
+  - Implemented `PaymentGatewayRegistry` abstracting concrete gateway implementations.
+  - Secured webhooks processing via strict validation API (verifying `val_id` and strict amount matching).
+  - Webhooks enforce row-level locks and idempotency protecting the `CAPTURED` state machine transitions.
   
 ## 3. Pending Capabilities (Backlog)
 - [ ] Dispute Management (Phase 3)

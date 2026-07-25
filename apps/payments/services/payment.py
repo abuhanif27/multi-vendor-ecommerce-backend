@@ -85,7 +85,7 @@ class PaymentService:
 
     @staticmethod
     @transaction.atomic
-    def process_webhook_success(payment_id, provider_reference, raw_metadata):
+    def process_webhook_success(payment_id, provider_reference, raw_metadata, verified_amount=None):
         """
         Called by the webhook view when a payment succeeds.
         Guaranteed to be idempotent.
@@ -96,6 +96,11 @@ class PaymentService:
         if payment.status == Payment.PaymentStatus.CAPTURED:
             # Idempotency safety: already processed
             return payment
+            
+        if verified_amount is not None:
+            from decimal import Decimal
+            if Decimal(str(verified_amount)) != payment.amount:
+                raise ValidationError(f"Amount mismatch. Expected {payment.amount}, received {verified_amount}")
             
         payment.status = Payment.PaymentStatus.CAPTURED
         payment.paid_at = timezone.now()
