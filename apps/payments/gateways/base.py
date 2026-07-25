@@ -1,32 +1,33 @@
 from abc import ABC, abstractmethod
+from decimal import Decimal
 
-class BaseGateway(ABC):
-    """
-    Abstract Base Class for all payment gateways.
-    Enforces a strict interface that all providers must implement.
-    """
-
+class PaymentGateway(ABC):
     @abstractmethod
-    def initialize_payment(self, payment):
+    def initialize_payment(self, payment_id: str, amount: Decimal, currency: str, customer_info: dict, return_url_base: str) -> str:
         """
-        Calls the external provider to generate a payment session or intent.
-        Returns a dictionary containing necessary frontend data, e.g.,
-        {"checkout_url": "https://...", "client_secret": "..."}
+        Initializes the payment with the gateway.
+        Returns the URL to which the customer should be redirected.
         """
         pass
 
     @abstractmethod
-    def verify_webhook(self, request):
+    def validate_payment(self, payload: dict) -> dict:
         """
-        Verifies the cryptographic signature of the incoming webhook.
-        Parses the payload and returns a standardized dictionary:
-        {"status": "CAPTURED", "provider_reference": "xxx", "amount": 100.00}
+        Validates IPN/Callback payload with the gateway server.
+        Returns validated data dictionary containing:
+        - valid: bool
+        - amount: Decimal
+        - currency: str
+        - raw_metadata: dict
         """
         pass
 
     @abstractmethod
-    def refund_payment(self, payment, amount=None):
+    def refund_payment(self, refund_id: str, payment_id: str, amount: Decimal, bank_tran_id: str = None) -> dict:
         """
-        Initiates a refund via the provider API.
+        Processes a refund via the gateway API.
+        Returns data dictionary containing:
+        - success: bool
+        - raw_metadata: dict
         """
         pass

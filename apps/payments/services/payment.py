@@ -16,14 +16,18 @@ class PaymentService:
     @staticmethod
     def _get_gateway(provider):
         if provider == Payment.Provider.COD:
+            from apps.payments.gateways.cod import CashOnDeliveryGateway
             return CashOnDeliveryGateway()
-        # elif provider == Payment.Provider.STRIPE:
-        #     return StripeGateway()
-        raise NotImplementedError(f"Gateway for {provider} is not implemented.")
+            
+        from apps.payments.gateways.registry import gateway_registry
+        try:
+            return gateway_registry.get(provider)
+        except ValueError:
+            raise NotImplementedError(f"Gateway for {provider} is not registered or implemented.")
 
     @staticmethod
     @transaction.atomic
-    def initialize_payment(order_id, provider):
+    def initialize_payment(order_id, provider, return_url_base=None):
         """
         Creates a PENDING payment record and calls the external gateway to initialize the session.
         """
@@ -45,15 +49,39 @@ class PaymentService:
         
         # 2. Call the Strategy
         gateway = PaymentService._get_gateway(provider)
-        response_data = gateway.initialize_payment(payment)
         
-        # 3. Handle CoD Special Case (Bypasses webhook)
         if provider == Payment.Provider.COD:
-            # Tell OrderService to start processing immediately without waiting for CAPTURED
+            customer_info = {} # COD doesn't care
+            response_data = gateway.initialize_payment(
+                payment_id=str(payment.id),
+                amount=payment.amount,
+                currency=payment.currency,
+                customer_info=customer_info,
+                return_url_base=return_url_base or ""
+            )
+            # 3. Handle CoD Special Case (Bypasses webhook)
             from apps.orders.services.order import OrderService
             OrderService.mark_order_processing(order.id)
+            return {"url": response_data, "payment_id": str(payment.id)}
             
-        return response_data
+        customer_info = {
+            'name': order.user.email.split('@')[0] if order.user else "Guest", # Assuming simple guest or user
+            'email': order.user.email if order.user else "guest@example.com",
+            'phone': order.shipping_address.get('phone', 'N/A') if order.shipping_address else 'N/A',
+        }
+        
+        if not return_url_base:
+            from django.conf import settings
+            return_url_base = getattr(settings, 'FRONTEND_URL', 'http://localhost:8000')
+            
+        redirect_url = gateway.initialize_payment(
+            payment_id=str(payment.id),
+            amount=payment.amount,
+            currency=payment.currency,
+            customer_info=customer_info,
+            return_url_base=return_url_base
+        )
+        return {"url": redirect_url, "payment_id": str(payment.id)}
 
     @staticmethod
     @transaction.atomic
@@ -164,10 +192,19 @@ class PaymentService:
         # Call Gateway
         gateway = PaymentService._get_gateway(payment.provider)
         try:
-            gateway_resp = gateway.refund_payment(payment, amount_decimal)
+            # Need to get bank_tran_id from raw_metadata if it exists
+            bank_tran_id = payment.raw_metadata.get('bank_tran_id')
+            gateway_resp = gateway.refund_payment(
+                refund_id=str(refund.id),
+                payment_id=str(payment.id),
+                amount=amount_decimal,
+                bank_tran_id=bank_tran_id
+            )
             refund.status = RefundStatus.SUCCEEDED
-            if gateway_resp and 'provider_reference' in gateway_resp:
-                refund.provider_reference = gateway_resp['provider_reference']
+            if gateway_resp and 'raw_metadata' in gateway_resp:
+                refund.raw_metadata = gateway_resp['raw_metadata']
+            if gateway_resp and 'raw_metadata' in gateway_resp and 'refund_ref_id' in gateway_resp['raw_metadata']:
+                refund.provider_reference = gateway_resp['raw_metadata']['refund_ref_id']
         except NotImplementedError:
             # Fallback for gateways that don't support automated refunds (e.g. COD)
             refund.status = RefundStatus.SUCCEEDED

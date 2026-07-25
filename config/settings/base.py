@@ -232,3 +232,7 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': crontab(hour=0, minute=0),  # Daily at midnight
     },
 }
+
+SSLCOMMERZ_STORE_ID = os.environ.get("SSLCOMMERZ_STORE_ID", "")
+SSLCOMMERZ_STORE_PASSWORD = os.environ.get("SSLCOMMERZ_STORE_PASSWORD", "")
+SSLCOMMERZ_SANDBOX = os.environ.get("SSLCOMMERZ_SANDBOX", "True").lower() in ["true", "1", "yes"]
