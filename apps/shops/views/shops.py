@@ -61,6 +61,7 @@ class ShopDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 
 @MY_SHOPS_SCHEMA
 class MyShopListAPIView(generics.ListAPIView):
+    queryset = Shop.objects.none()
     serializer_class = ShopSerializer
     permission_classes = [IsAuthenticated, IsVendor]
     pagination_class = DefaultPagination

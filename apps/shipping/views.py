@@ -20,6 +20,7 @@ class BuyerShipmentListAPIView(generics.ListAPIView):
     """
     GET: List shipments for a specific parent order belonging to the buyer.
     """
+    queryset = Shipment.objects.none()
     serializer_class = ShipmentReadSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = DefaultPagination

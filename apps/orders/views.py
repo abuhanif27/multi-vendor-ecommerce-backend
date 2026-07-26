@@ -17,6 +17,7 @@ class OrderListView(generics.ListAPIView):
     """
     List all orders for the authenticated buyer.
     """
+    queryset = Order.objects.none()
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = DefaultPagination
@@ -52,7 +53,7 @@ class VendorOrderListView(generics.ListAPIView):
     """
     List all vendor orders(sub-orders) for the authenticated vendor's shops.
     """
-
+    queryset = VendorOrder.objects.none()
     serializer_class = VendorOrderSerializer
     permission_classes = [permissions.IsAuthenticated, IsVendor]
     pagination_class = DefaultPagination

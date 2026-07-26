@@ -17,7 +17,7 @@ class InventoryReadSerializer(serializers.ModelSerializer):
         )
         read_only_fields = fields
 
-    def get_available_quantity(self, obj):
+    def get_available_quantity(self, obj) -> int:
         return obj.quantity_on_hand - obj.quantity_reserved
 
 

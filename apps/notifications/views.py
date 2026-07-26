@@ -13,6 +13,7 @@ class NotificationListAPIView(generics.ListAPIView):
     """
     GET: Returns a paginated list of IN_APP notifications for the authenticated user.
     """
+    queryset = Notification.objects.none()
     serializer_class = NotificationSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = DefaultPagination

@@ -64,6 +64,7 @@ class ProductDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 
 @MY_PRODUCTS_SCHEMA
 class MyProductListAPIView(generics.ListAPIView):
+    queryset = Product.objects.none()
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticated, IsVendor]
     pagination_class = DefaultPagination

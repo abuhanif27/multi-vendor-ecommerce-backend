@@ -37,7 +37,7 @@ class CartRetrieveAPIView(generics.RetrieveAPIView):
 
 @extend_schema_view(
     post=extend_schema(summary="Add Item to Cart", description="Add a product variant to the cart by SKU.", tags=['Cart'], responses={201: OpenApiResponse(description="Item added")}),
-    delete=extend_schema(summary="Clear Cart", description="Remove all items from the current cart.", tags=['Cart'], responses={204: OpenApiResponse(description="Cart cleared")})
+    delete=extend_schema(summary="Clear Cart", description="Remove all items from the current cart.", tags=['Cart'], responses={204: OpenApiResponse(description="Cart cleared")}, operation_id="clearCart")
 )
 class CartItemCollectionAPIView(generics.GenericAPIView):
     """
@@ -68,7 +68,7 @@ class CartItemCollectionAPIView(generics.GenericAPIView):
 
 @extend_schema_view(
     patch=extend_schema(summary="Update Cart Item", description="Update the quantity of a specific cart item.", tags=['Cart'], responses={200: OpenApiResponse(description="Cart item updated")}),
-    delete=extend_schema(summary="Remove Cart Item", description="Remove a specific item from the cart.", tags=['Cart'], responses={204: OpenApiResponse(description="Item removed")})
+    delete=extend_schema(summary="Remove Cart Item", description="Remove a specific item from the cart.", tags=['Cart'], responses={204: OpenApiResponse(description="Item removed")}, operation_id="removeCartItem")
 )
 class CartItemDetailAPIView(generics.GenericAPIView):
     """

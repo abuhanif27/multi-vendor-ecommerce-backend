@@ -19,7 +19,7 @@ class CartItemReadSerializer(serializers.ModelSerializer):
         model = CartItem
         fields = ('id', 'variant', 'quantity', 'unit_price', 'item_total', 'created_at')
 
-    def get_item_total(self, obj):
+    def get_item_total(self, obj) -> float:
         # We calculate total based on current live price rather than snapshot
         # Actually, if we use live price, we should multiply by variant price.
         # But for Cart, user sees snapshot until it is validated, or we show live price.
@@ -35,7 +35,7 @@ class CartReadSerializer(serializers.ModelSerializer):
         model = Cart
         fields = ('id', 'status', 'items', 'cart_total', 'created_at')
 
-    def get_cart_total(self, obj):
+    def get_cart_total(self, obj) -> float:
         return sum(item.variant.price * item.quantity for item in obj.items.all())
 
 

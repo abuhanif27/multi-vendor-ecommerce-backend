@@ -58,6 +58,9 @@ class InventoryTransactionListCreateAPIView(InventoryLookupMixin, generics.ListC
     permission_classes = [IsAuthenticated, IsInventoryOwner]
 
     def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            from apps.inventory.models import InventoryTransaction
+            return InventoryTransaction.objects.none()
         inventory = self.get_object()
         return inventory.transactions.all().order_by("-created_at")
 

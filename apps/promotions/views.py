@@ -19,6 +19,7 @@ class PromotionViewSet(viewsets.ModelViewSet):
     """
     Admin and Vendor APIs to manage promotions.
     """
+    queryset = Promotion.objects.none()
     serializer_class = PromotionSerializer
     permission_classes = [IsVendorOwnerOrAdmin]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]

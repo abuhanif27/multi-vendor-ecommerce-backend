@@ -107,6 +107,15 @@ Built with:
         "name": "MIT",
     },
     "SERVE_INCLUDE_SCHEMA": False,
+    "ENUM_NAME_OVERRIDES": {
+        "OrderStatusEnum": "apps.orders.models.Order.OrderStatus",
+        "PaymentStatusEnum": "apps.payments.models.Payment.PaymentStatus",
+        "VariantStatusEnum": "apps.shops.models.ProductVariant.VariantStatus",
+        "ShipmentStatusEnum": "apps.shipping.models.Shipment.ShipmentStatus",
+        "ReviewStatusEnum": "apps.reviews.models.ReviewStatus",
+    },
+    "SECURITY": [{"jwt": []}],
+    "COMPONENT_SPLIT_REQUEST": True,
 }
 
 MIDDLEWARE = [

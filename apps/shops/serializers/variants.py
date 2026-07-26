@@ -44,7 +44,7 @@ class VariantReadSerializer(
 
     images = serializers.SerializerMethodField()
 
-    def get_images(self, obj):
+    def get_images(self, obj) -> list:
         from .variant_images import VariantImageReadSerializer
         from .product_images import ProductImageReadSerializer
 
@@ -62,7 +62,7 @@ class VariantReadSerializer(
 
     available_stock = serializers.SerializerMethodField()
 
-    def get_available_stock(self, obj):
+    def get_available_stock(self, obj) -> int:
         if hasattr(obj, 'inventory'):
             return obj.inventory.quantity_on_hand - obj.inventory.quantity_reserved
         return 0
