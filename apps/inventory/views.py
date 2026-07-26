@@ -24,6 +24,11 @@ class InventoryLookupMixin(ProductLookupMixin):
         return obj
 
 
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiResponse
+
+@extend_schema_view(
+    get=extend_schema(summary="Get Inventory Detail", description="Retrieve full inventory ledger for a variant. Accessible only to the shop owner.", tags=['Inventory'])
+)
 class InventoryDetailAPIView(
     InventoryLookupMixin,
     generics.RetrieveAPIView,
@@ -41,6 +46,10 @@ class InventoryDetailAPIView(
         from apps.inventory.models import Inventory
         return Inventory.objects.all()
 
+@extend_schema_view(
+    get=extend_schema(summary="List Inventory Transactions", description="List history of inventory transactions.", tags=['Inventory']),
+    post=extend_schema(summary="Create Inventory Transaction", description="Create a new transaction (increase, decrease, adjust).", request=InventoryActionSerializer, responses={201: InventoryTransactionSerializer}, tags=['Inventory'])
+)
 class InventoryTransactionListCreateAPIView(InventoryLookupMixin, generics.ListCreateAPIView):
     """
     List history of inventory transactions or create a new transaction (increase, decrease, adjust).

@@ -14,6 +14,11 @@ from apps.cart.serializers import (
 from apps.cart.services.cart import CartService
 
 
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiResponse
+
+@extend_schema_view(
+    get=extend_schema(summary="Get Cart", description="Retrieve the current user's active cart.", tags=['Cart'])
+)
 class CartRetrieveAPIView(generics.RetrieveAPIView):
     """
     Retrieve the current user's active cart.
@@ -30,6 +35,10 @@ class CartRetrieveAPIView(generics.RetrieveAPIView):
         ).get(id=cart.id)
 
 
+@extend_schema_view(
+    post=extend_schema(summary="Add Item to Cart", description="Add a product variant to the cart by SKU.", tags=['Cart'], responses={201: OpenApiResponse(description="Item added")}),
+    delete=extend_schema(summary="Clear Cart", description="Remove all items from the current cart.", tags=['Cart'], responses={204: OpenApiResponse(description="Cart cleared")})
+)
 class CartItemCollectionAPIView(generics.GenericAPIView):
     """
     POST: Add an item to cart.
@@ -57,6 +66,10 @@ class CartItemCollectionAPIView(generics.GenericAPIView):
         return Response({"detail": "Cart cleared."}, status=status.HTTP_204_NO_CONTENT)
 
 
+@extend_schema_view(
+    patch=extend_schema(summary="Update Cart Item", description="Update the quantity of a specific cart item.", tags=['Cart'], responses={200: OpenApiResponse(description="Cart item updated")}),
+    delete=extend_schema(summary="Remove Cart Item", description="Remove a specific item from the cart.", tags=['Cart'], responses={204: OpenApiResponse(description="Item removed")})
+)
 class CartItemDetailAPIView(generics.GenericAPIView):
     """
     PATCH: Update cart item quantity.

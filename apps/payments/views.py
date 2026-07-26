@@ -5,6 +5,7 @@ from rest_framework import status
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework.exceptions import ValidationError
 
+from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiExample
 from apps.payments.serializers import PaymentInitializationSerializer
 from apps.payments.services.payment import PaymentService
 
@@ -13,6 +14,17 @@ class PaymentInitializeAPIView(APIView):
     POST: Initialize a payment for an order.
     """
     permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        summary="Initialize Payment",
+        description="Initialize a payment for an order using a specified provider.",
+        request=PaymentInitializationSerializer,
+        responses={
+            200: OpenApiResponse(description="Payment initialized", response=dict),
+            400: OpenApiResponse(description="Bad Request or not implemented")
+        },
+        tags=['Payments']
+    )
 
     def post(self, request, *args, **kwargs):
         serializer = PaymentInitializationSerializer(data=request.data)
@@ -37,6 +49,12 @@ class StripeWebhookAPIView(APIView):
     No authentication required, relies on HMAC signature verification.
     """
     permission_classes = []
+
+    @extend_schema(
+        summary="Stripe Webhook (Deprecated/Old)",
+        description="Old webhook endpoint for Stripe.",
+        exclude=True
+    )
 
     def post(self, request, *args, **kwargs):
         # 1. Verify Signature (Delegate to Gateway)

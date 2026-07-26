@@ -1,0 +1,5533 @@
+openapi: 3.0.3
+info:
+  title: Multi-Vendor Marketplace API
+  version: 1.0.0
+  description: |2
+
+    A production-ready REST API for a multi-vendor e-commerce platform.
+
+    ## Features
+
+    - JWT Authentication
+    - Vendor & Customer Roles
+    - Shop Management
+    - Product Catalog
+    - Category Management
+    - Product Filtering
+    - Product Search
+    - Product Ordering
+    - Pagination
+
+    Built with:
+
+    - Django
+    - Django REST Framework
+    - PostgreSQL
+  contact:
+    name: Abu Hanif
+    email: ahanif2500@gmail.com
+  license:
+    name: MIT
+paths:
+  /api/v1/admin/products/{product_id}/approve/:
+    post:
+      operationId: v1_admin_products_approve_create
+      parameters:
+      - in: path
+        name: product_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApproveProductRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ApproveProductRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ApproveProductRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApproveProductResponse'
+          description: ''
+  /api/v1/admin/products/{product_id}/reject/:
+    post:
+      operationId: v1_admin_products_reject_create
+      parameters:
+      - in: path
+        name: product_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RejectProductRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RejectProductRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RejectProductRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RejectProductResponse'
+          description: ''
+  /api/v1/admin/products/{product_id}/restore/:
+    post:
+      operationId: v1_admin_products_restore_create
+      parameters:
+      - in: path
+        name: product_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestoreProductRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RestoreProductRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RestoreProductRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestoreProductResponse'
+          description: ''
+  /api/v1/admin/products/{product_id}/suspend/:
+    post:
+      operationId: v1_admin_products_suspend_create
+      parameters:
+      - in: path
+        name: product_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SuspendProductRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SuspendProductRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SuspendProductRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuspendProductResponse'
+          description: ''
+  /api/v1/admin/promotions/:
+    get:
+      operationId: v1_admin_promotions_list
+      description: Admin and Vendor APIs to manage promotions.
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPromotionList'
+          description: ''
+    post:
+      operationId: v1_admin_promotions_create
+      description: Admin and Vendor APIs to manage promotions.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Promotion'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Promotion'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Promotion'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Promotion'
+          description: ''
+  /api/v1/admin/promotions/{id}/:
+    get:
+      operationId: v1_admin_promotions_retrieve
+      description: Admin and Vendor APIs to manage promotions.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Promotion'
+          description: ''
+    put:
+      operationId: v1_admin_promotions_update
+      description: Admin and Vendor APIs to manage promotions.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Promotion'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Promotion'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Promotion'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Promotion'
+          description: ''
+    patch:
+      operationId: v1_admin_promotions_partial_update
+      description: Admin and Vendor APIs to manage promotions.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPromotion'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPromotion'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPromotion'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Promotion'
+          description: ''
+    delete:
+      operationId: v1_admin_promotions_destroy
+      description: Admin and Vendor APIs to manage promotions.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/admin/reviews/product/{review_id}/hide/:
+    post:
+      operationId: v1_admin_reviews_product_hide_create
+      parameters:
+      - in: path
+        name: review_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModerateReviewRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ModerateReviewRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ModerateReviewRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/reviews/product/{review_id}/remove/:
+    post:
+      operationId: v1_admin_reviews_product_remove_create
+      parameters:
+      - in: path
+        name: review_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModerateReviewRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ModerateReviewRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ModerateReviewRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/reviews/product/{review_id}/restore/:
+    post:
+      operationId: v1_admin_reviews_product_restore_create
+      parameters:
+      - in: path
+        name: review_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestoreReviewRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RestoreReviewRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RestoreReviewRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/reviews/shop/{review_id}/hide/:
+    post:
+      operationId: v1_admin_reviews_shop_hide_create
+      parameters:
+      - in: path
+        name: review_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModerateReviewRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ModerateReviewRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ModerateReviewRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/reviews/shop/{review_id}/remove/:
+    post:
+      operationId: v1_admin_reviews_shop_remove_create
+      parameters:
+      - in: path
+        name: review_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModerateReviewRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ModerateReviewRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ModerateReviewRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/reviews/shop/{review_id}/restore/:
+    post:
+      operationId: v1_admin_reviews_shop_restore_create
+      parameters:
+      - in: path
+        name: review_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestoreReviewRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RestoreReviewRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RestoreReviewRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/vendors/{shop_id}/approve/:
+    post:
+      operationId: v1_admin_vendors_approve_create
+      parameters:
+      - in: path
+        name: shop_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApproveVendorRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ApproveVendorRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ApproveVendorRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApproveVendorResponse'
+          description: ''
+  /api/v1/admin/vendors/{shop_id}/reject/:
+    post:
+      operationId: v1_admin_vendors_reject_create
+      parameters:
+      - in: path
+        name: shop_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RejectVendorRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RejectVendorRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RejectVendorRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RejectVendorResponse'
+          description: ''
+  /api/v1/admin/vendors/{shop_id}/restore/:
+    post:
+      operationId: v1_admin_vendors_restore_create
+      parameters:
+      - in: path
+        name: shop_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestoreVendorRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RestoreVendorRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RestoreVendorRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestoreVendorResponse'
+          description: ''
+  /api/v1/admin/vendors/{shop_id}/suspend/:
+    post:
+      operationId: v1_admin_vendors_suspend_create
+      parameters:
+      - in: path
+        name: shop_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SuspendVendorRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SuspendVendorRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SuspendVendorRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuspendVendorResponse'
+          description: ''
+  /api/v1/analytics/dashboard/:
+    get:
+      operationId: v1_analytics_dashboard_retrieve
+      description: Read-only dashboards and analytics exports.
+      parameters:
+      - in: query
+        name: end_date
+        schema:
+          type: string
+          format: date
+        description: YYYY-MM-DD
+      - in: query
+        name: shop_id
+        schema:
+          type: string
+          format: uuid
+        description: For admins only
+      - in: query
+        name: start_date
+        schema:
+          type: string
+          format: date
+        description: YYYY-MM-DD
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardOverviewResponse'
+          description: ''
+  /api/v1/analytics/export-sales/:
+    post:
+      operationId: v1_analytics_export_sales_create
+      description: Triggers an asynchronous export of sales data.
+      parameters:
+      - in: query
+        name: end_date
+        schema:
+          type: string
+          format: date
+        required: true
+      - in: query
+        name: shop_id
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: start_date
+        schema:
+          type: string
+          format: date
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/login/:
+    post:
+      operationId: v1_auth_login_create
+      description: |2
+
+        Login to an existing customer account.
+      summary: Login user
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Login'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+        '400':
+          description: No response body
+  /api/v1/auth/register/:
+    post:
+      operationId: v1_auth_register_create
+      description: |2
+
+        Register a new customer account.
+
+        A verification email is sent after successful registration.
+      summary: Register user
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Register'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Register'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Register'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          description: No response body
+        '400':
+          description: No response body
+  /api/v1/auth/verify-email/:
+    get:
+      operationId: v1_auth_verify_email_retrieve
+      description: |2
+
+        Verify a user's email address using the verification token.
+      summary: Verify email
+      parameters:
+      - in: query
+        name: token
+        schema:
+          type: string
+        description: Email verification token.
+        required: true
+      tags:
+      - Authentication
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+        '400':
+          description: No response body
+        '404':
+          description: No response body
+  /api/v1/cart/:
+    get:
+      operationId: v1_cart_retrieve
+      description: Retrieve the current user's active cart.
+      summary: Get Cart
+      tags:
+      - Cart
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartRead'
+          description: ''
+  /api/v1/cart/items/:
+    post:
+      operationId: v1_cart_items_create
+      description: Add a product variant to the cart by SKU.
+      summary: Add Item to Cart
+      tags:
+      - Cart
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartItemWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CartItemWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CartItemWrite'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          description: Item added
+    delete:
+      operationId: v1_cart_items_destroy
+      description: Remove all items from the current cart.
+      summary: Clear Cart
+      tags:
+      - Cart
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: Cart cleared
+  /api/v1/cart/items/{id}/:
+    patch:
+      operationId: v1_cart_items_partial_update
+      description: Update the quantity of a specific cart item.
+      summary: Update Cart Item
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Cart
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCartItemUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCartItemUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCartItemUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: Cart item updated
+    delete:
+      operationId: v1_cart_items_destroy_2
+      description: Remove a specific item from the cart.
+      summary: Remove Cart Item
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Cart
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: Item removed
+  /api/v1/categories/:
+    get:
+      operationId: v1_categories_list
+      description: |2
+
+        Returns all active categories.
+
+        Public endpoint.
+      summary: List categories
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Categories
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCategoryList'
+              examples:
+                CategoryList:
+                  value:
+                    count: 123
+                    next: http://api.example.org/accounts/?page=4
+                    previous: http://api.example.org/accounts/?page=2
+                    results:
+                    - - id: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                        name: Phones
+                        slug: phones
+                        parent: null
+                        is_active: true
+                      - id: 3fa85f64-5717-4562-b3fc-2c963f66afa7
+                        name: Laptops
+                        slug: laptops
+                        parent: null
+                        is_active: true
+                  summary: Example category list response
+          description: ''
+  /api/v1/categories/{slug}/:
+    get:
+      operationId: v1_categories_retrieve
+      description: |2
+
+        Retrieve a category by its slug.
+
+        Public endpoint.
+      summary: Retrieve category
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - Categories
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+              examples:
+                CategoryDetail:
+                  value:
+                    id: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                    name: Phones
+                    slug: phones
+                    parent: null
+                    is_active: true
+                  summary: Example category detail response
+          description: ''
+        '404':
+          description: No response body
+  /api/v1/checkout/:
+    get:
+      operationId: v1_checkout_retrieve
+      description: Retrieve checkout summary including cart items, warnings, and totals.
+      summary: Get Checkout Summary
+      tags:
+      - Checkout
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckoutSummary'
+          description: ''
+    post:
+      operationId: v1_checkout_create
+      description: Submit shipping/billing addresses to process checkout and create
+        an order.
+      summary: Process Checkout
+      tags:
+      - Checkout
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckoutProcess'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CheckoutProcess'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CheckoutProcess'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: Order created successfully
+        '400':
+          description: Validation error
+  /api/v1/health/:
+    get:
+      operationId: v1_health_retrieve
+      description: Returns the status of the API.
+      summary: Health Check
+      tags:
+      - Core
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheck'
+          description: ''
+  /api/v1/me/:
+    get:
+      operationId: v1_me_retrieve
+      description: Returns the currently authenticated user's basic info.
+      summary: Get Current User
+      tags:
+      - Core
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: User info
+  /api/v1/my/products/:
+    get:
+      operationId: v1_my_products_list
+      description: Returns all products owned by the authenticated vendor.
+      summary: My products
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Vendor
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProductList'
+          description: ''
+        '401':
+          description: No response body
+        '403':
+          description: No response body
+  /api/v1/my/shops/:
+    get:
+      operationId: v1_my_shops_list
+      description: Returns all shops owned by the authenticated vendor.
+      summary: My shops
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Vendor
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedShopList'
+          description: ''
+        '401':
+          description: No response body
+        '403':
+          description: No response body
+  /api/v1/notifications/:
+    get:
+      operationId: v1_notifications_list
+      description: 'GET: Returns a paginated list of IN_APP notifications for the
+        authenticated user.'
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNotificationList'
+          description: ''
+  /api/v1/notifications/{id}/read/:
+    patch:
+      operationId: v1_notifications_read_partial_update
+      description: 'PATCH: Marks a specific notification as read.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+          description: ''
+  /api/v1/notifications/read-all/:
+    post:
+      operationId: v1_notifications_read_all_create
+      description: 'POST: Bulk marks all unread IN_APP notifications as read for the
+        authenticated user.'
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+          description: ''
+  /api/v1/orders/:
+    get:
+      operationId: v1_orders_list
+      description: List all orders for the authenticated buyer.
+      summary: List Orders
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Orders (Buyer)
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOrderList'
+          description: ''
+  /api/v1/orders/{id}/:
+    get:
+      operationId: v1_orders_retrieve
+      description: Retrieve specific order details for the authenticated buyer.
+      summary: Retrieve Order
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Orders (Buyer)
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+          description: ''
+  /api/v1/payments/create/:
+    post:
+      operationId: v1_payments_create_create
+      description: Initialize a payment for an order using a specified provider.
+      summary: Initialize Payment
+      tags:
+      - Payments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentInitialization'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PaymentInitialization'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PaymentInitialization'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: Payment initialized
+        '400':
+          description: Bad Request or not implemented
+  /api/v1/product-reviews/:
+    get:
+      operationId: v1_product_reviews_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: rating
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProductReviewList'
+          description: ''
+    post:
+      operationId: v1_product_reviews_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductReview'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProductReview'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProductReview'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductReview'
+          description: ''
+  /api/v1/product-reviews/{id}/:
+    get:
+      operationId: v1_product_reviews_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this product review.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductReview'
+          description: ''
+    put:
+      operationId: v1_product_reviews_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this product review.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductReview'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProductReview'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProductReview'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductReview'
+          description: ''
+    patch:
+      operationId: v1_product_reviews_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this product review.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProductReview'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProductReview'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProductReview'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductReview'
+          description: ''
+    delete:
+      operationId: v1_product_reviews_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this product review.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/product-reviews/{id}/report/:
+    post:
+      operationId: v1_product_reviews_report_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this product review.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductReviewReport'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProductReviewReport'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProductReviewReport'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductReviewReport'
+          description: ''
+  /api/v1/products/:
+    get:
+      operationId: v1_products_list
+      description: |2
+
+        Returns active products from approved shops.
+
+        Features:
+
+        - Pagination
+        - Category filtering
+        - Shop filtering
+        - Price filtering
+        - Search
+        - Ordering
+
+        Public endpoint.
+      summary: List products
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: string
+        description: Category slug.
+      - in: query
+        name: max_price
+        schema:
+          type: number
+          format: double
+        description: Maximum product price.
+      - in: query
+        name: min_price
+        schema:
+          type: number
+          format: double
+        description: Minimum product price.
+      - in: query
+        name: ordering
+        schema:
+          type: string
+        description: 'Available values: price, -price, name, created_at, -created_at.'
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Search by product name, description, shop name or category name.
+      - in: query
+        name: shop
+        schema:
+          type: string
+        description: Shop slug.
+      tags:
+      - Products
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProductList'
+          description: ''
+    post:
+      operationId: v1_products_create
+      description: |2
+
+        Creates a new product for the authenticated vendor.
+
+        Requirements:
+
+        - Authenticated user
+        - Vendor role
+      summary: Create product
+      tags:
+      - Products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+            examples:
+              CreateProduct:
+                value:
+                  shop: apple-store
+                  category: phones
+                  name: iPhone 16 Pro
+                  description: Latest Apple flagship smartphone.
+                  price: '1499.00'
+                  stock: 25
+                  status: active
+                summary: Example request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Product'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Product'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+        '400':
+          description: No response body
+        '401':
+          description: No response body
+        '403':
+          description: No response body
+  /api/v1/products/{slug}/:
+    get:
+      operationId: v1_products_retrieve
+      description: |2
+
+        Retrieve a single active product by its slug.
+
+        This endpoint is public.
+      summary: Retrieve product
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - Products
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+        '404':
+          description: No response body
+    patch:
+      operationId: v1_products_partial_update
+      description: |2
+
+        Partially update a product.
+
+        Requirements:
+        - Authenticated user
+        - Vendor role
+        - Product owner
+      summary: Update product
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - Products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProduct'
+            examples:
+              UpdateProduct:
+                value:
+                  price: '1399.00'
+                  stock: 40
+                summary: Partial update
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProduct'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProduct'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+        '400':
+          description: No response body
+        '401':
+          description: No response body
+        '403':
+          description: No response body
+        '404':
+          description: No response body
+    delete:
+      operationId: v1_products_destroy
+      description: |2
+
+        Delete a product.
+
+        Requirements:
+        - Authenticated user
+        - Vendor role
+        - Product owner
+      summary: Delete product
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - Products
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+        '401':
+          description: No response body
+        '403':
+          description: No response body
+        '404':
+          description: No response body
+  /api/v1/promotions/validate/:
+    post:
+      operationId: v1_promotions_validate_create
+      description: Public APIs for buyers to view automatic promotions and validate
+        coupons.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ValidationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ValidationRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+          description: ''
+  /api/v1/shipping/my-shipments/:
+    get:
+      operationId: v1_shipping_my_shipments_list
+      description: 'GET: List shipments for a specific parent order belonging to the
+        buyer.'
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedShipmentReadList'
+          description: ''
+  /api/v1/shipping/shipments/{id}/:
+    get:
+      operationId: v1_shipping_shipments_retrieve
+      description: 'GET: View shipment details (Vendor only).'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShipmentRead'
+          description: ''
+  /api/v1/shipping/shipments/{id}/assign-courier/:
+    post:
+      operationId: v1_shipping_shipments_assign_courier_create
+      description: 'POST: Assign courier and tracking number.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShipmentCourierAssign'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ShipmentCourierAssign'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ShipmentCourierAssign'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShipmentRead'
+          description: ''
+  /api/v1/shipping/shipments/{id}/update-status/:
+    patch:
+      operationId: v1_shipping_shipments_update_status_partial_update
+      description: 'PATCH: Update physical tracking state of the shipment.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedShipmentStatusUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedShipmentStatusUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedShipmentStatusUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShipmentRead'
+          description: ''
+  /api/v1/shop-reviews/:
+    get:
+      operationId: v1_shop_reviews_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: rating
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedShopReviewList'
+          description: ''
+    post:
+      operationId: v1_shop_reviews_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShopReview'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ShopReview'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ShopReview'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShopReview'
+          description: ''
+  /api/v1/shop-reviews/{id}/:
+    get:
+      operationId: v1_shop_reviews_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this shop review.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShopReview'
+          description: ''
+    put:
+      operationId: v1_shop_reviews_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this shop review.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShopReview'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ShopReview'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ShopReview'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShopReview'
+          description: ''
+    patch:
+      operationId: v1_shop_reviews_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this shop review.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedShopReview'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedShopReview'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedShopReview'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShopReview'
+          description: ''
+    delete:
+      operationId: v1_shop_reviews_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this shop review.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/shop-reviews/{id}/report/:
+    post:
+      operationId: v1_shop_reviews_report_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this shop review.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShopReviewReport'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ShopReviewReport'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ShopReviewReport'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShopReviewReport'
+          description: ''
+  /api/v1/shops/:
+    get:
+      operationId: v1_shops_list
+      description: |2
+
+        Returns all approved shops.
+
+        This endpoint is public.
+
+        Supports:
+        - Pagination
+      summary: List shops
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Shops
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedShopList'
+          description: ''
+    post:
+      operationId: v1_shops_create
+      description: |2
+
+        Creates a new shop for the authenticated vendor.
+
+        Authentication:
+        - Vendor only
+      summary: Create shop
+      tags:
+      - Shops
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Shop'
+            examples:
+              CreateShop:
+                value:
+                  name: Apple Store
+                summary: Example shop creation
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Shop'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Shop'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shop'
+          description: ''
+        '400':
+          description: No response body
+        '401':
+          description: No response body
+        '403':
+          description: No response body
+  /api/v1/shops/{shop_slug}/products/{product_slug}/images/:
+    post:
+      operationId: v1_shops_products_images_create
+      description: Resolve the parent product from the URL.
+      parameters:
+      - in: path
+        name: product_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: shop_slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductImageWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProductImageWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProductImageWrite'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductImageWrite'
+          description: ''
+  /api/v1/shops/{shop_slug}/products/{product_slug}/images/{id}/:
+    get:
+      operationId: v1_shops_products_images_retrieve
+      description: Resolve the parent product from the URL.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: product_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: shop_slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductImageRead'
+          description: ''
+    put:
+      operationId: v1_shops_products_images_update
+      description: Resolve the parent product from the URL.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: product_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: shop_slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductImageWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProductImageWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProductImageWrite'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductImageWrite'
+          description: ''
+    patch:
+      operationId: v1_shops_products_images_partial_update
+      description: Resolve the parent product from the URL.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: product_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: shop_slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProductImageWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProductImageWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProductImageWrite'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductImageWrite'
+          description: ''
+    delete:
+      operationId: v1_shops_products_images_destroy
+      description: Resolve the parent product from the URL.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: product_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: shop_slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/shops/{shop_slug}/products/{product_slug}/variants/:
+    get:
+      operationId: v1_shops_products_variants_list
+      description: List and create product variants.
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: path
+        name: product_slug
+        schema:
+          type: string
+        required: true
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: path
+        name: shop_slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVariantReadList'
+          description: ''
+    post:
+      operationId: v1_shops_products_variants_create
+      description: List and create product variants.
+      parameters:
+      - in: path
+        name: product_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: shop_slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VariantWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VariantWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VariantWrite'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VariantWrite'
+          description: ''
+  /api/v1/shops/{shop_slug}/products/{product_slug}/variants/{sku}/:
+    get:
+      operationId: v1_shops_products_variants_retrieve
+      description: Retrieve, update, and delete a product variant.
+      parameters:
+      - in: path
+        name: product_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: shop_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: sku
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VariantRead'
+          description: ''
+    put:
+      operationId: v1_shops_products_variants_update
+      description: Retrieve, update, and delete a product variant.
+      parameters:
+      - in: path
+        name: product_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: shop_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: sku
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VariantWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VariantWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VariantWrite'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VariantWrite'
+          description: ''
+    patch:
+      operationId: v1_shops_products_variants_partial_update
+      description: Retrieve, update, and delete a product variant.
+      parameters:
+      - in: path
+        name: product_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: shop_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: sku
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedVariantWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedVariantWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedVariantWrite'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VariantWrite'
+          description: ''
+    delete:
+      operationId: v1_shops_products_variants_destroy
+      description: Retrieve, update, and delete a product variant.
+      parameters:
+      - in: path
+        name: product_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: shop_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: sku
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/shops/{shop_slug}/products/{product_slug}/variants/{sku}/images/:
+    post:
+      operationId: v1_shops_products_variants_images_create
+      description: Resolve the parent product from the URL.
+      parameters:
+      - in: path
+        name: product_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: shop_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: sku
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VariantImageWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VariantImageWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VariantImageWrite'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VariantImageWrite'
+          description: ''
+  /api/v1/shops/{shop_slug}/products/{product_slug}/variants/{sku}/images/{id}/:
+    get:
+      operationId: v1_shops_products_variants_images_retrieve
+      description: Resolve the parent product from the URL.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: product_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: shop_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: sku
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VariantImageRead'
+          description: ''
+    put:
+      operationId: v1_shops_products_variants_images_update
+      description: Resolve the parent product from the URL.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: product_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: shop_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: sku
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VariantImageWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VariantImageWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VariantImageWrite'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VariantImageWrite'
+          description: ''
+    patch:
+      operationId: v1_shops_products_variants_images_partial_update
+      description: Resolve the parent product from the URL.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: product_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: shop_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: sku
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedVariantImageWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedVariantImageWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedVariantImageWrite'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VariantImageWrite'
+          description: ''
+    delete:
+      operationId: v1_shops_products_variants_images_destroy
+      description: Resolve the parent product from the URL.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: product_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: shop_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: sku
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/shops/{shop_slug}/products/{product_slug}/variants/{sku}/inventory/:
+    get:
+      operationId: v1_shops_products_variants_inventory_retrieve
+      description: Retrieve full inventory ledger for a variant. Accessible only to
+        the shop owner.
+      summary: Get Inventory Detail
+      parameters:
+      - in: path
+        name: product_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: shop_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: sku
+        schema:
+          type: string
+        required: true
+      tags:
+      - Inventory
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryRead'
+          description: ''
+  /api/v1/shops/{shop_slug}/products/{product_slug}/variants/{sku}/inventory/transactions/:
+    get:
+      operationId: v1_shops_products_variants_inventory_transactions_list
+      description: List history of inventory transactions.
+      summary: List Inventory Transactions
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: path
+        name: product_slug
+        schema:
+          type: string
+        required: true
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: path
+        name: shop_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: sku
+        schema:
+          type: string
+        required: true
+      tags:
+      - Inventory
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedInventoryTransactionList'
+          description: ''
+    post:
+      operationId: v1_shops_products_variants_inventory_transactions_create
+      description: Create a new transaction (increase, decrease, adjust).
+      summary: Create Inventory Transaction
+      parameters:
+      - in: path
+        name: product_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: shop_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: sku
+        schema:
+          type: string
+        required: true
+      tags:
+      - Inventory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InventoryAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InventoryAction'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryTransaction'
+          description: ''
+  /api/v1/shops/{slug}/:
+    get:
+      operationId: v1_shops_retrieve
+      description: |2
+
+        Retrieve a single active Shop by its slug.
+
+        This endpoint is public.
+      summary: Retrieve Shop
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - Shops
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shop'
+          description: ''
+        '404':
+          description: No response body
+    patch:
+      operationId: v1_shops_partial_update
+      description: |2
+
+        Partially update a Shop.
+
+        Requirements:
+        - Authenticated user
+        - Vendor role
+        - Shop owner
+      summary: Update Shop
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - Shops
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedShop'
+            examples:
+              RenameShop:
+                value:
+                  name: Apple Official Store
+                summary: Partial update
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedShop'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedShop'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shop'
+          description: ''
+        '400':
+          description: No response body
+        '401':
+          description: No response body
+        '403':
+          description: No response body
+        '404':
+          description: No response body
+    delete:
+      operationId: v1_shops_destroy
+      description: |2
+
+        Delete a Shop.
+
+        Requirements:
+        - Authenticated user
+        - Vendor role
+        - Shop owner
+      summary: Delete Shop
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - Shops
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+        '401':
+          description: No response body
+        '403':
+          description: No response body
+        '404':
+          description: No response body
+  /api/v1/vendor-orders/:
+    get:
+      operationId: v1_vendor_orders_list
+      description: List all vendor orders (sub-orders) for the authenticated vendor's
+        shops.
+      summary: List Vendor Orders
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Orders (Vendor)
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVendorOrderList'
+          description: ''
+  /api/v1/vendor-orders/{id}/:
+    get:
+      operationId: v1_vendor_orders_retrieve
+      description: Retrieve a specific vendor order.
+      summary: Retrieve Vendor Order
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Orders (Vendor)
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorOrder'
+          description: ''
+components:
+  schemas:
+    ActionEnum:
+      enum:
+      - increase
+      - decrease
+      - adjust
+      type: string
+      description: |-
+        * `increase` - Increase
+        * `decrease` - Decrease
+        * `adjust` - Adjust
+    Address:
+      type: object
+      properties:
+        street:
+          type: string
+          maxLength: 255
+        city:
+          type: string
+          maxLength: 100
+        state:
+          type: string
+          maxLength: 100
+        postal_code:
+          type: string
+          maxLength: 20
+        country:
+          type: string
+          maxLength: 100
+      required:
+      - city
+      - country
+      - postal_code
+      - state
+      - street
+    ApproveProductRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+    ApproveProductResponse:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+      - status
+    ApproveVendorRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+    ApproveVendorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+      - status
+    CartItemRead:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        variant:
+          allOf:
+          - $ref: '#/components/schemas/CartItemVariantRead'
+          readOnly: true
+        quantity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        unit_price:
+          type: number
+          format: double
+          maximum: 100000000
+          minimum: -100000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          description: Price snapshot at the time of adding to cart
+        item_total:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was created.
+      required:
+      - created_at
+      - id
+      - item_total
+      - quantity
+      - unit_price
+      - variant
+    CartItemValidation:
+      type: object
+      properties:
+        product_id:
+          type: string
+          format: uuid
+        category_id:
+          type: string
+          format: uuid
+        shop_id:
+          type: string
+          format: uuid
+        price:
+          type: number
+          format: double
+          maximum: 10000000000
+          minimum: -10000000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        quantity:
+          type: integer
+          minimum: 1
+      required:
+      - price
+      - quantity
+    CartItemVariantRead:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        sku:
+          type: string
+          maxLength: 100
+        price:
+          type: number
+          format: double
+          maximum: 100000000
+          minimum: 0.01
+          exclusiveMaximum: true
+        product_name:
+          type: string
+          readOnly: true
+        shop_name:
+          type: string
+          readOnly: true
+      required:
+      - id
+      - price
+      - product_name
+      - shop_name
+      - sku
+    CartItemWrite:
+      type: object
+      properties:
+        sku:
+          type: string
+          maxLength: 100
+        quantity:
+          type: integer
+          minimum: 1
+      required:
+      - quantity
+      - sku
+    CartRead:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/CartReadStatusEnum'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartItemRead'
+          readOnly: true
+        cart_total:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was created.
+      required:
+      - cart_total
+      - created_at
+      - id
+      - items
+    CartReadStatusEnum:
+      enum:
+      - ACTIVE
+      - CHECKED_OUT
+      - ABANDONED
+      type: string
+      description: |-
+        * `ACTIVE` - Active
+        * `CHECKED_OUT` - Checked Out
+        * `ABANDONED` - Abandoned
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+        parent:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+      required:
+      - id
+      - name
+      - slug
+    CheckoutItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sku:
+          type: string
+        product_name:
+          type: string
+        shop_name:
+          type: string
+        quantity:
+          type: integer
+        unit_price:
+          type: number
+          format: double
+          maximum: 100000000
+          minimum: -100000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        item_total:
+          type: number
+          format: double
+          maximum: 100000000
+          minimum: -100000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+      required:
+      - id
+      - item_total
+      - product_name
+      - quantity
+      - shop_name
+      - sku
+      - unit_price
+    CheckoutProcess:
+      type: object
+      properties:
+        shipping_address:
+          $ref: '#/components/schemas/Address'
+        billing_address:
+          $ref: '#/components/schemas/Address'
+      required:
+      - shipping_address
+    CheckoutSummary:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CheckoutItem'
+        subtotal:
+          type: number
+          format: double
+          maximum: 100000000
+          minimum: -100000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        discounts:
+          type: number
+          format: double
+          maximum: 100000000
+          minimum: -100000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        shipping:
+          type: number
+          format: double
+          maximum: 100000000
+          minimum: -100000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        taxes:
+          type: number
+          format: double
+          maximum: 100000000
+          minimum: -100000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        total:
+          type: number
+          format: double
+          maximum: 100000000
+          minimum: -100000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        warnings:
+          $ref: '#/components/schemas/CheckoutWarnings'
+      required:
+      - discounts
+      - items
+      - shipping
+      - subtotal
+      - taxes
+      - total
+      - warnings
+    CheckoutWarnings:
+      type: object
+      properties:
+        inventory:
+          type: array
+          items:
+            type: string
+        price:
+          type: array
+          items:
+            type: string
+        unavailable_items:
+          type: array
+          items:
+            type: string
+      required:
+      - inventory
+      - price
+      - unavailable_items
+    ConditionTypeEnum:
+      enum:
+      - MIN_SUBTOTAL
+      - NEW_CUSTOMER
+      - SPECIFIC_CATEGORY
+      - SPECIFIC_PRODUCT
+      - GENERIC_CONFIG
+      type: string
+      description: |-
+        * `MIN_SUBTOTAL` - Minimum Subtotal
+        * `NEW_CUSTOMER` - New Customer Only
+        * `SPECIFIC_CATEGORY` - Specific Category
+        * `SPECIFIC_PRODUCT` - Specific Product
+        * `GENERIC_CONFIG` - Generic JSON Config
+    CouponRejection:
+      type: object
+      properties:
+        code:
+          type: string
+        reason_code:
+          type: string
+        reason_message:
+          type: string
+      required:
+      - code
+      - reason_code
+      - reason_message
+    Courier:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        tracking_url_template:
+          description: Template for tracking URL, e.g., 'https://courier.com/track?id={tracking_number}'
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
+      required:
+      - id
+      - name
+    DashboardOverviewResponse:
+      type: object
+      properties:
+        sales_summary:
+          $ref: '#/components/schemas/SalesSummary'
+        widgets:
+          type: array
+          items:
+            $ref: '#/components/schemas/WidgetData'
+        top_products:
+          type: array
+          items:
+            $ref: '#/components/schemas/TopProduct'
+      required:
+      - sales_summary
+      - top_products
+      - widgets
+    HealthCheck:
+      type: object
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+      required:
+      - message
+      - status
+    InventoryAction:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/ActionEnum'
+        quantity:
+          type: integer
+          minimum: 0
+        note:
+          type: string
+          maxLength: 1000
+        reference:
+          type: string
+          maxLength: 255
+      required:
+      - action
+      - quantity
+    InventoryRead:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        quantity_on_hand:
+          type: integer
+          readOnly: true
+        quantity_reserved:
+          type: integer
+          readOnly: true
+        available_quantity:
+          type: string
+          readOnly: true
+        low_stock_threshold:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was created.
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was last updated.
+      required:
+      - available_quantity
+      - created_at
+      - id
+      - low_stock_threshold
+      - quantity_on_hand
+      - quantity_reserved
+      - updated_at
+    InventoryTransaction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        transaction_type:
+          allOf:
+          - $ref: '#/components/schemas/TransactionTypeEnum'
+          readOnly: true
+        quantity:
+          type: integer
+          readOnly: true
+        note:
+          type: string
+          readOnly: true
+        reference:
+          type: string
+          readOnly: true
+        created_by:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was created.
+      required:
+      - created_at
+      - created_by
+      - id
+      - note
+      - quantity
+      - reference
+      - transaction_type
+    Login:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - email
+      - password
+    MediaTypeEnum:
+      enum:
+      - IMAGE
+      - VIDEO
+      type: string
+      description: |-
+        * `IMAGE` - Image
+        * `VIDEO` - Video
+    ModerateReviewRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+      required:
+      - reason
+    Notification:
+      type: object
+      description: Serializer for the frontend notification bell/inbox.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        message:
+          type: string
+        action_url:
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was created.
+        is_read:
+          type: boolean
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - is_read
+      - message
+      - title
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/OrderStatusEnum'
+        subtotal:
+          type: number
+          format: double
+          maximum: 100000000
+          minimum: -100000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        shipping_total:
+          type: number
+          format: double
+          maximum: 100000000
+          minimum: -100000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        tax_total:
+          type: number
+          format: double
+          maximum: 100000000
+          minimum: -100000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        grand_total:
+          type: number
+          format: double
+          maximum: 100000000
+          minimum: -100000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        shipping_address: {}
+        billing_address:
+          nullable: true
+        vendor_orders:
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorOrder'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was created.
+      required:
+      - created_at
+      - id
+      - shipping_address
+      - vendor_orders
+    OrderItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        product_name:
+          type: string
+          maxLength: 255
+        sku:
+          type: string
+          maxLength: 100
+        variant_attributes: {}
+        shop_name:
+          type: string
+          maxLength: 255
+        image_url:
+          type: string
+          maxLength: 500
+        unit_price:
+          type: number
+          format: double
+          maximum: 100000000
+          minimum: -100000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        quantity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 1
+          format: int64
+        item_total:
+          type: number
+          format: double
+          maximum: 100000000
+          minimum: -100000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+      required:
+      - id
+      - item_total
+      - product_name
+      - quantity
+      - shop_name
+      - sku
+      - unit_price
+    OrderStatusEnum:
+      enum:
+      - PENDING
+      - PAID
+      - FAILED
+      - CANCELLED
+      - REFUNDED
+      - COMPLETED
+      - PARTIALLY_RETURNED
+      - RETURNED
+      type: string
+      description: |-
+        * `PENDING` - Pending
+        * `PAID` - Paid
+        * `FAILED` - Failed
+        * `CANCELLED` - Cancelled
+        * `REFUNDED` - Refunded
+        * `COMPLETED` - Completed
+        * `PARTIALLY_RETURNED` - Partially Returned
+        * `RETURNED` - Returned
+    PaginatedCategoryList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+    PaginatedInventoryTransactionList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/InventoryTransaction'
+    PaginatedNotificationList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
+    PaginatedOrderList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Order'
+    PaginatedProductList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+    PaginatedProductReviewList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductReview'
+    PaginatedPromotionList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Promotion'
+    PaginatedShipmentReadList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShipmentRead'
+    PaginatedShopList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Shop'
+    PaginatedShopReviewList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShopReview'
+    PaginatedVariantReadList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/VariantRead'
+    PaginatedVendorOrderList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorOrder'
+    PatchedCartItemUpdate:
+      type: object
+      properties:
+        quantity:
+          type: integer
+          minimum: 1
+    PatchedProduct:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        shop:
+          type: string
+          format: uuid
+        category:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 255
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ProductStatusEnum'
+          readOnly: true
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductImageRead'
+          readOnly: true
+    PatchedProductImageWrite:
+      type: object
+      properties:
+        image:
+          type: string
+          format: uri
+        alt_text:
+          type: string
+          maxLength: 255
+        is_primary:
+          type: boolean
+          default: false
+        display_order:
+          type: integer
+          writeOnly: true
+    PatchedProductReview:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        user:
+          allOf:
+          - $ref: '#/components/schemas/SimpleUser'
+          readOnly: true
+        product:
+          type: string
+          format: uuid
+          readOnly: true
+        order_item_id:
+          type: string
+          format: uuid
+          writeOnly: true
+        rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+        comment:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status0e1Enum'
+          readOnly: true
+        is_edited:
+          type: boolean
+          readOnly: true
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductReviewMedia'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was created.
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was last updated.
+    PatchedPromotion:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/PromotionStatusEnum'
+        shop:
+          type: string
+          format: uuid
+          nullable: true
+        priority:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          description: Higher numbers are evaluated first.
+        is_exclusive:
+          type: boolean
+          description: If true, no other promotions can stack with this.
+        start_date:
+          type: string
+          format: date-time
+          nullable: true
+        end_date:
+          type: string
+          format: date-time
+          nullable: true
+        conditions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PromotionCondition'
+          readOnly: true
+        reward:
+          allOf:
+          - $ref: '#/components/schemas/PromotionReward'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedShipmentStatusUpdate:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/Status6d8Enum'
+        location:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+    PatchedShop:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ShopStatusEnum'
+          readOnly: true
+    PatchedShopReview:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        user:
+          allOf:
+          - $ref: '#/components/schemas/SimpleUser'
+          readOnly: true
+        shop:
+          type: string
+          format: uuid
+          readOnly: true
+        vendor_order_id:
+          type: string
+          format: uuid
+          writeOnly: true
+        rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+        comment:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status0e1Enum'
+          readOnly: true
+        is_edited:
+          type: boolean
+          readOnly: true
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShopReviewMedia'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was created.
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was last updated.
+    PatchedVariantImageWrite:
+      type: object
+      properties:
+        image:
+          type: string
+          format: uri
+        alt_text:
+          type: string
+          maxLength: 255
+        is_primary:
+          type: boolean
+          default: false
+        display_order:
+          type: integer
+          writeOnly: true
+    PatchedVariantWrite:
+      type: object
+      properties:
+        sku:
+          type: string
+          maxLength: 100
+        price:
+          type: number
+          format: double
+          maximum: 100000000
+          minimum: 0.01
+          exclusiveMaximum: true
+        barcode:
+          type: string
+          maxLength: 100
+        status:
+          $ref: '#/components/schemas/StatusA3eEnum'
+        selected_values:
+          type: array
+          items:
+            type: string
+            format: uuid
+            writeOnly: true
+          writeOnly: true
+    PaymentInitialization:
+      type: object
+      properties:
+        order_id:
+          type: string
+          format: uuid
+        provider:
+          $ref: '#/components/schemas/ProviderEnum'
+      required:
+      - order_id
+      - provider
+    PricingBreakdown:
+      type: object
+      properties:
+        subtotal:
+          type: number
+          format: double
+          maximum: 10000000000
+          minimum: -10000000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        discount_total:
+          type: number
+          format: double
+          maximum: 10000000000
+          minimum: -10000000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        shipping_total:
+          type: number
+          format: double
+          maximum: 10000000000
+          minimum: -10000000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        tax_total:
+          type: number
+          format: double
+          maximum: 10000000000
+          minimum: -10000000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        grand_total:
+          type: number
+          format: double
+          maximum: 10000000000
+          minimum: -10000000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+      required:
+      - discount_total
+      - grand_total
+      - shipping_total
+      - subtotal
+      - tax_total
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        shop:
+          type: string
+          format: uuid
+        category:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 255
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ProductStatusEnum'
+          readOnly: true
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductImageRead'
+          readOnly: true
+      required:
+      - category
+      - id
+      - images
+      - name
+      - shop
+      - slug
+      - status
+    ProductImageRead:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        image:
+          type: string
+          format: uri
+          nullable: true
+          readOnly: true
+        alt_text:
+          type: string
+          readOnly: true
+        display_order:
+          type: integer
+          readOnly: true
+        is_primary:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was created.
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was last updated.
+      required:
+      - alt_text
+      - created_at
+      - display_order
+      - id
+      - image
+      - is_primary
+      - updated_at
+    ProductImageWrite:
+      type: object
+      properties:
+        image:
+          type: string
+          format: uri
+        alt_text:
+          type: string
+          maxLength: 255
+        is_primary:
+          type: boolean
+          default: false
+        display_order:
+          type: integer
+          writeOnly: true
+      required:
+      - image
+    ProductReview:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        user:
+          allOf:
+          - $ref: '#/components/schemas/SimpleUser'
+          readOnly: true
+        product:
+          type: string
+          format: uuid
+          readOnly: true
+        order_item_id:
+          type: string
+          format: uuid
+          writeOnly: true
+        rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+        comment:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status0e1Enum'
+          readOnly: true
+        is_edited:
+          type: boolean
+          readOnly: true
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductReviewMedia'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was created.
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was last updated.
+      required:
+      - created_at
+      - id
+      - is_edited
+      - media
+      - product
+      - rating
+      - status
+      - updated_at
+      - user
+    ProductReviewMedia:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        file_url:
+          type: string
+          format: uri
+          maxLength: 1000
+        media_type:
+          $ref: '#/components/schemas/MediaTypeEnum'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was created.
+      required:
+      - created_at
+      - file_url
+      - id
+    ProductReviewReport:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        reporter:
+          type: string
+          format: uuid
+          readOnly: true
+        review:
+          type: string
+          format: uuid
+          readOnly: true
+        reason:
+          type: string
+        is_resolved:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was created.
+      required:
+      - created_at
+      - id
+      - is_resolved
+      - reason
+      - reporter
+      - review
+    ProductStatusEnum:
+      enum:
+      - draft
+      - pending
+      - active
+      - rejected
+      - suspended
+      - archived
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `pending` - Pending
+        * `active` - Active
+        * `rejected` - Rejected
+        * `suspended` - Suspended
+        * `archived` - Archived
+    Promotion:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/PromotionStatusEnum'
+        shop:
+          type: string
+          format: uuid
+          nullable: true
+        priority:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          description: Higher numbers are evaluated first.
+        is_exclusive:
+          type: boolean
+          description: If true, no other promotions can stack with this.
+        start_date:
+          type: string
+          format: date-time
+          nullable: true
+        end_date:
+          type: string
+          format: date-time
+          nullable: true
+        conditions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PromotionCondition'
+          readOnly: true
+        reward:
+          allOf:
+          - $ref: '#/components/schemas/PromotionReward'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - conditions
+      - created_at
+      - id
+      - name
+      - reward
+      - updated_at
+    PromotionCondition:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        condition_type:
+          $ref: '#/components/schemas/ConditionTypeEnum'
+        min_amount:
+          type: number
+          format: double
+          maximum: 10000000000
+          minimum: -10000000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          nullable: true
+        category:
+          type: string
+          format: uuid
+          nullable: true
+        product:
+          type: string
+          format: uuid
+          nullable: true
+        config: {}
+      required:
+      - condition_type
+      - id
+    PromotionLine:
+      type: object
+      properties:
+        promotion_id:
+          type: string
+          format: uuid
+        promotion_name:
+          type: string
+        discount_amount:
+          type: number
+          format: double
+          maximum: 10000000000
+          minimum: -10000000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        is_free_shipping:
+          type: boolean
+      required:
+      - discount_amount
+      - is_free_shipping
+      - promotion_id
+      - promotion_name
+    PromotionReward:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        reward_type:
+          $ref: '#/components/schemas/RewardTypeEnum'
+        fixed_amount:
+          type: number
+          format: double
+          maximum: 10000000000
+          minimum: -10000000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          nullable: true
+        percentage:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          nullable: true
+        max_discount_amount:
+          type: number
+          format: double
+          maximum: 10000000000
+          minimum: -10000000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          nullable: true
+        config: {}
+      required:
+      - id
+      - reward_type
+    PromotionStatusEnum:
+      enum:
+      - DRAFT
+      - ACTIVE
+      - PAUSED
+      - EXPIRED
+      - ARCHIVED
+      type: string
+      description: |-
+        * `DRAFT` - Draft
+        * `ACTIVE` - Active
+        * `PAUSED` - Paused
+        * `EXPIRED` - Expired
+        * `ARCHIVED` - Archived
+    ProviderEnum:
+      enum:
+      - STRIPE
+      - SSLCOMMERZ
+      - BKASH
+      - NAGAD
+      - COD
+      type: string
+      description: |-
+        * `STRIPE` - Stripe
+        * `SSLCOMMERZ` - SSLCommerz
+        * `BKASH` - bKash
+        * `NAGAD` - Nagad
+        * `COD` - Cash on Delivery
+    Register:
+      type: object
+      properties:
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          writeOnly: true
+          minLength: 8
+        confirm_password:
+          type: string
+          writeOnly: true
+      required:
+      - confirm_password
+      - email
+      - first_name
+      - last_name
+      - password
+    RejectProductRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+      required:
+      - reason
+    RejectProductResponse:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+      - status
+    RejectVendorRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+      required:
+      - reason
+    RejectVendorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+      - status
+    RestoreProductRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+    RestoreProductResponse:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+      - status
+    RestoreReviewRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+    RestoreVendorRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+    RestoreVendorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+      - status
+    RewardTypeEnum:
+      enum:
+      - FIXED_AMOUNT
+      - PERCENTAGE
+      - FREE_SHIPPING
+      type: string
+      description: |-
+        * `FIXED_AMOUNT` - Fixed Amount Discount
+        * `PERCENTAGE` - Percentage Discount
+        * `FREE_SHIPPING` - Free Shipping
+    SalesSummary:
+      type: object
+      properties:
+        gross_revenue:
+          type: number
+          format: double
+          maximum: 1000000000000
+          minimum: -1000000000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        net_revenue:
+          type: number
+          format: double
+          maximum: 1000000000000
+          minimum: -1000000000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        order_count:
+          type: integer
+        average_order_value:
+          type: number
+          format: double
+          maximum: 1000000000000
+          minimum: -1000000000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        cancellation_rate:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        return_rate:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+      required:
+      - average_order_value
+      - cancellation_rate
+      - gross_revenue
+      - net_revenue
+      - order_count
+      - return_rate
+    ShipmentCourierAssign:
+      type: object
+      properties:
+        courier_id:
+          type: string
+          format: uuid
+        tracking_number:
+          type: string
+          maxLength: 100
+      required:
+      - courier_id
+      - tracking_number
+    ShipmentRead:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        vendor_order_id:
+          type: string
+          format: uuid
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/Status6d8Enum'
+        courier:
+          allOf:
+          - $ref: '#/components/schemas/Courier'
+          readOnly: true
+        tracking_number:
+          type: string
+          maxLength: 100
+        tracking_url:
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
+        shipping_address_snapshot: {}
+        estimated_delivery_date:
+          type: string
+          format: date
+          nullable: true
+        actual_delivery_date:
+          type: string
+          format: date-time
+          nullable: true
+        tracking_events:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShipmentTrackingEvent'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was created.
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was last updated.
+      required:
+      - courier
+      - created_at
+      - id
+      - shipping_address_snapshot
+      - tracking_events
+      - updated_at
+      - vendor_order_id
+    ShipmentTrackingEvent:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/Status6d8Enum'
+        location:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was created.
+      required:
+      - created_at
+      - status
+    Shop:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ShopStatusEnum'
+          readOnly: true
+      required:
+      - id
+      - name
+      - slug
+      - status
+    ShopReview:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        user:
+          allOf:
+          - $ref: '#/components/schemas/SimpleUser'
+          readOnly: true
+        shop:
+          type: string
+          format: uuid
+          readOnly: true
+        vendor_order_id:
+          type: string
+          format: uuid
+          writeOnly: true
+        rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+        comment:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status0e1Enum'
+          readOnly: true
+        is_edited:
+          type: boolean
+          readOnly: true
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShopReviewMedia'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was created.
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was last updated.
+      required:
+      - created_at
+      - id
+      - is_edited
+      - media
+      - rating
+      - shop
+      - status
+      - updated_at
+      - user
+    ShopReviewMedia:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        file_url:
+          type: string
+          format: uri
+          maxLength: 1000
+        media_type:
+          $ref: '#/components/schemas/MediaTypeEnum'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was created.
+      required:
+      - created_at
+      - file_url
+      - id
+    ShopReviewReport:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        reporter:
+          type: string
+          format: uuid
+          readOnly: true
+        review:
+          type: string
+          format: uuid
+          readOnly: true
+        reason:
+          type: string
+        is_resolved:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was created.
+      required:
+      - created_at
+      - id
+      - is_resolved
+      - reason
+      - reporter
+      - review
+    ShopStatusEnum:
+      enum:
+      - pending
+      - approved
+      - suspended
+      - rejected
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `approved` - Approved
+        * `suspended` - Suspended
+        * `rejected` - Rejected
+    SimpleUser:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+          title: Email Address
+        first_name:
+          type: string
+          readOnly: true
+        last_name:
+          type: string
+          readOnly: true
+      required:
+      - email
+      - first_name
+      - id
+      - last_name
+    Status0e1Enum:
+      enum:
+      - PUBLISHED
+      - HIDDEN
+      - REMOVED
+      type: string
+      description: |-
+        * `PUBLISHED` - Published
+        * `HIDDEN` - Hidden
+        * `REMOVED` - Removed by Admin
+    Status6d8Enum:
+      enum:
+      - PENDING
+      - READY_FOR_PICKUP
+      - SHIPPED
+      - OUT_FOR_DELIVERY
+      - DELIVERED
+      - FAILED_DELIVERY
+      - RETURNED
+      type: string
+      description: |-
+        * `PENDING` - Pending
+        * `READY_FOR_PICKUP` - Ready for Pickup
+        * `SHIPPED` - Shipped
+        * `OUT_FOR_DELIVERY` - Out for Delivery
+        * `DELIVERED` - Delivered
+        * `FAILED_DELIVERY` - Failed Delivery
+        * `RETURNED` - Returned to Sender
+    StatusA3eEnum:
+      enum:
+      - active
+      - inactive
+      type: string
+      description: |-
+        * `active` - Active
+        * `inactive` - Inactive
+    SuspendProductRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+      required:
+      - reason
+    SuspendProductResponse:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+      - status
+    SuspendVendorRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+      required:
+      - reason
+    SuspendVendorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+      - status
+    TopProduct:
+      type: object
+      properties:
+        product_id:
+          type: string
+        product_name:
+          type: string
+        units_sold:
+          type: integer
+        gross_revenue:
+          type: number
+          format: double
+          maximum: 1000000000000
+          minimum: -1000000000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+      required:
+      - gross_revenue
+      - product_id
+      - product_name
+      - units_sold
+    TransactionTypeEnum:
+      enum:
+      - IN
+      - OUT
+      - RESERVE
+      - RELEASE
+      - ADJUST
+      type: string
+      description: |-
+        * `IN` - In
+        * `OUT` - Out
+        * `RESERVE` - Reserve
+        * `RELEASE` - Release
+        * `ADJUST` - Adjust
+    ValidationRequest:
+      type: object
+      properties:
+        subtotal:
+          type: number
+          format: double
+          maximum: 10000000000
+          minimum: -10000000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartItemValidation'
+        coupon_codes:
+          type: array
+          items:
+            type: string
+      required:
+      - items
+      - subtotal
+    ValidationResponse:
+      type: object
+      properties:
+        pricing:
+          $ref: '#/components/schemas/PricingBreakdown'
+        is_free_shipping:
+          type: boolean
+        applied_promotions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PromotionLine'
+        rejections:
+          type: array
+          items:
+            $ref: '#/components/schemas/CouponRejection'
+      required:
+      - applied_promotions
+      - is_free_shipping
+      - pricing
+      - rejections
+    VariantAttributeValue:
+      type: object
+      properties:
+        attribute:
+          type: string
+          readOnly: true
+        value:
+          type: string
+          readOnly: true
+      required:
+      - attribute
+      - value
+    VariantImageRead:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        image:
+          type: string
+          format: uri
+          nullable: true
+          readOnly: true
+        alt_text:
+          type: string
+          readOnly: true
+        display_order:
+          type: integer
+          readOnly: true
+        is_primary:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was created.
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was last updated.
+      required:
+      - alt_text
+      - created_at
+      - display_order
+      - id
+      - image
+      - is_primary
+      - updated_at
+    VariantImageWrite:
+      type: object
+      properties:
+        image:
+          type: string
+          format: uri
+        alt_text:
+          type: string
+          maxLength: 255
+        is_primary:
+          type: boolean
+          default: false
+        display_order:
+          type: integer
+          writeOnly: true
+      required:
+      - image
+    VariantRead:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        sku:
+          type: string
+          readOnly: true
+        price:
+          type: number
+          format: double
+          maximum: 100000000
+          minimum: -100000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          readOnly: true
+        available_stock:
+          type: string
+          readOnly: true
+        barcode:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusA3eEnum'
+          readOnly: true
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/VariantAttributeValue'
+          readOnly: true
+        images:
+          type: string
+          readOnly: true
+      required:
+      - attributes
+      - available_stock
+      - barcode
+      - id
+      - images
+      - price
+      - sku
+      - status
+    VariantWrite:
+      type: object
+      properties:
+        sku:
+          type: string
+          maxLength: 100
+        price:
+          type: number
+          format: double
+          maximum: 100000000
+          minimum: 0.01
+          exclusiveMaximum: true
+        barcode:
+          type: string
+          maxLength: 100
+        status:
+          $ref: '#/components/schemas/StatusA3eEnum'
+        selected_values:
+          type: array
+          items:
+            type: string
+            format: uuid
+            writeOnly: true
+          writeOnly: true
+      required:
+      - price
+      - selected_values
+      - sku
+    VendorOrder:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        shop:
+          type: string
+          format: uuid
+        shop_name:
+          type: string
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/VendorOrderStatusEnum'
+        vendor_subtotal:
+          type: number
+          format: double
+          maximum: 100000000
+          minimum: -100000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        vendor_shipping:
+          type: number
+          format: double
+          maximum: 100000000
+          minimum: -100000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        vendor_tax:
+          type: number
+          format: double
+          maximum: 100000000
+          minimum: -100000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        vendor_total:
+          type: number
+          format: double
+          maximum: 100000000
+          minimum: -100000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time when this record was created.
+      required:
+      - created_at
+      - id
+      - items
+      - shop
+      - shop_name
+    VendorOrderStatusEnum:
+      enum:
+      - PENDING
+      - PROCESSING
+      - SHIPPED
+      - DELIVERED
+      - CANCELLED
+      - REFUNDED
+      - PARTIALLY_RETURNED
+      - RETURNED
+      type: string
+      description: |-
+        * `PENDING` - Pending (Awaiting Payment)
+        * `PROCESSING` - Processing (Paid)
+        * `SHIPPED` - Shipped
+        * `DELIVERED` - Delivered
+        * `CANCELLED` - Cancelled
+        * `REFUNDED` - Refunded
+        * `PARTIALLY_RETURNED` - Partially Returned
+        * `RETURNED` - Returned
+    WidgetData:
+      type: object
+      properties:
+        title:
+          type: string
+        value:
+          type: string
+        delta_percentage:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          nullable: true
+        delta_label:
+          type: string
+          nullable: true
+        chart_labels:
+          type: array
+          items:
+            type: string
+          nullable: true
+        chart_data:
+          type: array
+          items:
+            type: number
+            format: double
+          nullable: true
+      required:
+      - title
+      - value
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

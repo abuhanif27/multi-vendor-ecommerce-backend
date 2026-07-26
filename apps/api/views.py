@@ -5,8 +5,15 @@ from rest_framework.views import APIView
 from apps.api.serializers import HealthCheckSerializer
 
 
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 class HealthCheckAPIView(APIView):
 
+    @extend_schema(
+        summary="Health Check",
+        description="Returns the status of the API.",
+        responses={200: HealthCheckSerializer},
+        tags=['Core']
+    )
     def get(self, request):
         data = {
             "status": "ok",
@@ -21,6 +28,12 @@ class HealthCheckAPIView(APIView):
 class MeAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        summary="Get Current User",
+        description="Returns the currently authenticated user's basic info.",
+        responses={200: OpenApiResponse(response=dict, description="User info")},
+        tags=['Core']
+    )
     def get(self, request):
         return Response(
             {

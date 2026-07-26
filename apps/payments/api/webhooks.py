@@ -10,10 +10,17 @@ from apps.payments.exceptions import PaymentGatewayError, PaymentValidationFaile
 
 logger = logging.getLogger(__name__)
 
+from drf_spectacular.utils import extend_schema
 @method_decorator(csrf_exempt, name='dispatch')
 class SSLCommerzWebhookView(APIView):
     authentication_classes = []
     permission_classes = []
+
+    @extend_schema(
+        summary="SSLCommerz Webhook",
+        description="Receives payment updates from SSLCommerz.",
+        exclude=True
+    )
 
     def post(self, request, action):
         payload = request.POST.dict()
@@ -74,6 +81,12 @@ class SSLCommerzWebhookView(APIView):
 class StripeWebhookView(APIView):
     authentication_classes = []
     permission_classes = []
+
+    @extend_schema(
+        summary="Stripe Webhook",
+        description="Receives payment updates from Stripe.",
+        exclude=True
+    )
 
     def post(self, request):
         import stripe
