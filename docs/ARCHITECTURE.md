@@ -153,10 +153,15 @@ multi-vendor-ecommerce-backend/
 
 ---
 
-## 10. Future Roadmap
+### 11. API Documentation (Complete)
 
-With the Core Commerce Loop completely finished, the project is ready to absorb auxiliary business domains. 
+The API is fully documented using OpenAPI 3.0 via `drf-spectacular`. 
 
-### Recommended Next Module: Reviews & Ratings
-- **Rationale**: Currently, the platform supports multi-vendor catalog browsing and purchasing. To build buyer trust and enable algorithmic catalog sorting (e.g., "Top Rated Products", "Trusted Vendors"), a robust Review system is required. 
-- **Implementation**: Needs a strict lifecycle. A Buyer should only be allowed to review a Product/Vendor if they have a successfully `COMPLETED` order for that specific SKU. This integrates directly with the existing `OrderService` state machine.
+Key standards achieved:
+- **Zero Warnings**: The OpenAPI schema generator passes strictly without schema, serialization, or Enum mapping collisions.
+- **Categorization**: All APIs are distinctly tagged into domains (e.g., `Authentication`, `Checkout`, `Cart`, `Payments`).
+- **Examples & Shapes**: Leverage DRF Serializers to expose exactly the expected `requestBody` and `responses`.
+- **JWT Authorization**: Integrated via `SECURITY: [{"jwt": []}]` so frontend devs can authenticate directly in the Swagger UI.
+- **Internal Webhooks**: Gateway callbacks (Stripe, SSLCommerz) are strictly excluded from public Swagger definitions to prevent accidental misuse.
+
+The Swagger UI is accessible locally at `/api/docs/` and Redoc at `/api/redoc/`.
