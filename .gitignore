@@ -2,8 +2,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 db.sqlite3
+staticfiles/
+media/
 *.png
 *.jpg
 *.jpeg
 *.webp
 .env
+.env.*
+!.env.example

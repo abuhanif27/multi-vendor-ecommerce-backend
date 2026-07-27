@@ -1,24 +1,27 @@
-<article class="group flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.045] p-5 shadow-2xl shadow-black/10 ring-1 ring-white/[0.03] transition duration-200 hover:-translate-y-1 hover:border-cyan-300/40 hover:bg-white/[0.07]">
+<article
+    class="group flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.045] p-5 shadow-2xl shadow-black/10 ring-1 ring-white/[0.03] transition duration-200 hover:-translate-y-1 hover:border-cyan-300/40 hover:bg-white/[0.07]">
     <div class="flex items-start justify-between gap-4">
         <div>
             <h3 class="text-base font-semibold text-white">{{ module.name }}</h3>
             <p class="mt-2 text-sm leading-6 text-slate-300">{{ module.purpose }}</p>
         </div>
-        <span class="mt-1 h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-lg shadow-emerald-400/40" aria-hidden="true"></span>
-    </div>
-
-    <div class="mt-5">
-        <h4 class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Major Endpoints</h4>
-        <ul class="mt-3 space-y-2" aria-label="{{ module.name }} endpoints">
-            {% for endpoint in module.endpoints %}
-                <li class="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 font-mono text-xs text-cyan-100">{{ endpoint }}</li>
-            {% endfor %}
-        </ul>
+        <span class="mt-1 h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-lg shadow-emerald-400/40"
+            aria-hidden="true"></span>
     </div>
 
     <div class="mt-auto pt-5">
-        <a href="{{ swagger_url }}" class="inline-flex w-full items-center justify-center rounded-xl border border-cyan-300/30 bg-cyan-300/10 px-4 py-2.5 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200 hover:bg-cyan-300/20 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-slate-950">
-            View in Swagger
-        </a>
+        <div class="rounded-xl border border-white/10 bg-slate-950/55 p-4 text-xs text-slate-400">
+            Open the OpenAPI schema for exact request and response contracts.
+        </div>
+        <div class="mt-4 grid gap-3 sm:grid-cols-2">
+            <a href="{{ swagger_url }}"
+                class="inline-flex w-full items-center justify-center rounded-xl border border-cyan-300/30 bg-cyan-300/10 px-4 py-2.5 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200 hover:bg-cyan-300/20 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-slate-950">
+                Swagger
+            </a>
+            <a href="{{ swagger_url }}"
+                class="inline-flex w-full items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/[0.08] focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-slate-950">
+                Open Docs
+            </a>
+        </div>
     </div>
 </article>

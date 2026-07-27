@@ -8,13 +8,16 @@ click-didyoumean==0.3.1
 click-plugins==1.1.1.2
 click-repl==0.3.0
 cron-descriptor==1.4.5
+django-cors-headers==4.9.0
 Django==5.2
+gunicorn==26.0.0
 django-celery-beat==2.9.0
 django-filter==25.2
 django-timezone-field==7.2.2
 djangorestframework==3.17.1
 djangorestframework_simplejwt==5.5.1
 drf-spectacular==0.30.0
+psycopg2-binary==2.9.12
 inflection==0.5.1
 jsonschema==4.26.0
 jsonschema-specifications==2025.9.1
@@ -37,3 +40,4 @@ uritemplate==4.2.0
 vine==5.1.0
 wcwidth==0.8.2
 requests==2.31.0
+whitenoise==6.12.0

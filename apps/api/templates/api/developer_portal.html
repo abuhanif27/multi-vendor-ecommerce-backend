@@ -1,11 +1,17 @@
 <!doctype html>
-<html lang="en" class="h-full bg-slate-950">
+<html lang="en" class="h-full bg-slate-950 scroll-smooth">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="dark">
     <title>{{ project_title }} Developer Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -18,16 +24,28 @@
             }
         }
     </script>
+    <style>
+        .glass {
+            background: rgba(9, 16, 31, 0.72);
+            backdrop-filter: blur(18px);
+        }
+    </style>
 </head>
-<body class="min-h-full bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.16),transparent_34rem),radial-gradient(circle_at_top_right,rgba(16,185,129,0.12),transparent_30rem),linear-gradient(180deg,#020617_0%,#0f172a_52%,#020617_100%)] text-slate-100 antialiased">
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-cyan-300 focus:px-4 focus:py-2 focus:text-slate-950">
+
+<body
+    class="min-h-full bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.18),transparent_28rem),radial-gradient(circle_at_top_right,rgba(16,185,129,0.12),transparent_26rem),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.12),transparent_24rem),linear-gradient(180deg,#020617_0%,#08111f_52%,#020617_100%)] text-slate-100 antialiased">
+    <a href="#main-content"
+        class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-cyan-300 focus:px-4 focus:py-2 focus:text-slate-950">
         Skip to content
     </a>
 
-    <header class="border-b border-white/10 bg-slate-950/70 backdrop-blur">
-        <nav class="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-8" aria-label="Primary navigation">
-            <a href="/" class="flex items-center gap-3 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-slate-950">
-                <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-300 text-sm font-black text-slate-950">API</span>
+    <header class="sticky top-0 z-40 border-b border-white/10 bg-slate-950/70 backdrop-blur">
+        <nav class="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-8"
+            aria-label="Primary navigation">
+            <a href="/"
+                class="flex items-center gap-3 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-slate-950">
+                <span
+                    class="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-300 text-sm font-black text-slate-950">API</span>
                 <span>
                     <span class="block text-sm font-semibold text-white">{{ project_title }}</span>
                     <span class="block text-xs text-slate-400">Developer Portal</span>
@@ -35,40 +53,67 @@
             </a>
             <div class="hidden items-center gap-2 md:flex">
                 {% for link in quick_links %}
-                    <a href="{{ link.url }}" class="rounded-lg px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-slate-950">{{ link.label }}</a>
+                <a href="{{ link.url }}"
+                    class="rounded-lg px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-slate-950">{{
+                    link.label }}</a>
                 {% endfor %}
             </div>
         </nav>
     </header>
 
     <main id="main-content">
-        <section class="mx-auto grid max-w-7xl gap-10 px-6 pb-16 pt-14 lg:grid-cols-[1.1fr_0.9fr] lg:px-8 lg:pb-24 lg:pt-20">
+        <section
+            class="mx-auto grid max-w-7xl gap-10 px-6 pb-16 pt-14 lg:grid-cols-[1.08fr_0.92fr] lg:px-8 lg:pb-24 lg:pt-20">
             <div>
-                <p class="inline-flex rounded-full border border-cyan-300/30 bg-cyan-300/10 px-3 py-1 text-sm font-medium text-cyan-100">
+                <div
+                    class="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-300/10 px-3 py-1 text-sm font-medium text-cyan-100">
+                    <span class="h-2 w-2 rounded-full bg-cyan-300"></span>
                     API {{ api_version }} · {{ environment }}
-                </p>
-                <h1 class="mt-6 max-w-4xl text-4xl font-semibold tracking-normal text-white sm:text-6xl">
+                </div>
+                <h1 class="mt-6 max-w-4xl text-4xl font-semibold tracking-tight text-white sm:text-6xl">
                     {{ project_title }}
                 </h1>
                 <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
-                    {{ project_description }} Explore routes, authentication, infrastructure, modules, and integration examples from one production-ready entry point.
+                    {{ project_description }} This portal provides a single professional entry point for recruiters and
+                    engineers to inspect runtime metadata, architecture, and the live API documentation.
                 </p>
                 <div class="mt-8 flex flex-wrap gap-3" aria-label="Quick links">
                     {% for link in quick_links %}
-                        <a href="{{ link.url }}" class="{% if link.style == 'primary' %}bg-cyan-300 text-slate-950 hover:bg-cyan-200{% else %}border border-white/10 bg-white/5 text-white hover:bg-white/10{% endif %} inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-slate-950">
-                            {{ link.label }}
-                        </a>
+                    <a href="{{ link.url }}"
+                        class="{% if link.style == 'primary' %}bg-cyan-300 text-slate-950 hover:bg-cyan-200{% else %}border border-white/10 bg-white/5 text-white hover:bg-white/10{% endif %} inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-slate-950">
+                        {{ link.label }}
+                    </a>
                     {% endfor %}
                 </div>
+                <dl class="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                    <div class="rounded-2xl border border-white/10 bg-white/[0.05] p-4">
+                        <dt class="text-xs uppercase tracking-[0.16em] text-slate-500">Python</dt>
+                        <dd class="mt-2 font-mono text-lg text-white">{{ python_version }}</dd>
+                    </div>
+                    <div class="rounded-2xl border border-white/10 bg-white/[0.05] p-4">
+                        <dt class="text-xs uppercase tracking-[0.16em] text-slate-500">Django</dt>
+                        <dd class="mt-2 font-mono text-lg text-white">{{ django_version }}</dd>
+                    </div>
+                    <div class="rounded-2xl border border-white/10 bg-white/[0.05] p-4">
+                        <dt class="text-xs uppercase tracking-[0.16em] text-slate-500">Version</dt>
+                        <dd class="mt-2 font-mono text-lg text-white">{{ api_version }}</dd>
+                    </div>
+                    <div class="rounded-2xl border border-white/10 bg-white/[0.05] p-4">
+                        <dt class="text-xs uppercase tracking-[0.16em] text-slate-500">Environment</dt>
+                        <dd class="mt-2 font-mono text-lg text-white">{{ environment }}</dd>
+                    </div>
+                </dl>
             </div>
 
-            <aside class="rounded-3xl border border-white/10 bg-white/[0.055] p-6 shadow-2xl shadow-black/20" aria-labelledby="api-status-heading">
+            <aside class="glass rounded-3xl border border-white/10 p-6 shadow-2xl shadow-black/20"
+                aria-labelledby="api-status-heading">
                 <div class="flex items-center justify-between gap-4">
                     <div>
                         <h2 id="api-status-heading" class="text-lg font-semibold text-white">API Status</h2>
                         <p class="mt-1 text-sm text-slate-400">Runtime metadata from this deployment.</p>
                     </div>
-                    <span class="inline-flex items-center gap-2 rounded-full bg-emerald-400/10 px-3 py-1 text-sm font-medium text-emerald-200">
+                    <span
+                        class="inline-flex items-center gap-2 rounded-full bg-emerald-400/10 px-3 py-1 text-sm font-medium text-emerald-200">
                         <span class="h-2 w-2 rounded-full bg-emerald-300" aria-hidden="true"></span>
                         Operational
                     </span>
@@ -92,11 +137,17 @@
                     </div>
                     <div class="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
                         <dt class="text-xs uppercase tracking-[0.16em] text-slate-500">PostgreSQL</dt>
-                        <dd class="mt-2 font-mono text-sm text-white">{% if is_postgresql %}Configured{% else %}Production target{% endif %}</dd>
+                        <dd class="mt-2 font-mono text-sm text-white">{% if is_postgresql %}Configured{% else
+                            %}Production target{% endif %}</dd>
                     </div>
                     <div class="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
                         <dt class="text-xs uppercase tracking-[0.16em] text-slate-500">Database Engine</dt>
                         <dd class="mt-2 font-mono text-sm text-white">{{ database_engine }}</dd>
+                    </div>
+                    <div class="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
+                        <dt class="text-xs uppercase tracking-[0.16em] text-slate-500">Redis</dt>
+                        <dd class="mt-2 font-mono text-sm text-white">{% if is_redis_configured %}Configured{% else
+                            %}Local cache fallback{% endif %}</dd>
                     </div>
                     <div class="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
                         <dt class="text-xs uppercase tracking-[0.16em] text-slate-500">JWT Authentication</dt>
@@ -104,7 +155,7 @@
                     </div>
                     <div class="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
                         <dt class="text-xs uppercase tracking-[0.16em] text-slate-500">Payments</dt>
-                        <dd class="mt-2 font-mono text-sm text-white">{{ payment_gateways|join:", " }}</dd>
+                        <dd class="mt-2 font-mono text-sm text-white">Stripe / SSLCommerz</dd>
                     </div>
                 </dl>
             </aside>
@@ -112,10 +163,34 @@
 
         <section class="border-y border-white/10 bg-slate-950/45 py-10" aria-labelledby="stack-heading">
             <div class="mx-auto max-w-7xl px-6 lg:px-8">
-                <h2 id="stack-heading" class="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Technology Stack</h2>
+                <h2 id="stack-heading" class="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">
+                    Technology Stack</h2>
                 <div class="mt-5 flex flex-wrap gap-3">
                     {% for item in tech_stack %}
-                        <span class="rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-medium text-slate-200">{{ item }}</span>
+                    <span
+                        class="rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-medium text-slate-200">{{
+                        item }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <section class="mx-auto max-w-7xl px-6 py-16 lg:px-8" aria-labelledby="features-heading">
+            <div class="grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
+                <div>
+                    <p class="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-200">Platform Highlights</p>
+                    <h2 id="features-heading" class="mt-3 text-3xl font-semibold text-white">Capabilities verified in
+                        this codebase</h2>
+                    <p class="mt-4 text-base leading-7 text-slate-300">
+                        The following items are grounded in the implemented apps, configuration, and tests. No
+                        capability is advertised unless the repository already supports it.
+                    </p>
+                </div>
+                <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                    {% for feature in platform_features %}
+                    <div
+                        class="rounded-2xl border border-white/10 bg-white/[0.045] px-4 py-4 text-sm font-medium text-slate-200">
+                        {{ feature }}</div>
                     {% endfor %}
                 </div>
             </div>
@@ -125,9 +200,13 @@
             <div class="grid gap-10 lg:grid-cols-[0.85fr_1.15fr]">
                 <div>
                     <p class="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-200">Architecture</p>
-                    <h2 id="architecture-heading" class="mt-3 text-3xl font-semibold text-white">Request flow from client to domain services</h2>
+                    <h2 id="architecture-heading" class="mt-3 text-3xl font-semibold text-white">Request flow from
+                        client to domain services</h2>
                     <p class="mt-4 text-base leading-7 text-slate-300">
-                        The API keeps external clients on versioned REST routes, delegates authentication to JWT, documents contracts through OpenAPI, and routes business workflows into focused Django apps.
+                        The API keeps external clients on versioned REST routes, delegates authentication to JWT,
+                        documents contracts through OpenAPI, and routes business workflows into focused Django apps.
+                        Celery handles background work, Redis backs caching and queueing, and PostgreSQL stores
+                        transactional data.
                     </p>
                 </div>
                 <div class="rounded-3xl border border-white/10 bg-white/[0.045] p-5">
@@ -161,17 +240,22 @@
             <div class="grid gap-6 lg:grid-cols-2">
                 <article class="rounded-3xl border border-white/10 bg-white/[0.045] p-6">
                     <h2 id="examples-heading" class="text-xl font-semibold text-white">JWT Authentication Example</h2>
-                    <p class="mt-3 text-sm leading-6 text-slate-300">Send the access token with every protected request using the Bearer scheme.</p>
-                    <pre class="mt-5 overflow-x-auto rounded-2xl border border-white/10 bg-slate-950 p-4 text-sm leading-6 text-slate-200"><code>Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example.signature</code></pre>
+                    <p class="mt-3 text-sm leading-6 text-slate-300">Send the access token with every protected request
+                        using the Bearer scheme.</p>
+                    <pre
+                        class="mt-5 overflow-x-auto rounded-2xl border border-white/10 bg-slate-950 p-4 text-sm leading-6 text-slate-200"><code>Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example.signature</code></pre>
                 </article>
                 <article class="rounded-3xl border border-white/10 bg-white/[0.045] p-6">
                     <h2 class="text-xl font-semibold text-white">Sample cURL Requests</h2>
                     <div class="mt-5 space-y-4">
-                        <pre class="overflow-x-auto rounded-2xl border border-white/10 bg-slate-950 p-4 text-sm leading-6 text-slate-200"><code>curl {{ base_url }}/health/</code></pre>
-                        <pre class="overflow-x-auto rounded-2xl border border-white/10 bg-slate-950 p-4 text-sm leading-6 text-slate-200"><code>curl -X POST {{ base_url }}/api/v1/auth/login/ \
+                        <pre
+                            class="overflow-x-auto rounded-2xl border border-white/10 bg-slate-950 p-4 text-sm leading-6 text-slate-200"><code>curl {{ base_url }}/health/</code></pre>
+                        <pre
+                            class="overflow-x-auto rounded-2xl border border-white/10 bg-slate-950 p-4 text-sm leading-6 text-slate-200"><code>curl -X POST {{ base_url }}/api/v1/auth/login/ \
   -H "Content-Type: application/json" \
   -d '{"email":"developer@example.com","password":"change-me"}'</code></pre>
-                        <pre class="overflow-x-auto rounded-2xl border border-white/10 bg-slate-950 p-4 text-sm leading-6 text-slate-200"><code>curl {{ base_url }}/api/v1/products/ \
+                        <pre
+                            class="overflow-x-auto rounded-2xl border border-white/10 bg-slate-950 p-4 text-sm leading-6 text-slate-200"><code>curl {{ base_url }}/api/v1/products/ \
   -H "Authorization: Bearer &lt;access-token&gt;"</code></pre>
                     </div>
                 </article>
@@ -182,21 +266,29 @@
             <div class="mb-8 max-w-3xl">
                 <p class="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-200">API Modules</p>
                 <h2 id="modules-heading" class="mt-3 text-3xl font-semibold text-white">Major platform capabilities</h2>
-                <p class="mt-4 text-base leading-7 text-slate-300">Each module maps to focused versioned routes under <span class="font-mono text-cyan-100">/api/v1/</span> and is documented in the OpenAPI schema.</p>
+                <p class="mt-4 text-base leading-7 text-slate-300">Each module maps to focused versioned routes under
+                    <span class="font-mono text-cyan-100">/api/v1/</span> and is documented in the OpenAPI schema. Use
+                    Swagger for route-level detail instead of listing every endpoint here.</p>
             </div>
             <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {% for module in module_cards %}
-                    {% include "api/partials/module_card.html" with module=module swagger_url=swagger_url only %}
+                {% include "api/partials/module_card.html" with module=module swagger_url=swagger_url only %}
                 {% endfor %}
             </div>
         </section>
     </main>
 
     <footer class="border-t border-white/10 bg-slate-950/80">
-        <div class="mx-auto flex max-w-7xl flex-col gap-3 px-6 py-8 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between lg:px-8">
+        <div
+            class="mx-auto flex max-w-7xl flex-col gap-3 px-6 py-8 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between lg:px-8">
             <p>&copy; {{ current_year }} {{ project_title }}. All rights reserved.</p>
-            <p>API version <span class="font-mono text-slate-200">{{ api_version }}</span></p>
+            <div class="flex flex-wrap gap-4">
+                <span>API version <span class="font-mono text-slate-200">{{ api_version }}</span></span>
+                <span>Repository <a href="{{ repository_url }}"
+                        class="text-cyan-200 underline-offset-4 hover:underline">GitHub</a></span>
+            </div>
         </div>
     </footer>
 </body>
+
 </html>
