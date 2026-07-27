@@ -1,0 +1,77 @@
+name: multi-vendor-ecommerce-backend
+region: nyc
+
+services:
+  - name: web
+    environment_slug: python
+    source_dir: /
+    github:
+      repo: abuhanif27/multi-vendor-ecommerce-backend
+      branch: main
+      deploy_on_push: true
+    build_command: python manage.py collectstatic --noinput
+    run_command: gunicorn config.wsgi:application --bind 0.0.0.0:${PORT:-8080} --workers 3 --timeout 120
+    http_port: 8080
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    routes:
+      - path: /
+    envs:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.production
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: WEB_CONCURRENCY
+        value: "3"
+  - name: celery-worker
+    environment_slug: python
+    source_dir: /
+    github:
+      repo: abuhanif27/multi-vendor-ecommerce-backend
+      branch: main
+      deploy_on_push: true
+    build_command: python manage.py collectstatic --noinput
+    run_command: celery -A config worker -l info
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    envs:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.production
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+  - name: celery-beat
+    environment_slug: python
+    source_dir: /
+    github:
+      repo: abuhanif27/multi-vendor-ecommerce-backend
+      branch: main
+      deploy_on_push: true
+    build_command: python manage.py collectstatic --noinput
+    run_command: celery -A config beat -l info
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    envs:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.production
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+
+databases:
+  - name: multi-vendor-postgres
+    engine: PG
+    version: "15"
+    size: basic-xs
+    num_nodes: 1
+    production: true
+    db_name: multi_vendor_ecommerce
+    db_user: multi_vendor_ecommerce
+
+domains:
+  - domain: example.com
+    type: PRIMARY

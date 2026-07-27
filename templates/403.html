@@ -1,0 +1,40 @@
+{% load static %}
+<!doctype html>
+<html lang="en" class="h-full">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#020617">
+    <title>403 Forbidden</title>
+    <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body
+    class="min-h-full bg-[radial-gradient(circle_at_top_right,rgba(248,113,113,0.16),transparent_28rem),linear-gradient(180deg,#020617_0%,#111827_100%)] font-sans text-slate-100 antialiased">
+    <main class="flex min-h-screen items-center justify-center px-6 py-16">
+        <section
+            class="w-full max-w-3xl rounded-[2rem] border border-white/10 bg-white/[0.05] p-8 shadow-2xl shadow-black/30 backdrop-blur md:p-12">
+            <div
+                class="inline-flex rounded-full border border-rose-300/30 bg-rose-300/10 px-3 py-1 text-sm font-semibold text-rose-100">
+                403</div>
+            <h1 class="mt-6 text-4xl font-bold tracking-tight text-white md:text-6xl">Access denied.</h1>
+            <p class="mt-4 max-w-2xl text-base leading-7 text-slate-300 md:text-lg">You do not have permission to view
+                this resource. If this should be available, sign in or return to the portal.</p>
+            <div class="mt-8 flex flex-wrap gap-3">
+                <a href="/"
+                    class="rounded-xl bg-cyan-300 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200">Developer
+                    Portal</a>
+                <a href="/admin/"
+                    class="rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10">Django
+                    Admin</a>
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>

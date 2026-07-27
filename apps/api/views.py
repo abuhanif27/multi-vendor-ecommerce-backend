@@ -19,12 +19,17 @@ def developer_portal(request):
     api_version = settings.SPECTACULAR_SETTINGS.get("VERSION", "v1")
     project_description = settings.SPECTACULAR_SETTINGS.get(
         "DESCRIPTION", "REST API developer portal.")
+    page_description = (
+        "Production-grade multi-vendor marketplace API with JWT authentication, Redis, Celery, "
+        "Stripe, SSLCommerz, PostgreSQL, and OpenAPI documentation."
+    )
     environment = os.environ.get(
         "DJANGO_ENV", "Development" if settings.DEBUG else "Production")
     database_engine = settings.DATABASES["default"]["ENGINE"].rsplit(
         ".", 1)[-1]
     database_name = settings.DATABASES["default"].get("NAME", "")
     base_url = request.build_absolute_uri("/").rstrip("/")
+    canonical_url = request.build_absolute_uri(request.path)
     redis_url = getattr(settings, "REDIS_URL", "")
 
     platform_features = [
@@ -139,6 +144,7 @@ def developer_portal(request):
     context = {
         "project_title": settings.SPECTACULAR_SETTINGS.get("TITLE", "Marketplace API"),
         "project_description": project_description,
+        "page_description": page_description,
         "api_version": api_version,
         "environment": environment,
         "django_version": django.get_version(),
@@ -166,7 +172,12 @@ def developer_portal(request):
         "module_cards": module_cards,
         "swagger_url": reverse("swagger-ui"),
         "base_url": base_url,
+        "canonical_url": canonical_url,
         "repository_url": settings.PROJECT_REPOSITORY_URL,
+        "theme_color": "#020617",
+        "site_name": settings.SPECTACULAR_SETTINGS.get(
+            "TITLE", "Multi-Vendor Marketplace API"),
+        "social_image_url": request.build_absolute_uri("/static/social-card.svg"),
         "current_year": timezone.now().year,
     }
 

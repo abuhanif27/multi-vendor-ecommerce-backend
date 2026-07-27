@@ -118,7 +118,12 @@ Deployment instructions for DigitalOcean App Platform are documented in [docs/de
 
 ## Screenshots
 
-Add production screenshots of the deployed developer portal and Swagger UI here once the App Platform deployment is live.
+Screenshot placeholders live in [docs/screenshots/README.md](docs/screenshots/README.md).
+
+- Developer portal placeholder: [docs/screenshots/developer-portal.png](docs/screenshots/developer-portal.png)
+- Swagger UI placeholder: [docs/screenshots/swagger-ui.png](docs/screenshots/swagger-ui.png)
+- ReDoc placeholder: [docs/screenshots/redoc.png](docs/screenshots/redoc.png)
+- Health check placeholder: [docs/screenshots/health-check.png](docs/screenshots/health-check.png)
 
 ## API Documentation
 
@@ -129,6 +134,14 @@ Add production screenshots of the deployed developer portal and Swagger UI here 
 ## Live Demo
 
 Placeholder: add the public App Platform URL here after deployment.
+
+## Deployment Checklist
+
+See [docs/deployment/Deployment_Readiness_Report.md](docs/deployment/Deployment_Readiness_Report.md) for the step-by-step DigitalOcean App Platform checklist.
+
+## Readiness Score
+
+Portfolio readiness is rated 88/100. The remaining items are documented in [docs/deployment/Deployment_Readiness_Report.md](docs/deployment/Deployment_Readiness_Report.md).
 
 ## License
 
