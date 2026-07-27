@@ -9,7 +9,10 @@ from datetime import datetime, date, timedelta
 
 from apps.analytics.services.analytics import AnalyticsService
 from apps.analytics.services.reporting import ReportingService
-from apps.analytics.serializers import DashboardOverviewResponseSerializer
+from apps.analytics.serializers import (
+    DashboardOverviewResponseSerializer,
+    ExportSalesResponseSerializer,
+)
 from apps.analytics.dtos import WidgetDataDTO
 from apps.promotions.permissions import IsVendorOwnerOrAdmin # We can reuse this permission if appropriate, but wait, analytics doesn't have an object.
 
@@ -25,6 +28,7 @@ class AnalyticsViewSet(viewsets.ViewSet):
     Read-only dashboards and analytics exports.
     """
     permission_classes = [IsAnalyticsViewer]
+    serializer_class = DashboardOverviewResponseSerializer
 
     def _get_shop_id(self, request) -> str:
         """
@@ -103,7 +107,12 @@ class AnalyticsViewSet(viewsets.ViewSet):
             OpenApiParameter('start_date', OpenApiTypes.DATE, required=True),
             OpenApiParameter('end_date', OpenApiTypes.DATE, required=True),
             OpenApiParameter('shop_id', OpenApiTypes.UUID)
-        ]
+        ],
+        responses={
+            202: ExportSalesResponseSerializer,
+            400: ExportSalesResponseSerializer,
+            403: ExportSalesResponseSerializer,
+        },
     )
     @action(detail=False, methods=['post'], url_path='export-sales', throttle_classes=[UserRateThrottle])
     def export_sales(self, request):

@@ -6,7 +6,10 @@ from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 
 from apps.notifications.models import Notification, NotificationDelivery
-from apps.notifications.serializers import NotificationSerializer
+from apps.notifications.serializers import (
+    NotificationMessageSerializer,
+    NotificationSerializer,
+)
 from apps.common.pagination import DefaultPagination
 
 class NotificationListAPIView(generics.ListAPIView):
@@ -31,6 +34,7 @@ class NotificationReadAPIView(APIView):
     PATCH: Marks a specific notification as read.
     """
     permission_classes = [IsAuthenticated]
+    serializer_class = NotificationSerializer
 
     @extend_schema(responses={200: NotificationSerializer})
     def patch(self, request, pk):
@@ -51,8 +55,9 @@ class NotificationReadAllAPIView(APIView):
     POST: Bulk marks all unread IN_APP notifications as read for the authenticated user.
     """
     permission_classes = [IsAuthenticated]
+    serializer_class = NotificationMessageSerializer
 
-    @extend_schema(responses={200: {"type": "object", "properties": {"detail": {"type": "string"}}}})
+    @extend_schema(responses={200: NotificationMessageSerializer})
     def post(self, request):
         count = Notification.objects.filter(
             recipient=request.user,

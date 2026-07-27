@@ -26,3 +26,7 @@ class DashboardOverviewResponseSerializer(serializers.Serializer):
     sales_summary = SalesSummarySerializer()
     widgets = WidgetDataSerializer(many=True)
     top_products = TopProductSerializer(many=True)
+
+
+class ExportSalesResponseSerializer(serializers.Serializer):
+    detail = serializers.CharField()

@@ -386,7 +386,29 @@ paths:
       - jwt: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewModerationResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewModerationError'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewModerationError'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewModerationError'
+          description: ''
   /api/v1/admin/reviews/product/{review_id}/remove/:
     post:
       operationId: api_v1_admin_reviews_product_remove_create
@@ -416,7 +438,29 @@ paths:
       - jwt: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewModerationResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewModerationError'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewModerationError'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewModerationError'
+          description: ''
   /api/v1/admin/reviews/product/{review_id}/restore/:
     post:
       operationId: api_v1_admin_reviews_product_restore_create
@@ -445,7 +489,29 @@ paths:
       - jwt: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewModerationResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewModerationError'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewModerationError'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewModerationError'
+          description: ''
   /api/v1/admin/reviews/shop/{review_id}/hide/:
     post:
       operationId: api_v1_admin_reviews_shop_hide_create
@@ -475,7 +541,29 @@ paths:
       - jwt: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewModerationResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewModerationError'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewModerationError'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewModerationError'
+          description: ''
   /api/v1/admin/reviews/shop/{review_id}/remove/:
     post:
       operationId: api_v1_admin_reviews_shop_remove_create
@@ -505,7 +593,29 @@ paths:
       - jwt: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewModerationResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewModerationError'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewModerationError'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewModerationError'
+          description: ''
   /api/v1/admin/reviews/shop/{review_id}/restore/:
     post:
       operationId: api_v1_admin_reviews_shop_restore_create
@@ -534,7 +644,29 @@ paths:
       - jwt: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewModerationResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewModerationError'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewModerationError'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewModerationError'
+          description: ''
   /api/v1/admin/vendors/{shop_id}/approve/:
     post:
       operationId: api_v1_admin_vendors_approve_create
@@ -728,12 +860,40 @@ paths:
         required: true
       tags:
       - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DashboardOverviewResponseRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DashboardOverviewResponseRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DashboardOverviewResponseRequest'
+        required: true
       security:
       - jwtAuth: []
       - jwt: []
       responses:
-        '200':
-          description: No response body
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportSalesResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportSalesResponse'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportSalesResponse'
+          description: ''
   /api/v1/auth/login/:
     post:
       operationId: api_v1_auth_login_create
@@ -1234,6 +1394,17 @@ paths:
         required: true
       tags:
       - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedNotificationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedNotificationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedNotificationRequest'
       security:
       - jwtAuth: []
       - jwt: []
@@ -1251,6 +1422,18 @@ paths:
         authenticated user.'
       tags:
       - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationMessageRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NotificationMessageRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NotificationMessageRequest'
+        required: true
       security:
       - jwtAuth: []
       - jwt: []
@@ -1259,10 +1442,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  detail:
-                    type: string
+                $ref: '#/components/schemas/NotificationMessage'
           description: ''
   /api/v1/orders/:
     get:
@@ -3609,6 +3789,30 @@ components:
       - sales_summary
       - top_products
       - widgets
+    DashboardOverviewResponseRequest:
+      type: object
+      properties:
+        sales_summary:
+          $ref: '#/components/schemas/SalesSummaryRequest'
+        widgets:
+          type: array
+          items:
+            $ref: '#/components/schemas/WidgetDataRequest'
+        top_products:
+          type: array
+          items:
+            $ref: '#/components/schemas/TopProductRequest'
+      required:
+      - sales_summary
+      - top_products
+      - widgets
+    ExportSalesResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+      required:
+      - detail
     HealthCheck:
       type: object
       properties:
@@ -3773,6 +3977,21 @@ components:
       - is_read
       - message
       - title
+    NotificationMessage:
+      type: object
+      properties:
+        detail:
+          type: string
+      required:
+      - detail
+    NotificationMessageRequest:
+      type: object
+      properties:
+        detail:
+          type: string
+          minLength: 1
+      required:
+      - detail
     Order:
       type: object
       properties:
@@ -4177,6 +4396,24 @@ components:
         quantity:
           type: integer
           minimum: 1
+    PatchedNotificationRequest:
+      type: object
+      description: Serializer for the frontend notification bell/inbox.
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+        message:
+          type: string
+          minLength: 1
+        action_url:
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
     PatchedProductImageWriteRequest:
       type: object
       properties:
@@ -5016,6 +5253,20 @@ components:
           type: string
       required:
       - status
+    ReviewModerationError:
+      type: object
+      properties:
+        detail:
+          type: string
+      required:
+      - detail
+    ReviewModerationResponse:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+      - status
     ReviewStatusEnum:
       enum:
       - PUBLISHED
@@ -5037,6 +5288,53 @@ components:
         * `PERCENTAGE` - Percentage Discount
         * `FREE_SHIPPING` - Free Shipping
     SalesSummary:
+      type: object
+      properties:
+        gross_revenue:
+          type: number
+          format: double
+          maximum: 1000000000000
+          minimum: -1000000000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        net_revenue:
+          type: number
+          format: double
+          maximum: 1000000000000
+          minimum: -1000000000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        order_count:
+          type: integer
+        average_order_value:
+          type: number
+          format: double
+          maximum: 1000000000000
+          minimum: -1000000000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        cancellation_rate:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        return_rate:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+      required:
+      - average_order_value
+      - cancellation_rate
+      - gross_revenue
+      - net_revenue
+      - order_count
+      - return_rate
+    SalesSummaryRequest:
       type: object
       properties:
         gross_revenue:
@@ -5451,6 +5749,29 @@ components:
       - product_id
       - product_name
       - units_sold
+    TopProductRequest:
+      type: object
+      properties:
+        product_id:
+          type: string
+          minLength: 1
+        product_name:
+          type: string
+          minLength: 1
+        units_sold:
+          type: integer
+        gross_revenue:
+          type: number
+          format: double
+          maximum: 1000000000000
+          minimum: -1000000000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+      required:
+      - gross_revenue
+      - product_id
+      - product_name
+      - units_sold
     TransactionTypeEnum:
       enum:
       - IN
@@ -5793,6 +6114,42 @@ components:
           type: array
           items:
             type: string
+          nullable: true
+        chart_data:
+          type: array
+          items:
+            type: number
+            format: double
+          nullable: true
+      required:
+      - title
+      - value
+    WidgetDataRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+        value:
+          type: string
+          minLength: 1
+        delta_percentage:
+          type: number
+          format: double
+          maximum: 1000
+          minimum: -1000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          nullable: true
+        delta_label:
+          type: string
+          nullable: true
+          minLength: 1
+        chart_labels:
+          type: array
+          items:
+            type: string
+            minLength: 1
           nullable: true
         chart_data:
           type: array

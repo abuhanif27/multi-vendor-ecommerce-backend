@@ -13,3 +13,7 @@ class NotificationSerializer(serializers.ModelSerializer):
 
     def get_is_read(self, obj) -> bool:
         return obj.read_at is not None
+
+
+class NotificationMessageSerializer(serializers.Serializer):
+    detail = serializers.CharField()

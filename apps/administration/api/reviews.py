@@ -13,8 +13,17 @@ from apps.administration.services.review_moderation import ReviewModerationServi
 class ModerateReviewRequestSerializer(serializers.Serializer):
     reason = serializers.CharField(required=True, allow_blank=False)
 
+
 class RestoreReviewRequestSerializer(serializers.Serializer):
     reason = serializers.CharField(required=False, allow_blank=True)
+
+
+class ReviewModerationResponseSerializer(serializers.Serializer):
+    status = serializers.CharField()
+
+
+class ReviewModerationErrorSerializer(serializers.Serializer):
+    detail = serializers.CharField()
 
 
 class BaseReviewModerationView(APIView):
@@ -43,32 +52,84 @@ class BaseReviewModerationView(APIView):
 
 
 class HideProductReviewView(BaseReviewModerationView):
-    @extend_schema(request=ModerateReviewRequestSerializer)
+    @extend_schema(
+        request=ModerateReviewRequestSerializer,
+        responses={
+            200: ReviewModerationResponseSerializer,
+            400: ReviewModerationErrorSerializer,
+            403: ReviewModerationErrorSerializer,
+            404: ReviewModerationErrorSerializer,
+        },
+    )
     def post(self, request, review_id):
         return self._execute_moderation(request, review_id, ReviewModerationService.hide_product_review)
 
+
 class RemoveProductReviewView(BaseReviewModerationView):
-    @extend_schema(request=ModerateReviewRequestSerializer)
+    @extend_schema(
+        request=ModerateReviewRequestSerializer,
+        responses={
+            200: ReviewModerationResponseSerializer,
+            400: ReviewModerationErrorSerializer,
+            403: ReviewModerationErrorSerializer,
+            404: ReviewModerationErrorSerializer,
+        },
+    )
     def post(self, request, review_id):
         return self._execute_moderation(request, review_id, ReviewModerationService.remove_product_review)
 
+
 class RestoreProductReviewView(BaseReviewModerationView):
-    @extend_schema(request=RestoreReviewRequestSerializer)
+    @extend_schema(
+        request=RestoreReviewRequestSerializer,
+        responses={
+            200: ReviewModerationResponseSerializer,
+            400: ReviewModerationErrorSerializer,
+            403: ReviewModerationErrorSerializer,
+            404: ReviewModerationErrorSerializer,
+        },
+    )
     def post(self, request, review_id):
         return self._execute_moderation(request, review_id, ReviewModerationService.restore_product_review, require_reason=False)
 
 
 class HideShopReviewView(BaseReviewModerationView):
-    @extend_schema(request=ModerateReviewRequestSerializer)
+    @extend_schema(
+        request=ModerateReviewRequestSerializer,
+        responses={
+            200: ReviewModerationResponseSerializer,
+            400: ReviewModerationErrorSerializer,
+            403: ReviewModerationErrorSerializer,
+            404: ReviewModerationErrorSerializer,
+        },
+    )
     def post(self, request, review_id):
         return self._execute_moderation(request, review_id, ReviewModerationService.hide_shop_review)
 
+
 class RemoveShopReviewView(BaseReviewModerationView):
-    @extend_schema(request=ModerateReviewRequestSerializer)
+    @extend_schema(
+        request=ModerateReviewRequestSerializer,
+        responses={
+            200: ReviewModerationResponseSerializer,
+            400: ReviewModerationErrorSerializer,
+            403: ReviewModerationErrorSerializer,
+            404: ReviewModerationErrorSerializer,
+        },
+    )
     def post(self, request, review_id):
         return self._execute_moderation(request, review_id, ReviewModerationService.remove_shop_review)
 
+
 class RestoreShopReviewView(BaseReviewModerationView):
-    @extend_schema(request=RestoreReviewRequestSerializer)
+    @extend_schema(
+        request=RestoreReviewRequestSerializer,
+        responses={
+            200: ReviewModerationResponseSerializer,
+            400: ReviewModerationErrorSerializer,
+            403: ReviewModerationErrorSerializer,
+            404: ReviewModerationErrorSerializer,
+        },
+    )
     def post(self, request, review_id):
         return self._execute_moderation(request, review_id, ReviewModerationService.restore_shop_review, require_reason=False)
