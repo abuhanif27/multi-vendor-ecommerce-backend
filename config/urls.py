@@ -3,7 +3,6 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.http import JsonResponse
 from django.urls import include, path
 from drf_spectacular.views import (
     SpectacularAPIView,
@@ -11,21 +10,7 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 
-from apps.api.views import HealthCheckAPIView
-
-
-def api_landing_page(request):
-    return JsonResponse(
-        {
-            "name": "Multi-Vendor E-commerce Backend API",
-            "version": "v1",
-            "api": "/api/v1/",
-            "docs": "/docs/",
-            "redoc": "/redoc/",
-            "schema": "/schema/",
-            "health": "/health/",
-        }
-    )
+from apps.api.views import HealthCheckAPIView, developer_portal
 
 
 api_v1_urlpatterns = [
@@ -48,7 +33,7 @@ api_v1_urlpatterns = [
 
 
 urlpatterns = [
-    path("", api_landing_page, name="api-landing-page"),
+    path("", developer_portal, name="developer-portal"),
     path("admin/", admin.site.urls),
     path("health/", HealthCheckAPIView.as_view(), name="health-check-root"),
     path("api/v1/", include(api_v1_urlpatterns)),
