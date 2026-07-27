@@ -31,7 +31,7 @@ info:
 paths:
   /api/v1/admin/products/{product_id}/approve/:
     post:
-      operationId: v1_admin_products_approve_create
+      operationId: api_v1_admin_products_approve_create
       parameters:
       - in: path
         name: product_id
@@ -40,7 +40,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -64,7 +64,7 @@ paths:
           description: ''
   /api/v1/admin/products/{product_id}/reject/:
     post:
-      operationId: v1_admin_products_reject_create
+      operationId: api_v1_admin_products_reject_create
       parameters:
       - in: path
         name: product_id
@@ -73,7 +73,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -98,7 +98,7 @@ paths:
           description: ''
   /api/v1/admin/products/{product_id}/restore/:
     post:
-      operationId: v1_admin_products_restore_create
+      operationId: api_v1_admin_products_restore_create
       parameters:
       - in: path
         name: product_id
@@ -107,7 +107,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -131,7 +131,7 @@ paths:
           description: ''
   /api/v1/admin/products/{product_id}/suspend/:
     post:
-      operationId: v1_admin_products_suspend_create
+      operationId: api_v1_admin_products_suspend_create
       parameters:
       - in: path
         name: product_id
@@ -140,7 +140,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -165,7 +165,7 @@ paths:
           description: ''
   /api/v1/admin/promotions/:
     get:
-      operationId: v1_admin_promotions_list
+      operationId: api_v1_admin_promotions_list
       description: Admin and Vendor APIs to manage promotions.
       parameters:
       - in: query
@@ -207,7 +207,7 @@ paths:
           * `EXPIRED` - Expired
           * `ARCHIVED` - Archived
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - jwt: []
@@ -219,10 +219,10 @@ paths:
                 $ref: '#/components/schemas/PaginatedPromotionList'
           description: ''
     post:
-      operationId: v1_admin_promotions_create
+      operationId: api_v1_admin_promotions_create
       description: Admin and Vendor APIs to manage promotions.
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -247,7 +247,7 @@ paths:
           description: ''
   /api/v1/admin/promotions/{id}/:
     get:
-      operationId: v1_admin_promotions_retrieve
+      operationId: api_v1_admin_promotions_retrieve
       description: Admin and Vendor APIs to manage promotions.
       parameters:
       - in: path
@@ -258,7 +258,7 @@ paths:
         description: A UUID string identifying this promotion.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - jwt: []
@@ -270,7 +270,7 @@ paths:
                 $ref: '#/components/schemas/Promotion'
           description: ''
     put:
-      operationId: v1_admin_promotions_update
+      operationId: api_v1_admin_promotions_update
       description: Admin and Vendor APIs to manage promotions.
       parameters:
       - in: path
@@ -281,7 +281,7 @@ paths:
         description: A UUID string identifying this promotion.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -305,7 +305,7 @@ paths:
                 $ref: '#/components/schemas/Promotion'
           description: ''
     patch:
-      operationId: v1_admin_promotions_partial_update
+      operationId: api_v1_admin_promotions_partial_update
       description: Admin and Vendor APIs to manage promotions.
       parameters:
       - in: path
@@ -316,7 +316,7 @@ paths:
         description: A UUID string identifying this promotion.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -339,7 +339,7 @@ paths:
                 $ref: '#/components/schemas/Promotion'
           description: ''
     delete:
-      operationId: v1_admin_promotions_destroy
+      operationId: api_v1_admin_promotions_destroy
       description: Admin and Vendor APIs to manage promotions.
       parameters:
       - in: path
@@ -350,7 +350,7 @@ paths:
         description: A UUID string identifying this promotion.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - jwt: []
@@ -359,7 +359,7 @@ paths:
           description: No response body
   /api/v1/admin/reviews/product/{review_id}/hide/:
     post:
-      operationId: v1_admin_reviews_product_hide_create
+      operationId: api_v1_admin_reviews_product_hide_create
       parameters:
       - in: path
         name: review_id
@@ -368,7 +368,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -389,7 +389,7 @@ paths:
           description: No response body
   /api/v1/admin/reviews/product/{review_id}/remove/:
     post:
-      operationId: v1_admin_reviews_product_remove_create
+      operationId: api_v1_admin_reviews_product_remove_create
       parameters:
       - in: path
         name: review_id
@@ -398,7 +398,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -419,7 +419,7 @@ paths:
           description: No response body
   /api/v1/admin/reviews/product/{review_id}/restore/:
     post:
-      operationId: v1_admin_reviews_product_restore_create
+      operationId: api_v1_admin_reviews_product_restore_create
       parameters:
       - in: path
         name: review_id
@@ -428,7 +428,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -448,7 +448,7 @@ paths:
           description: No response body
   /api/v1/admin/reviews/shop/{review_id}/hide/:
     post:
-      operationId: v1_admin_reviews_shop_hide_create
+      operationId: api_v1_admin_reviews_shop_hide_create
       parameters:
       - in: path
         name: review_id
@@ -457,7 +457,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -478,7 +478,7 @@ paths:
           description: No response body
   /api/v1/admin/reviews/shop/{review_id}/remove/:
     post:
-      operationId: v1_admin_reviews_shop_remove_create
+      operationId: api_v1_admin_reviews_shop_remove_create
       parameters:
       - in: path
         name: review_id
@@ -487,7 +487,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -508,7 +508,7 @@ paths:
           description: No response body
   /api/v1/admin/reviews/shop/{review_id}/restore/:
     post:
-      operationId: v1_admin_reviews_shop_restore_create
+      operationId: api_v1_admin_reviews_shop_restore_create
       parameters:
       - in: path
         name: review_id
@@ -517,7 +517,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -537,7 +537,7 @@ paths:
           description: No response body
   /api/v1/admin/vendors/{shop_id}/approve/:
     post:
-      operationId: v1_admin_vendors_approve_create
+      operationId: api_v1_admin_vendors_approve_create
       parameters:
       - in: path
         name: shop_id
@@ -546,7 +546,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -570,7 +570,7 @@ paths:
           description: ''
   /api/v1/admin/vendors/{shop_id}/reject/:
     post:
-      operationId: v1_admin_vendors_reject_create
+      operationId: api_v1_admin_vendors_reject_create
       parameters:
       - in: path
         name: shop_id
@@ -579,7 +579,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -604,7 +604,7 @@ paths:
           description: ''
   /api/v1/admin/vendors/{shop_id}/restore/:
     post:
-      operationId: v1_admin_vendors_restore_create
+      operationId: api_v1_admin_vendors_restore_create
       parameters:
       - in: path
         name: shop_id
@@ -613,7 +613,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -637,7 +637,7 @@ paths:
           description: ''
   /api/v1/admin/vendors/{shop_id}/suspend/:
     post:
-      operationId: v1_admin_vendors_suspend_create
+      operationId: api_v1_admin_vendors_suspend_create
       parameters:
       - in: path
         name: shop_id
@@ -646,7 +646,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -671,7 +671,7 @@ paths:
           description: ''
   /api/v1/analytics/dashboard/:
     get:
-      operationId: v1_analytics_dashboard_retrieve
+      operationId: api_v1_analytics_dashboard_retrieve
       description: Read-only dashboards and analytics exports.
       parameters:
       - in: query
@@ -693,7 +693,7 @@ paths:
           format: date
         description: YYYY-MM-DD
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - jwt: []
@@ -706,7 +706,7 @@ paths:
           description: ''
   /api/v1/analytics/export-sales/:
     post:
-      operationId: v1_analytics_export_sales_create
+      operationId: api_v1_analytics_export_sales_create
       description: Triggers an asynchronous export of sales data.
       parameters:
       - in: query
@@ -727,7 +727,7 @@ paths:
           format: date
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - jwt: []
@@ -736,7 +736,7 @@ paths:
           description: No response body
   /api/v1/auth/login/:
     post:
-      operationId: v1_auth_login_create
+      operationId: api_v1_auth_login_create
       description: |2
 
         Login to an existing customer account.
@@ -766,7 +766,7 @@ paths:
           description: No response body
   /api/v1/auth/register/:
     post:
-      operationId: v1_auth_register_create
+      operationId: api_v1_auth_register_create
       description: |2
 
         Register a new customer account.
@@ -798,7 +798,7 @@ paths:
           description: No response body
   /api/v1/auth/verify-email/:
     get:
-      operationId: v1_auth_verify_email_retrieve
+      operationId: api_v1_auth_verify_email_retrieve
       description: |2
 
         Verify a user's email address using the verification token.
@@ -825,7 +825,7 @@ paths:
           description: No response body
   /api/v1/cart/:
     get:
-      operationId: v1_cart_retrieve
+      operationId: api_v1_cart_retrieve
       description: Retrieve the current user's active cart.
       summary: Get Cart
       tags:
@@ -842,7 +842,7 @@ paths:
           description: ''
   /api/v1/cart/items/:
     post:
-      operationId: v1_cart_items_create
+      operationId: api_v1_cart_items_create
       description: Add a product variant to the cart by SKU.
       summary: Add Item to Cart
       tags:
@@ -879,7 +879,7 @@ paths:
           description: Cart cleared
   /api/v1/cart/items/{id}/:
     patch:
-      operationId: v1_cart_items_partial_update
+      operationId: api_v1_cart_items_partial_update
       description: Update the quantity of a specific cart item.
       summary: Update Cart Item
       parameters:
@@ -929,7 +929,7 @@ paths:
           description: Item removed
   /api/v1/categories/:
     get:
-      operationId: v1_categories_list
+      operationId: api_v1_categories_list
       description: |2
 
         Returns all active categories.
@@ -988,7 +988,7 @@ paths:
           description: ''
   /api/v1/categories/{slug}/:
     get:
-      operationId: v1_categories_retrieve
+      operationId: api_v1_categories_retrieve
       description: |2
 
         Retrieve a category by its slug.
@@ -1027,7 +1027,7 @@ paths:
           description: No response body
   /api/v1/checkout/:
     get:
-      operationId: v1_checkout_retrieve
+      operationId: api_v1_checkout_retrieve
       description: Retrieve checkout summary including cart items, warnings, and totals.
       summary: Get Checkout Summary
       tags:
@@ -1043,7 +1043,7 @@ paths:
                 $ref: '#/components/schemas/CheckoutSummary'
           description: ''
     post:
-      operationId: v1_checkout_create
+      operationId: api_v1_checkout_create
       description: Submit shipping/billing addresses to process checkout and create
         an order.
       summary: Process Checkout
@@ -1071,7 +1071,7 @@ paths:
           description: Validation error
   /api/v1/health/:
     get:
-      operationId: v1_health_retrieve
+      operationId: api_v1_health_retrieve
       description: Returns the status of the API.
       summary: Health Check
       tags:
@@ -1089,7 +1089,7 @@ paths:
           description: ''
   /api/v1/me/:
     get:
-      operationId: v1_me_retrieve
+      operationId: api_v1_me_retrieve
       description: Returns the currently authenticated user's basic info.
       summary: Get Current User
       tags:
@@ -1107,7 +1107,7 @@ paths:
           description: User info
   /api/v1/my/products/:
     get:
-      operationId: v1_my_products_list
+      operationId: api_v1_my_products_list
       description: Returns all products owned by the authenticated vendor.
       summary: My products
       parameters:
@@ -1147,7 +1147,7 @@ paths:
           description: No response body
   /api/v1/my/shops/:
     get:
-      operationId: v1_my_shops_list
+      operationId: api_v1_my_shops_list
       description: Returns all shops owned by the authenticated vendor.
       summary: My shops
       parameters:
@@ -1187,7 +1187,7 @@ paths:
           description: No response body
   /api/v1/notifications/:
     get:
-      operationId: v1_notifications_list
+      operationId: api_v1_notifications_list
       description: 'GET: Returns a paginated list of IN_APP notifications for the
         authenticated user.'
       parameters:
@@ -1210,7 +1210,7 @@ paths:
         schema:
           type: string
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - jwt: []
@@ -1223,7 +1223,7 @@ paths:
           description: ''
   /api/v1/notifications/{id}/read/:
     patch:
-      operationId: v1_notifications_read_partial_update
+      operationId: api_v1_notifications_read_partial_update
       description: 'PATCH: Marks a specific notification as read.'
       parameters:
       - in: path
@@ -1233,7 +1233,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - jwt: []
@@ -1246,11 +1246,11 @@ paths:
           description: ''
   /api/v1/notifications/read-all/:
     post:
-      operationId: v1_notifications_read_all_create
+      operationId: api_v1_notifications_read_all_create
       description: 'POST: Bulk marks all unread IN_APP notifications as read for the
         authenticated user.'
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - jwt: []
@@ -1266,7 +1266,7 @@ paths:
           description: ''
   /api/v1/orders/:
     get:
-      operationId: v1_orders_list
+      operationId: api_v1_orders_list
       description: List all orders for the authenticated buyer.
       summary: List Orders
       parameters:
@@ -1302,7 +1302,7 @@ paths:
           description: ''
   /api/v1/orders/{id}/:
     get:
-      operationId: v1_orders_retrieve
+      operationId: api_v1_orders_retrieve
       description: Retrieve specific order details for the authenticated buyer.
       summary: Retrieve Order
       parameters:
@@ -1326,7 +1326,7 @@ paths:
           description: ''
   /api/v1/payments/create/:
     post:
-      operationId: v1_payments_create_create
+      operationId: api_v1_payments_create_create
       description: Initialize a payment for an order using a specified provider.
       summary: Initialize Payment
       tags:
@@ -1358,7 +1358,7 @@ paths:
           description: Bad Request or not implemented
   /api/v1/product-reviews/:
     get:
-      operationId: v1_product_reviews_list
+      operationId: api_v1_product_reviews_list
       parameters:
       - name: ordering
         required: false
@@ -1377,7 +1377,7 @@ paths:
         schema:
           type: integer
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - jwt: []
@@ -1390,9 +1390,9 @@ paths:
                 $ref: '#/components/schemas/PaginatedProductReviewList'
           description: ''
     post:
-      operationId: v1_product_reviews_create
+      operationId: api_v1_product_reviews_create
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -1417,7 +1417,7 @@ paths:
           description: ''
   /api/v1/product-reviews/{id}/:
     get:
-      operationId: v1_product_reviews_retrieve
+      operationId: api_v1_product_reviews_retrieve
       parameters:
       - in: path
         name: id
@@ -1427,7 +1427,7 @@ paths:
         description: A UUID string identifying this product review.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - jwt: []
@@ -1440,7 +1440,7 @@ paths:
                 $ref: '#/components/schemas/ProductReview'
           description: ''
     put:
-      operationId: v1_product_reviews_update
+      operationId: api_v1_product_reviews_update
       parameters:
       - in: path
         name: id
@@ -1450,7 +1450,7 @@ paths:
         description: A UUID string identifying this product review.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -1474,7 +1474,7 @@ paths:
                 $ref: '#/components/schemas/ProductReview'
           description: ''
     patch:
-      operationId: v1_product_reviews_partial_update
+      operationId: api_v1_product_reviews_partial_update
       parameters:
       - in: path
         name: id
@@ -1484,7 +1484,7 @@ paths:
         description: A UUID string identifying this product review.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -1507,7 +1507,7 @@ paths:
                 $ref: '#/components/schemas/ProductReview'
           description: ''
     delete:
-      operationId: v1_product_reviews_destroy
+      operationId: api_v1_product_reviews_destroy
       parameters:
       - in: path
         name: id
@@ -1517,7 +1517,7 @@ paths:
         description: A UUID string identifying this product review.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - jwt: []
@@ -1526,7 +1526,7 @@ paths:
           description: No response body
   /api/v1/product-reviews/{id}/report/:
     post:
-      operationId: v1_product_reviews_report_create
+      operationId: api_v1_product_reviews_report_create
       parameters:
       - in: path
         name: id
@@ -1536,7 +1536,7 @@ paths:
         description: A UUID string identifying this product review.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -1561,7 +1561,7 @@ paths:
           description: ''
   /api/v1/products/:
     get:
-      operationId: v1_products_list
+      operationId: api_v1_products_list
       description: |2
 
         Returns active products from approved shops.
@@ -1629,7 +1629,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedProductList'
           description: ''
     post:
-      operationId: v1_products_create
+      operationId: api_v1_products_create
       description: |2
 
         Creates a new product for the authenticated vendor.
@@ -1682,7 +1682,7 @@ paths:
           description: No response body
   /api/v1/products/{slug}/:
     get:
-      operationId: v1_products_retrieve
+      operationId: api_v1_products_retrieve
       description: |2
 
         Retrieve a single active product by its slug.
@@ -1711,7 +1711,7 @@ paths:
         '404':
           description: No response body
     patch:
-      operationId: v1_products_partial_update
+      operationId: api_v1_products_partial_update
       description: |2
 
         Partially update a product.
@@ -1765,7 +1765,7 @@ paths:
         '404':
           description: No response body
     delete:
-      operationId: v1_products_destroy
+      operationId: api_v1_products_destroy
       description: |2
 
         Delete a product.
@@ -1797,11 +1797,11 @@ paths:
           description: No response body
   /api/v1/promotions/validate/:
     post:
-      operationId: v1_promotions_validate_create
+      operationId: api_v1_promotions_validate_create
       description: Public APIs for buyers to view automatic promotions and validate
         coupons.
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -1826,7 +1826,7 @@ paths:
           description: ''
   /api/v1/shipping/my-shipments/:
     get:
-      operationId: v1_shipping_my_shipments_list
+      operationId: api_v1_shipping_my_shipments_list
       description: 'GET: List shipments for a specific parent order belonging to the
         buyer.'
       parameters:
@@ -1849,7 +1849,7 @@ paths:
         schema:
           type: string
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - jwt: []
@@ -1862,7 +1862,7 @@ paths:
           description: ''
   /api/v1/shipping/shipments/{id}/:
     get:
-      operationId: v1_shipping_shipments_retrieve
+      operationId: api_v1_shipping_shipments_retrieve
       description: 'GET: View shipment details (Vendor only).'
       parameters:
       - in: path
@@ -1872,7 +1872,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - jwt: []
@@ -1885,7 +1885,7 @@ paths:
           description: ''
   /api/v1/shipping/shipments/{id}/assign-courier/:
     post:
-      operationId: v1_shipping_shipments_assign_courier_create
+      operationId: api_v1_shipping_shipments_assign_courier_create
       description: 'POST: Assign courier and tracking number.'
       parameters:
       - in: path
@@ -1895,7 +1895,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -1920,7 +1920,7 @@ paths:
           description: ''
   /api/v1/shipping/shipments/{id}/update-status/:
     patch:
-      operationId: v1_shipping_shipments_update_status_partial_update
+      operationId: api_v1_shipping_shipments_update_status_partial_update
       description: 'PATCH: Update physical tracking state of the shipment.'
       parameters:
       - in: path
@@ -1930,7 +1930,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -1954,7 +1954,7 @@ paths:
           description: ''
   /api/v1/shop-reviews/:
     get:
-      operationId: v1_shop_reviews_list
+      operationId: api_v1_shop_reviews_list
       parameters:
       - name: ordering
         required: false
@@ -1973,7 +1973,7 @@ paths:
         schema:
           type: integer
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - jwt: []
@@ -1986,9 +1986,9 @@ paths:
                 $ref: '#/components/schemas/PaginatedShopReviewList'
           description: ''
     post:
-      operationId: v1_shop_reviews_create
+      operationId: api_v1_shop_reviews_create
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -2013,7 +2013,7 @@ paths:
           description: ''
   /api/v1/shop-reviews/{id}/:
     get:
-      operationId: v1_shop_reviews_retrieve
+      operationId: api_v1_shop_reviews_retrieve
       parameters:
       - in: path
         name: id
@@ -2023,7 +2023,7 @@ paths:
         description: A UUID string identifying this shop review.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - jwt: []
@@ -2036,7 +2036,7 @@ paths:
                 $ref: '#/components/schemas/ShopReview'
           description: ''
     put:
-      operationId: v1_shop_reviews_update
+      operationId: api_v1_shop_reviews_update
       parameters:
       - in: path
         name: id
@@ -2046,7 +2046,7 @@ paths:
         description: A UUID string identifying this shop review.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -2070,7 +2070,7 @@ paths:
                 $ref: '#/components/schemas/ShopReview'
           description: ''
     patch:
-      operationId: v1_shop_reviews_partial_update
+      operationId: api_v1_shop_reviews_partial_update
       parameters:
       - in: path
         name: id
@@ -2080,7 +2080,7 @@ paths:
         description: A UUID string identifying this shop review.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -2103,7 +2103,7 @@ paths:
                 $ref: '#/components/schemas/ShopReview'
           description: ''
     delete:
-      operationId: v1_shop_reviews_destroy
+      operationId: api_v1_shop_reviews_destroy
       parameters:
       - in: path
         name: id
@@ -2113,7 +2113,7 @@ paths:
         description: A UUID string identifying this shop review.
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - jwt: []
@@ -2122,7 +2122,7 @@ paths:
           description: No response body
   /api/v1/shop-reviews/{id}/report/:
     post:
-      operationId: v1_shop_reviews_report_create
+      operationId: api_v1_shop_reviews_report_create
       parameters:
       - in: path
         name: id
@@ -2132,7 +2132,7 @@ paths:
         description: A UUID string identifying this shop review.
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -2157,7 +2157,7 @@ paths:
           description: ''
   /api/v1/shops/:
     get:
-      operationId: v1_shops_list
+      operationId: api_v1_shops_list
       description: |2
 
         Returns all approved shops.
@@ -2199,7 +2199,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedShopList'
           description: ''
     post:
-      operationId: v1_shops_create
+      operationId: api_v1_shops_create
       description: |2
 
         Creates a new shop for the authenticated vendor.
@@ -2244,7 +2244,7 @@ paths:
           description: No response body
   /api/v1/shops/{shop_slug}/products/{product_slug}/images/:
     post:
-      operationId: v1_shops_products_images_create
+      operationId: api_v1_shops_products_images_create
       description: Resolve the parent product from the URL.
       parameters:
       - in: path
@@ -2258,7 +2258,7 @@ paths:
           type: string
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -2283,7 +2283,7 @@ paths:
           description: ''
   /api/v1/shops/{shop_slug}/products/{product_slug}/images/{id}/:
     get:
-      operationId: v1_shops_products_images_retrieve
+      operationId: api_v1_shops_products_images_retrieve
       description: Resolve the parent product from the URL.
       parameters:
       - in: path
@@ -2303,7 +2303,7 @@ paths:
           type: string
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - jwt: []
@@ -2316,7 +2316,7 @@ paths:
                 $ref: '#/components/schemas/ProductImageRead'
           description: ''
     put:
-      operationId: v1_shops_products_images_update
+      operationId: api_v1_shops_products_images_update
       description: Resolve the parent product from the URL.
       parameters:
       - in: path
@@ -2336,7 +2336,7 @@ paths:
           type: string
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -2360,7 +2360,7 @@ paths:
                 $ref: '#/components/schemas/ProductImageWrite'
           description: ''
     patch:
-      operationId: v1_shops_products_images_partial_update
+      operationId: api_v1_shops_products_images_partial_update
       description: Resolve the parent product from the URL.
       parameters:
       - in: path
@@ -2380,7 +2380,7 @@ paths:
           type: string
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -2403,7 +2403,7 @@ paths:
                 $ref: '#/components/schemas/ProductImageWrite'
           description: ''
     delete:
-      operationId: v1_shops_products_images_destroy
+      operationId: api_v1_shops_products_images_destroy
       description: Resolve the parent product from the URL.
       parameters:
       - in: path
@@ -2423,7 +2423,7 @@ paths:
           type: string
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - jwt: []
@@ -2432,7 +2432,7 @@ paths:
           description: No response body
   /api/v1/shops/{shop_slug}/products/{product_slug}/variants/:
     get:
-      operationId: v1_shops_products_variants_list
+      operationId: api_v1_shops_products_variants_list
       description: List and create product variants.
       parameters:
       - name: ordering
@@ -2464,7 +2464,7 @@ paths:
           type: string
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - jwt: []
@@ -2477,7 +2477,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedVariantReadList'
           description: ''
     post:
-      operationId: v1_shops_products_variants_create
+      operationId: api_v1_shops_products_variants_create
       description: List and create product variants.
       parameters:
       - in: path
@@ -2491,7 +2491,7 @@ paths:
           type: string
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -2516,7 +2516,7 @@ paths:
           description: ''
   /api/v1/shops/{shop_slug}/products/{product_slug}/variants/{sku}/:
     get:
-      operationId: v1_shops_products_variants_retrieve
+      operationId: api_v1_shops_products_variants_retrieve
       description: Retrieve, update, and delete a product variant.
       parameters:
       - in: path
@@ -2535,7 +2535,7 @@ paths:
           type: string
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - jwt: []
@@ -2548,7 +2548,7 @@ paths:
                 $ref: '#/components/schemas/VariantRead'
           description: ''
     put:
-      operationId: v1_shops_products_variants_update
+      operationId: api_v1_shops_products_variants_update
       description: Retrieve, update, and delete a product variant.
       parameters:
       - in: path
@@ -2567,7 +2567,7 @@ paths:
           type: string
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -2591,7 +2591,7 @@ paths:
                 $ref: '#/components/schemas/VariantWrite'
           description: ''
     patch:
-      operationId: v1_shops_products_variants_partial_update
+      operationId: api_v1_shops_products_variants_partial_update
       description: Retrieve, update, and delete a product variant.
       parameters:
       - in: path
@@ -2610,7 +2610,7 @@ paths:
           type: string
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -2633,7 +2633,7 @@ paths:
                 $ref: '#/components/schemas/VariantWrite'
           description: ''
     delete:
-      operationId: v1_shops_products_variants_destroy
+      operationId: api_v1_shops_products_variants_destroy
       description: Retrieve, update, and delete a product variant.
       parameters:
       - in: path
@@ -2652,7 +2652,7 @@ paths:
           type: string
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - jwt: []
@@ -2661,7 +2661,7 @@ paths:
           description: No response body
   /api/v1/shops/{shop_slug}/products/{product_slug}/variants/{sku}/images/:
     post:
-      operationId: v1_shops_products_variants_images_create
+      operationId: api_v1_shops_products_variants_images_create
       description: Resolve the parent product from the URL.
       parameters:
       - in: path
@@ -2680,7 +2680,7 @@ paths:
           type: string
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -2705,7 +2705,7 @@ paths:
           description: ''
   /api/v1/shops/{shop_slug}/products/{product_slug}/variants/{sku}/images/{id}/:
     get:
-      operationId: v1_shops_products_variants_images_retrieve
+      operationId: api_v1_shops_products_variants_images_retrieve
       description: Resolve the parent product from the URL.
       parameters:
       - in: path
@@ -2730,7 +2730,7 @@ paths:
           type: string
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - jwt: []
@@ -2743,7 +2743,7 @@ paths:
                 $ref: '#/components/schemas/VariantImageRead'
           description: ''
     put:
-      operationId: v1_shops_products_variants_images_update
+      operationId: api_v1_shops_products_variants_images_update
       description: Resolve the parent product from the URL.
       parameters:
       - in: path
@@ -2768,7 +2768,7 @@ paths:
           type: string
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -2792,7 +2792,7 @@ paths:
                 $ref: '#/components/schemas/VariantImageWrite'
           description: ''
     patch:
-      operationId: v1_shops_products_variants_images_partial_update
+      operationId: api_v1_shops_products_variants_images_partial_update
       description: Resolve the parent product from the URL.
       parameters:
       - in: path
@@ -2817,7 +2817,7 @@ paths:
           type: string
         required: true
       tags:
-      - v1
+      - api
       requestBody:
         content:
           application/json:
@@ -2840,7 +2840,7 @@ paths:
                 $ref: '#/components/schemas/VariantImageWrite'
           description: ''
     delete:
-      operationId: v1_shops_products_variants_images_destroy
+      operationId: api_v1_shops_products_variants_images_destroy
       description: Resolve the parent product from the URL.
       parameters:
       - in: path
@@ -2865,7 +2865,7 @@ paths:
           type: string
         required: true
       tags:
-      - v1
+      - api
       security:
       - jwtAuth: []
       - jwt: []
@@ -2874,7 +2874,7 @@ paths:
           description: No response body
   /api/v1/shops/{shop_slug}/products/{product_slug}/variants/{sku}/inventory/:
     get:
-      operationId: v1_shops_products_variants_inventory_retrieve
+      operationId: api_v1_shops_products_variants_inventory_retrieve
       description: Retrieve full inventory ledger for a variant. Accessible only to
         the shop owner.
       summary: Get Inventory Detail
@@ -2908,7 +2908,7 @@ paths:
           description: ''
   /api/v1/shops/{shop_slug}/products/{product_slug}/variants/{sku}/inventory/transactions/:
     get:
-      operationId: v1_shops_products_variants_inventory_transactions_list
+      operationId: api_v1_shops_products_variants_inventory_transactions_list
       description: List history of inventory transactions.
       summary: List Inventory Transactions
       parameters:
@@ -2958,7 +2958,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedInventoryTransactionList'
           description: ''
     post:
-      operationId: v1_shops_products_variants_inventory_transactions_create
+      operationId: api_v1_shops_products_variants_inventory_transactions_create
       description: Create a new transaction (increase, decrease, adjust).
       summary: Create Inventory Transaction
       parameters:
@@ -3003,7 +3003,7 @@ paths:
           description: ''
   /api/v1/shops/{slug}/:
     get:
-      operationId: v1_shops_retrieve
+      operationId: api_v1_shops_retrieve
       description: |2
 
         Retrieve a single active Shop by its slug.
@@ -3032,7 +3032,7 @@ paths:
         '404':
           description: No response body
     patch:
-      operationId: v1_shops_partial_update
+      operationId: api_v1_shops_partial_update
       description: |2
 
         Partially update a Shop.
@@ -3085,7 +3085,7 @@ paths:
         '404':
           description: No response body
     delete:
-      operationId: v1_shops_destroy
+      operationId: api_v1_shops_destroy
       description: |2
 
         Delete a Shop.
@@ -3117,7 +3117,7 @@ paths:
           description: No response body
   /api/v1/vendor-orders/:
     get:
-      operationId: v1_vendor_orders_list
+      operationId: api_v1_vendor_orders_list
       description: List all vendor orders (sub-orders) for the authenticated vendor's
         shops.
       summary: List Vendor Orders
@@ -3154,7 +3154,7 @@ paths:
           description: ''
   /api/v1/vendor-orders/{id}/:
     get:
-      operationId: v1_vendor_orders_retrieve
+      operationId: api_v1_vendor_orders_retrieve
       description: Retrieve a specific vendor order.
       summary: Retrieve Vendor Order
       parameters:
@@ -3175,6 +3175,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VendorOrder'
+          description: ''
+  /health/:
+    get:
+      operationId: health_retrieve
+      description: Returns the status of the API.
+      summary: Health Check
+      tags:
+      - Core
+      security:
+      - jwtAuth: []
+      - jwt: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheck'
           description: ''
 components:
   schemas:
